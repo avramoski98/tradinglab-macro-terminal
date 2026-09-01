@@ -19,6 +19,18 @@ jobs:
           ref: main
       - name: Patch terminal UI
         run: python tools/upgrade_live_ui.py
+      - name: Set 15-second news refresh
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('FinancialJuice headlines refresh every 60 seconds','FinancialJuice headlines refresh every 15 seconds')
+          s=s.replace('Auto refresh: 60s · high-impact macro / regime changes glow red','Auto refresh: 15s · high-impact macro / regime changes glow red')
+          s=s.replace('FinancialJuice headlines refresh every 60 seconds.','FinancialJuice headlines refresh every 15 seconds.')
+          s=s.replace('setInterval(loadNews,60000)','setInterval(loadNews,15000)')
+          p.write_text(s)
+          PY
       - name: Commit upgraded terminal
         run: |
           git config user.name "TradingLab Automation"
@@ -28,5 +40,5 @@ jobs:
             echo "No UI changes needed"
             exit 0
           fi
-          git commit -m "Enable live FinancialJuice G10 catalyst ranking"
+          git commit -m "Set FinancialJuice refresh to 15 seconds"
           git push origin HEAD:main
