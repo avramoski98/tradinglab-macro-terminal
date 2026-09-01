@@ -1,0 +1,40 @@
+name: Update terminal header time
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/update-header-time.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Update timestamp only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          old = 'Updated 30 Aug 2026 · Week of 31 Aug–4 Sep · click any currency for full reasoning'
+          new = 'Updated 1 Sep 2026 · 17:52 · Week of 31 Aug–4 Sep · click any currency for full reasoning'
+          if old in s:
+              p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Commit timestamp
+        run: |
+          git config user.name "TradingLab Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No timestamp change needed"
+            exit 0
+          fi
+          git commit -m "Set terminal timestamp to 17:52"
+          git push origin HEAD:main
