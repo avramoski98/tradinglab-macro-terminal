@@ -31,33 +31,6 @@ jobs:
           s=s.replace('setInterval(loadNews,60000)','setInterval(loadNews,15000)')
           p.write_text(s)
           PY
-      - name: Mark released calendar events from live macro feed
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
-          p=Path('index.html')
-          s=p.read_text()
-
-          s=s.replace('Updated 30 Aug 2026 · Week of 31 Aug–4 Sep · click any currency for full reasoning',
-                      'Updated 1 Sep 2026 · 17:52 · Week of 31 Aug–4 Sep · click any currency for full reasoning')
-
-          helpers = r'''const CAL_MACRO_STORE='tl_calendar_macro_v1';
-function calendarMacroHistory(){try{return JSON.parse(localStorage.getItem(CAL_MACRO_STORE)||'[]')}catch(e){return[]}}
-function saveCalendarMacro(items){try{let all=[...(items||[]),...calendarMacroHistory()],seen=new Set(),out=[];for(const u of all){let k=[u.date,u.ccy,u.event,u.actual].join('|');if(seen.has(k))continue;seen.add(k);out.push(u)}localStorage.setItem(CAL_MACRO_STORE,JSON.stringify(out.slice(0,240)))}catch(e){}}
-function allCalendarMacro(){let all=[...(newsData.macroUpdates||[]),...calendarMacroHistory()],seen=new Set();return all.filter(u=>{let k=[u.date,u.ccy,u.event,u.actual].join('|');if(seen.has(k))return false;seen.add(k);return true})}
-function skopjeDate(v){let d=new Date(v);if(!isFinite(d))return'';let q=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Skopje',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d),m={};q.forEach(z=>m[z.type]=z.value);return `${m.year}-${m.month}-${m.day}`}
-function calendarEventMatch(cal,u){let a=String(cal||'').toLowerCase(),b=[u.event,u.kind,u.headline].join(' ').toLowerCase();let rules=[[/nonfarm|payroll|\bnfp\b/,/nonfarm|payroll|\bnfp\b/],[/unemployment/,/unemployment/],[/cpi|hicp|inflation/,/cpi|hicp|inflation/],[/ism manufacturing/,/ism.*manufacturing|manufacturing.*ism/],[/ism services/,/ism.*services|services.*ism/],[/jolts/,/jolts|job openings/],[/retail sales/,/retail sales/],[/industrial production/,/industrial production/],[/manufacturing pmi/,/manufacturing pmi/],[/services pmi/,/services pmi/],[/\bgdp\b/,/\bgdp\b/],[/employment change/,/employment change|employment level/],[/rate decision|ocr|cash rate|bank rate/,/rate decision|interest rate|policy rate|ocr|cash rate|bank rate/]];let hit=false;for(const [ra,rb] of rules)if(ra.test(a)&&rb.test(b))hit=true;return hit}
-function calendarHits(x){return allCalendarMacro().filter(u=>u.ccy===x[2]&&skopjeDate(u.date)===x[0]&&calendarEventMatch(x[3],u)).sort((a,b)=>new Date(a.date)-new Date(b.date))}
-function calendar(){let rows=[...STATIC_CAL].sort((a,b)=>(a[0]+a[1]).localeCompare(b[0]+b[1]));let sev=x=>String(x).replace(/[^A-Z]/g,'');$('#calendar').innerHTML=`<div class="card"><div class="call"><b>Times are Europe/Skopje (CEST).</b> Calendar auto-marks a scheduled event as <b>RELEASED</b> when FinancialJuice returns a structured Actual / Forecast / Previous result. The same release can then feed the G10 catalyst layer.</div><div style="overflow:auto"><div class="calrow head"><div>Date</div><div>Time</div><div>CCY</div><div>Event</div><div>Previous</div><div>Forecast</div><div>TradingLab Trigger</div></div>${rows.map(x=>{let hits=calendarHits(x),released=hits.length>0,summary=hits.map(u=>`${esc(u.kind||u.event)}: <b>${esc(u.actual)}</b> vs ${esc(u.forecast)} · <span class="${u.result==='BEAT'?'good':u.result==='MISS'?'bad':'warn'}">${esc(u.result)}</span>`).join(' · ');return `<div class="calrow"><div class="caldate">${esc(x[0].slice(5))}</div><div>${esc(x[1])}</div><div><b>${esc(x[2])}</b><br><span class="severity ${sev(x[7])}">${esc(x[7])}</span></div><div><b>${esc(x[3])}</b><div class="mini" style="margin-top:4px">${released?'<span class="tag green">RELEASED</span> '+summary:'<span class="tag gray">PENDING</span>'}</div><div class="mini">${esc(x[8])}</div></div><div>${esc(x[4])}</div><div>${esc(x[5])}</div><div class="trigger">${esc(x[9])}</div></div>`}).join('')}</div></div>`}'''
-
-          s, n = re.subn(r'function calendar\(\)\{.*?\}\nfunction live\(\)', helpers+'\nfunction live()', s, count=1, flags=re.S)
-          if n != 1:
-              raise SystemExit('calendar function patch target not found')
-
-          s=s.replace("newsData={financialjuice:d.items||d.financialjuice||[],macroUpdates:d.macroUpdates||[],reuters:d.reuters||[],reutersConfigured:!!d.reutersConfigured};newsMode=", "newsData={financialjuice:d.items||d.financialjuice||[],macroUpdates:d.macroUpdates||[],reuters:d.reuters||[],reutersConfigured:!!d.reutersConfigured};saveCalendarMacro(newsData.macroUpdates);newsMode=")
-          p.write_text(s)
-          PY
       - name: Commit upgraded terminal
         run: |
           git config user.name "TradingLab Automation"
@@ -67,5 +40,5 @@ function calendar(){let rows=[...STATIC_CAL].sort((a,b)=>(a[0]+a[1]).localeCompa
             echo "No UI changes needed"
             exit 0
           fi
-          git commit -m "Auto-mark released macro calendar events"
+          git commit -m "Set FinancialJuice refresh to 15 seconds"
           git push origin HEAD:main
