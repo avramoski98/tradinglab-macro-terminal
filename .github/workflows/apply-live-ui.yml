@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - tools/upgrade_live_ui.py
+      - tools/calendar_live_patch.py
       - .github/workflows/apply-live-ui.yml
 
 permissions:
@@ -31,6 +32,8 @@ jobs:
           s=s.replace('setInterval(loadNews,60000)','setInterval(loadNews,15000)')
           p.write_text(s)
           PY
+      - name: Update calendar release status
+        run: python tools/calendar_live_patch.py
       - name: Commit upgraded terminal
         run: |
           git config user.name "TradingLab Automation"
@@ -40,5 +43,5 @@ jobs:
             echo "No UI changes needed"
             exit 0
           fi
-          git commit -m "Set FinancialJuice refresh to 15 seconds"
+          git commit -m "Auto-mark released macro calendar events"
           git push origin HEAD:main
