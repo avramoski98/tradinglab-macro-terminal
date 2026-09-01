@@ -1,0 +1,32 @@
+name: Apply TradingLab live UI upgrade
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/upgrade_live_ui.py
+      - .github/workflows/apply-live-ui.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch terminal UI
+        run: python tools/upgrade_live_ui.py
+      - name: Commit upgraded terminal
+        run: |
+          git config user.name "TradingLab Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No UI changes needed"
+            exit 0
+          fi
+          git commit -m "Enable live FinancialJuice G10 catalyst ranking"
+          git push origin HEAD:main
