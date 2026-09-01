@@ -4,14 +4,9 @@ import re
 p=Path('index.html')
 s=p.read_text()
 
-# Make the header explicit that the terminal uses Skopje/Belgrade local time.
 s=s.replace('Updated 1 Sep 2026 · 17:52 · Week of 31 Aug–4 Sep',
             'Updated 1 Sep 2026 · 17:52 Skopje · Week of 31 Aug–4 Sep')
-s=s.replace('Updated 1 Sep 2026 · 17:52 Skopje · Week of 31 Aug–4 Sep',
-            'Updated 1 Sep 2026 · 17:52 Skopje · Week of 31 Aug–4 Sep')
 
-# Replace the calendar helper/render block with a version that has verified static results
-# for all events already released through ISM/JOLTS, while still accepting future live FJ results.
 block=r'''const CAL_MACRO_STORE='tl_calendar_macro_v1';
 const CAL_RESULT_OVERRIDES=[
  {date:'2026-08-31',ccy:'JPY',test:/Retail Sales.*Industrial Production/i,previous:'Retail 0.6% · IP 1.9% m/m',forecast:'Retail 3.2% · IP -0.7% m/m',actual:'Retail 4.0% · IP 0.1% m/m',verdict:'BEAT',detail:'Retail BEAT +0.8pp · IP BEAT +0.8pp'},
@@ -33,22 +28,18 @@ function calendarOverride(x){return CAL_RESULT_OVERRIDES.find(o=>o.date===x[0]&&
 function verdictClass(v){return /BEAT/.test(v)?'good':/MISS/.test(v)?'bad':'warn'}
 function calendar(){let rows=[...STATIC_CAL].sort((a,b)=>(a[0]+a[1]).localeCompare(b[0]+b[1]));let sev=x=>String(x).replace(/[^A-Z]/g,'');$('#calendar').innerHTML=`<div class="card"><div class="call"><b>Times: Europe/Skopje / Belgrade.</b> Passed releases are locked as <b>RELEASED</b>. Future structured FinancialJuice results can update this table automatically and feed the G10 catalyst layer.</div><div style="overflow:auto"><div class="calrow head" style="grid-template-columns:78px 50px 55px minmax(210px,1.35fr) 120px 120px minmax(210px,1.2fr) minmax(250px,1.3fr)"><div>Date</div><div>Time</div><div>CCY</div><div>Event</div><div>Previous</div><div>Forecast</div><div>Last Update</div><div>TradingLab Trigger</div></div>${rows.map(x=>{let ov=calendarOverride(x),hits=calendarHits(x),live=hits.length?hits[hits.length-1]:null,released=!!ov||!!live;let prev=ov?ov.previous:x[4],fc=ov?ov.forecast:x[5],last='';if(ov)last=`<b>${esc(ov.actual)}</b><div class="${verdictClass(ov.verdict)}" style="margin-top:3px;font-weight:900">${esc(ov.verdict)} · ${esc(ov.detail)}</div>`;else if(live)last=`<b>${esc(live.actual)}</b><div class="${verdictClass(live.result)}" style="margin-top:3px;font-weight:900">${esc(live.result)}</div>`;else last='<span class="tag gray">PENDING</span>';return `<div class="calrow" style="grid-template-columns:78px 50px 55px minmax(210px,1.35fr) 120px 120px minmax(210px,1.2fr) minmax(250px,1.3fr)"><div class="caldate">${esc(x[0].slice(5))}</div><div>${esc(x[1])}</div><div><b>${esc(x[2])}</b><br><span class="severity ${sev(x[7])}">${esc(x[7])}</span></div><div><b>${esc(x[3])}</b><div class="mini" style="margin-top:4px">${released?'<span class="tag green">RELEASED</span>':'<span class="tag gray">PENDING</span>'}</div><div class="mini">${esc(x[8])}</div></div><div>${esc(prev)}</div><div>${esc(fc)}</div><div class="trigger">${last}</div><div class="trigger">${esc(x[9])}</div></div>`}).join('')}</div></div>`}'''
 
-# Replace existing calendar helper block regardless of whether it was already patched.
 pattern=r"const CAL_MACRO_STORE='tl_calendar_macro_v1';.*?\nfunction live\(\)"
 if re.search(pattern,s,re.S):
-    s=re.sub(pattern,block+'\nfunction live()',s,count=1,flags=re.S)
+    s=re.sub(pattern,lambda m:block+'\nfunction live()',s,count=1,flags=re.S)
 else:
-    # Fallback for an older build: replace only the calendar function and prepend helpers.
     m=re.search(r'function calendar\(\)\{.*?\}\nfunction live\(\)',s,re.S)
     if not m: raise SystemExit('calendar patch target not found')
     s=s[:m.start()]+block+'\nfunction live()'+s[m.end():]
 
-# Ensure new live FinancialJuice macro data persists for calendar matching.
 needle="newsData={financialjuice:d.items||d.financialjuice||[],macroUpdates:d.macroUpdates||[],reuters:d.reuters||[],reutersConfigured:!!d.reutersConfigured};"
 if needle in s and 'saveCalendarMacro(newsData.macroUpdates);newsMode=' not in s:
     s=s.replace(needle,needle+'saveCalendarMacro(newsData.macroUpdates);',1)
 
-# Convert news timestamps, last sync and header clock to Europe/Skopje.
 s=re.sub(r"tm=esc\(x\.time\|\|x\.pubDate\|\|''\)","tm=esc(skopjeTime(x.time||x.pubDate||''))",s)
 s=s.replace("$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString();",
             "$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Skopje';")
