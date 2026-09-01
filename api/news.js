@@ -13,4 +13,17 @@ function parseMacro(title,pubDate){let ccy=detectCcy(title),actual=capture(title
 function regimeHighImpact(title=''){let s=title.toLowerCase();return /\b(emergency|intervention|unexpected rate|surprise hike|surprise cut|rate decision|declares war|missile attack|major sanctions|default|capital controls)\b/.test(s)}
 function parseRSS(xml,limit=80){return [...String(xml).matchAll(/<item\b[\s\S]*?<\/item>/gi)].slice(0,limit).map(m=>{let b=m[0],title=tag(b,'title'),pubDate=tag(b,'pubDate'),macro=parseMacro(title,pubDate),cats=[...new Set([...tags(b,'category'),...categories(title)])],highImpact=!!macro?.highImpact||regimeHighImpact(title);return {title,link:tag(b,'link'),url:tag(b,'link'),guid:tag(b,'guid'),pubDate,time:pubDate,categories:cats,highImpact,macro}}).filter(x=>x.title)}
 async function fetchRSS(url,headers={}){let r=await fetch(url,{headers:{Accept:'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.5','User-Agent':'TradingLabMacroTerminal/2.0',...headers}});if(!r.ok)throw new Error(`${r.status} ${r.statusText}`);return parseRSS(await r.text())}
-export default async function handler(req,res){res.setHeader('Cache-Control','s-maxage=20, stale-while-revalidate=40');let items=[],reuters=[],errors=[];try{items=await fetchRSS(FJ_RSS,{Referer:'https://www.financialjuice.com/home'})}catch(e){errors.push('FinancialJuice: '+String(e.message||e))}const reutersUrl=process.env.REUTERS_RSS_URL,reutersToken=process.env.REUTERS_TOKEN;if(reutersUrl){try{reuters=await fetchRSS(reutersUrl,reutersToken?{Authorization:`Bearer ${reutersToken}`}:{})}catch(e){errors.push('Reuters: '+String(e.message||e))}}let macroUpdates=items.filter(x=>x.macro).map(x=>({...x.macro,headline:x.title,link:x.link}));return res.status(200).json({mode:items.length?'live':'degraded',financialJuiceLive:!!items.length,generatedAt:new Date().toISOString(),items,financialjuice:items,macroUpdates,reuters,reutersConfigured:!!reutersUrl,errors});}
+export default async function handler(req,res){
+  res.setHeader('Cache-Control','s-maxage=30, stale-while-revalidate=180');
+  let items=[],reuters=[],errors=[];
+  try{items=await fetchRSS(FJ_RSS,{Referer:'https://www.financialjuice.com/home'})}catch(e){errors.push('FinancialJuice: '+String(e.message||e))}
+  if(!items.length){
+    if(!errors.length)errors.push('FinancialJuice: empty upstream feed');
+    res.setHeader('Cache-Control','no-store');
+    return res.status(503).json({mode:'degraded',financialJuiceLive:false,generatedAt:new Date().toISOString(),items:[],financialjuice:[],macroUpdates:[],reuters:[],reutersConfigured:!!process.env.REUTERS_RSS_URL,errors});
+  }
+  const reutersUrl=process.env.REUTERS_RSS_URL,reutersToken=process.env.REUTERS_TOKEN;
+  if(reutersUrl){try{reuters=await fetchRSS(reutersUrl,reutersToken?{Authorization:`Bearer ${reutersToken}`}:{})}catch(e){errors.push('Reuters: '+String(e.message||e))}}
+  let macroUpdates=items.filter(x=>x.macro).map(x=>({...x.macro,headline:x.title,link:x.link}));
+  return res.status(200).json({mode:'live',financialJuiceLive:true,generatedAt:new Date().toISOString(),items,financialjuice:items,macroUpdates,reuters,reutersConfigured:!!reutersUrl,errors});
+}
