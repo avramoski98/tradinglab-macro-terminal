@@ -37,6 +37,19 @@ jobs:
         run: python tools/calendar_live_patch.py
       - name: Preserve last good FinancialJuice feed
         run: python tools/news_resilience_patch.py
+      - name: Sync Economic Releases with central history
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          new=r'''function live(){let items=allReleaseHistory().map(u=>({date:u.date,currency:u.ccy,event:u.event,previous:u.previous,forecast:u.forecast,actual:u.actual,label:u.result||'RELEASED',impact:Number(u.score)>0?'Strengthens · '+(u.result||'BEAT'):Number(u.score)<0?'Weakens · '+(u.result||'MISS'):(u.result||'Neutral'),why:u.why})).slice(0,120);$('#live').innerHTML=`<div class="livebar"><div><b>Live Macro Feed</b><div class="statusline">Auto refresh: 30s · newest released data first · source: ${esc(sourceMode)}</div></div><button class="refresh" onclick="loadLive(true)">Refresh now</button></div><div class="card"><h3>Economic Releases</h3><div class="feed">${items.length?items.map(renderRelease).join(''):'<div class="mini">No released macro data returned yet.</div>'}</div></div>`}'''
+          s,n=re.subn(r'function live\(\)\{.*?\}\n\nfunction newsCardItem',lambda m:new+'\n\nfunction newsCardItem',s,count=1,flags=re.S)
+          if n!=1:
+              raise SystemExit('Economic Releases live() target not found')
+          p.write_text(s)
+          PY
       - name: Commit upgraded terminal
         run: |
           git config user.name "TradingLab Automation"
@@ -46,5 +59,5 @@ jobs:
             echo "No UI changes needed"
             exit 0
           fi
-          git commit -m "Keep FinancialJuice headlines during feed retries"
+          git commit -m "Sync Economic Releases with live history"
           git push origin HEAD:main
