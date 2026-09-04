@@ -15,3 +15,5 @@ Browser reminders require the terminal to remain open. True closed-browser push 
 
 
 Institutional monitor upgrade (30 Aug): Bloomberg-inspired dense market tape + compact G10 monitor. Market tape values are labeled 28 Aug snapshots unless a live market-price provider is added.
+
+Redeploy marker: 04 Sep 2026 14:13 Prilep — force clean production rebuild after rollback.
