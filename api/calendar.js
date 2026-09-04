@@ -1,4 +1,76 @@
-const COUNTRY_TO_CCY={"United States":"USD","Euro Area":"EUR","European Union":"EUR","United Kingdom":"GBP","Japan":"JPY","Switzerland":"CHF","Australia":"AUD","New Zealand":"NZD","Canada":"CAD","Sweden":"SEK","Norway":"NOK"};
-function num(v){if(v==null)return NaN;return Number(String(v).replace(/[^0-9+-.]/g,''));}
-function infer(ev,a0,f0){const a=num(a0),f=num(f0);if(!Number.isFinite(a)||!Number.isFinite(f))return{label:'Update',impact:'Neutral'};if(a===f)return{label:'Neutral',impact:'Neutral'};const lower=/unemployment|jobless|claims|deficit/i.test(ev||'');const pos=lower?a<f:a>f;return{label:a>f?'Beat':'Miss',impact:pos?'Strengthens':'Weakens'};}
-export default async function handler(req,res){res.setHeader('Cache-Control','s-maxage=15, stale-while-revalidate=45');const key=process.env.TRADING_ECONOMICS_KEY;if(!key)return res.status(200).json({mode:'seed',provider:'none',events:[],notice:'Set TRADING_ECONOMICS_KEY to enable live G10 calendar data.'});try{const now=new Date(),from=new Date(now.getTime()-72*3600e3),to=new Date(now.getTime()+8*86400e3);const d=x=>x.toISOString().slice(0,10);const countries='United%20States,Euro%20Area,United%20Kingdom,Japan,Switzerland,Australia,New%20Zealand,Canada,Sweden,Norway';const url=`https://api.tradingeconomics.com/calendar/country/${countries}/${d(from)}/${d(to)}?c=${encodeURIComponent(key)}`;const r=await fetch(url,{headers:{Accept:'application/json'}});if(!r.ok)throw new Error(`provider ${r.status}`);const raw=await r.json();const events=(Array.isArray(raw)?raw:[]).map(x=>{const z=infer(x.Event||x.Category,x.Actual,x.Forecast);return{date:x.Date,country:x.Country,currency:x.Currency||COUNTRY_TO_CCY[x.Country]||'',event:x.Event||x.Category,previous:x.Previous??'—',forecast:x.Forecast??'—',actual:x.Actual??'—',importance:x.Importance??'',label:z.label,impact:z.impact,lastUpdate:x.LastUpdate||null};}).filter(x=>x.currency);return res.status(200).json({mode:'live',provider:'TradingEconomics',events,updatedAt:new Date().toISOString()});}catch(e){return res.status(200).json({mode:'seed',provider:'error',events:[],notice:String(e?.message||e)});}}
+const FF_CALENDAR_URL='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+const G10=new Set(['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD','SEK','NOK']);
+
+function importance(v){
+  const s=String(v||'').trim().toUpperCase();
+  if(s==='HIGH'||s==='3')return'HIGH';
+  if(s==='MEDIUM'||s==='MED'||s==='2')return'MED';
+  if(s==='LOW'||s==='1')return'LOW';
+  return'';
+}
+
+function num(v){
+  if(v==null)return NaN;
+  return Number(String(v).replace(/,/g,'').replace(/[^0-9+-.]/g,''));
+}
+
+function infer(ev,a0,f0){
+  const a=num(a0),f=num(f0);
+  if(!Number.isFinite(a)||!Number.isFinite(f))return{label:'Update',impact:'Neutral'};
+  if(Math.abs(a-f)<1e-12)return{label:'Neutral',impact:'Neutral'};
+  const lower=/unemployment|jobless|claims|deficit/i.test(ev||'');
+  const positive=lower?a<f:a>f;
+  return{label:positive?'Beat':'Miss',impact:positive?'Strengthens':'Weakens'};
+}
+
+async function fetchForexFactory(){
+  const r=await fetch(FF_CALENDAR_URL,{
+    headers:{Accept:'application/json','User-Agent':'TradingLabMacroTerminal/3.0'}
+  });
+  if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
+  const raw=await r.json();
+  return (Array.isArray(raw)?raw:[]).map(x=>{
+    const currency=String(x.country||x.currency||'').toUpperCase();
+    const imp=importance(x.impact||x.importance);
+    if(!G10.has(currency)||!imp)return null;
+    const actual=x.actual??'—';
+    const forecast=x.forecast??'—';
+    const z=infer(x.title||x.event,actual,forecast);
+    return{
+      date:x.date||'',
+      country:currency,
+      currency,
+      event:x.title||x.event||'',
+      previous:x.previous||'—',
+      forecast:forecast||'—',
+      actual:actual||'—',
+      importance:imp,
+      label:z.label,
+      impact:z.impact,
+      lastUpdate:null,
+      source:'ForexFactory'
+    };
+  }).filter(Boolean);
+}
+
+export default async function handler(req,res){
+  res.setHeader('Cache-Control','s-maxage=30, stale-while-revalidate=180');
+  try{
+    const events=await fetchForexFactory();
+    return res.status(200).json({
+      mode:'live',
+      provider:'ForexFactory weekly export',
+      events,
+      updatedAt:new Date().toISOString(),
+      notice:'Weekly G10 schedule is loaded automatically. LOW/MED are supporting events; HIGH are major events. FinancialJuice supplies live Actual/Forecast/Previous release updates in the terminal.'
+    });
+  }catch(e){
+    return res.status(200).json({
+      mode:'seed',
+      provider:'error',
+      events:[],
+      updatedAt:new Date().toISOString(),
+      notice:String(e?.message||e)
+    });
+  }
+}
