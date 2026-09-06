@@ -1,4 +1,5 @@
-const FF_CALENDAR_URL='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+const FF_THIS_WEEK='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+const FF_NEXT_WEEK='https://nfs.faireconomy.media/ff_calendar_nextweek.json';
 const G10=new Set(['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD','SEK','NOK']);
 const TARGET_TZ='Europe/Skopje';
 
@@ -40,58 +41,42 @@ function toPrilepIso(value){
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}${offset}`;
 }
 
-async function fetchForexFactory(){
-  const r=await fetch(FF_CALENDAR_URL,{
-    headers:{Accept:'application/json','User-Agent':'TradingLabMacroTerminal/3.1'}
-  });
+function skopjeWeekday(){
+  const day=new Intl.DateTimeFormat('en-US',{timeZone:TARGET_TZ,weekday:'short'}).format(new Date());
+  return day;
+}
+
+async function fetchCalendar(url){
+  const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'TradingLabMacroTerminal/4.0'}});
   if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
   const raw=await r.json();
   return (Array.isArray(raw)?raw:[]).map(x=>{
     const currency=String(x.country||x.currency||'').toUpperCase();
     const imp=importance(x.impact||x.importance);
-    if(!G10.has(currency)||!imp)return null;
+    if(!G10.has(currency)||!imp||imp==='LOW')return null;
     const actual=x.actual??'—';
     const forecast=x.forecast??'—';
     const z=infer(x.title||x.event,actual,forecast);
     return{
-      date:toPrilepIso(x.date||''),
-      sourceDate:x.date||'',
-      timeZone:TARGET_TZ,
-      country:currency,
-      currency,
-      event:x.title||x.event||'',
-      previous:x.previous||'—',
-      forecast:forecast||'—',
-      actual:actual||'—',
-      importance:imp,
-      label:z.label,
-      impact:z.impact,
-      lastUpdate:null,
-      source:'ForexFactory'
+      date:toPrilepIso(x.date||''),sourceDate:x.date||'',timeZone:TARGET_TZ,
+      country:currency,currency,event:x.title||x.event||'',previous:x.previous||'—',
+      forecast:forecast||'—',actual:actual||'—',importance:imp,label:z.label,impact:z.impact,
+      lastUpdate:null,source:'ForexFactory'
     };
   }).filter(Boolean);
 }
 
 export default async function handler(req,res){
   res.setHeader('Cache-Control','s-maxage=30, stale-while-revalidate=180');
+  const sunday=skopjeWeekday()==='Sun';
+  const primary=sunday?FF_NEXT_WEEK:FF_THIS_WEEK;
+  const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
   try{
-    const events=await fetchForexFactory();
-    return res.status(200).json({
-      mode:'live',
-      provider:'ForexFactory weekly export',
-      timeZone:TARGET_TZ,
-      events,
-      updatedAt:new Date().toISOString(),
-      notice:'Weekly G10 calendar times are converted automatically to Prilep, Macedonia (Europe/Skopje), including daylight-saving changes.'
-    });
+    let events=[];let provider='ForexFactory weekly export';
+    try{events=await fetchCalendar(primary);provider+=sunday?' · next week':' · this week';}
+    catch(e){events=await fetchCalendar(secondary);provider+=' · fallback';}
+    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'Medium and High-impact G10 calendar only. On Sundays the terminal requests the coming week; Monday-Friday it requests the active week. Times are converted to Europe/Skopje.'});
   }catch(e){
-    return res.status(200).json({
-      mode:'seed',
-      provider:'error',
-      timeZone:TARGET_TZ,
-      events:[],
-      updatedAt:new Date().toISOString(),
-      notice:String(e?.message||e)
-    });
+    return res.status(200).json({mode:'seed',provider:'error',timeZone:TARGET_TZ,events:[],updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
   }
 }
