@@ -111,7 +111,7 @@ function weekBounds(){let now=new Date(),parts=new Intl.DateTimeFormat('en-CA',{
 function allCatalysts(){let [ws,we]=weekBounds(),all=[...MANUAL_CATALYSTS,...(newsData.macroUpdates||[]),...calendarMacroHistory(),...scoredLiveEvents()],seen=new Set(),out=[];for(const u of all){let d=new Date(u.date||0);if(!isFinite(d)||d<ws||d>=we)continue;let key=[u.ccy,skopjeDate(u.date),u.kind||catalystKind(u.event),u.event,u.actual].join('|');if(seen.has(key))continue;seen.add(key);out.push(u)}return out.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0))}
 function catalystScore(c){let sum=0;for(const u of allCatalysts())if(u.ccy===c)sum+=Number(u.score||0);return Math.max(-4,Math.min(4,Math.round(sum*10)/10))}
 function liveStrength(c){return (11-Number(RES[c].order||10)) + catalystScore(c)*.70}
-function currentOrder(){return [...ORDER].sort((a,b)=>liveStrength(b)-liveStrength(a)||RES[a].order-RES[b].order)}
+function currentOrder(){return [...ORDER].sort((a,b)=>Number(RES[a].order||99)-Number(RES[b].order||99))}
 function scoreMarkup(c){let s=catalystScore(c),cls=s>0?'pos':s<0?'neg':'flat';return `<span class="live-score ${cls}">${s>0?'+':''}${s.toFixed(1)}</span>`}
 function newsMacroFor(c){return allCatalysts().filter(x=>x.ccy===c).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0))[0]||null}
 function adjustedBiasNote(c){let s=catalystScore(c);return s>=3?'UPGRADE WATCH':s<=-3?'DOWNGRADE WATCH':Math.abs(s)>=1.5?'CATALYST ACTIVE':'BASE INTACT'}
