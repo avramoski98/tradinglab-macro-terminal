@@ -35,6 +35,25 @@
 #commodity .commodity-detail-btn{border:1px solid #51401d;background:#15100a;color:var(--accent2);padding:6px 8px;cursor:pointer;font:inherit;font-size:9px;text-transform:uppercase}
 @media(max-width:1000px){#commodity .commodity-cards{grid-template-columns:1fr}}
 
+
+#rates .rates-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#rates .rate-card{border:1px solid var(--line);background:#080808;min-width:0}
+#rates .rate-head{display:flex;justify-content:space-between;gap:14px;padding:10px 11px;border-bottom:1px solid #4a3218;background:#15100a}
+#rates .rate-bank{font-size:12px;font-weight:900;color:var(--accent2)}
+#rates .rate-meta{text-align:right;color:#777;font-size:9px;line-height:1.5}
+#rates .rate-table{display:grid;grid-template-columns:minmax(92px,1fr) 88px 88px 86px}
+#rates .rate-cell{padding:8px 10px;border-bottom:1px solid #1d1d1d;font-size:10px;text-align:right}
+#rates .rate-cell:nth-child(4n+1){text-align:left}
+#rates .rate-colhead{background:#0d0d0d;color:#777;font-size:8.5px;text-transform:uppercase;letter-spacing:.55px;font-weight:800}
+#rates .rate-current{color:#fff;font-weight:900}
+#rates .rate-change.pos{color:var(--green);font-weight:900}
+#rates .rate-change.neg{color:var(--red);font-weight:900}
+#rates .rate-change.flat{color:#7f7f7f;font-weight:900}
+#rates .rate-read{padding:9px 10px;background:#090909;font-size:9.5px;line-height:1.5}
+#rates .rate-read b{font-weight:900}
+#rates .rates-status{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:8px;padding:9px 10px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);background:#090909}
+@media(max-width:950px){#rates .rates-grid{grid-template-columns:1fr}}
+
 </style>
 </head><body>
 <div class="app">
@@ -44,6 +63,7 @@
   <div class="nav">
     <button class="active" data-tab="overview">Overview</button>
     <button data-tab="g10">G10 Macro Monitor</button>
+    <button data-tab="rates">Rates Probabilities</button>
     <button data-tab="weekly">Weekly Focus</button>
     <button data-tab="calendar">Next Week Calendar</button>
     <button data-tab="live">Live Macro</button>
@@ -63,6 +83,7 @@
   <div id="marketTape" class="market-tape"></div>
   <section id="overview" class="section active"></section>
   <section id="g10" class="section"></section>
+  <section id="rates" class="section"></section>
   <section id="weekly" class="section"></section>
   <section id="calendar" class="section"></section>
   <section id="live" class="section"></section>
@@ -114,6 +135,9 @@ const MANUAL_CATALYSTS=[
  {date:'2026-08-31T14:00:00+02:00',ccy:'EUR',event:'Germany Preliminary CPI · Aug',kind:'INFLATION',actual:'2.9% y/y',forecast:'3.0% y/y',previous:'2.8% y/y',result:'MISS',score:-2.5,highImpact:true,why:'German inflation undershot consensus, modestly reducing the hawkish EUR inflation impulse.'},
  {date:'2026-09-01T09:30:00+02:00',ccy:'SEK',event:'Manufacturing PMI · Aug',kind:'MANUFACTURING PMI',actual:'56.1',forecast:'55.1',previous:'55.7',result:'BEAT',score:1.25,highImpact:false,why:'Manufacturing activity beat consensus and reinforced the SEK recovery narrative.'},
  {date:'2026-09-01T10:30:00+02:00',ccy:'GBP',event:'UK Manufacturing PMI · final',kind:'MANUFACTURING PMI',actual:'51.7',forecast:'51.5',previous:'51.9',result:'BEAT',score:1.25,highImpact:false,why:'Final manufacturing PMI was slightly stronger than expected; secondary positive GBP activity catalyst.'},
+ {date:'2026-09-08T08:00:00+02:00',ccy:'EUR',event:'Germany Trade Balance · Jul',kind:'TRADE',actual:'€21.3B',forecast:'€16.0B',previous:'€15.4B',result:'BEAT / MIXED',score:0.5,highImpact:false,why:'The surplus beat consensus, but the detail was mixed: exports fell 0.8% m/m while imports fell 5.7%, so this is not a clean external-demand bullish signal.'},
+ {date:'2026-09-08T08:45:00+02:00',ccy:'EUR',event:'France Trade Balance · Jul',kind:'TRADE',actual:'-€6.67B',forecast:'-€6.0B',previous:'-€5.75B rev.',result:'MISS',score:-0.75,highImpact:false,why:'The French trade deficit widened more than expected, a secondary negative contribution to EUR breadth.'},
+ {date:'2026-09-08T08:45:00+02:00',ccy:'EUR',event:'France Current Account · Jul',kind:'CURRENT ACCOUNT',actual:'-€4.70B',forecast:'-€2.0B',previous:'-€1.60B',result:'MISS',score:-0.5,highImpact:false,why:'The current-account deficit widened sharply as goods and services balances deteriorated; secondary EUR negative.'},
  {date:'2026-09-07T08:00:00+02:00',ccy:'EUR',event:'German Industrial Production · Jul',kind:'INDUSTRIAL PRODUCTION',actual:'-1.1% m/m',forecast:'0.1% m/m',previous:'0.0% m/m',result:'MISS',score:-2.0,highImpact:true,why:'German industrial production unexpectedly contracted, a clear negative activity surprise for EUR.'},
  {date:'2026-09-07T08:00:00+02:00',ccy:'GBP',event:'Lloyds House Price Index · Aug',kind:'HOUSING',actual:'-0.2% m/m',forecast:'0.2% m/m',previous:'-0.1% m/m',result:'MISS',score:-0.5,highImpact:false,why:'UK house prices missed consensus; low-impact GBP growth/housing negative.'},
  {date:'2026-09-07T10:30:00+02:00',ccy:'EUR',event:'Sentix Investor Confidence · Sep',kind:'SENTIMENT',actual:'5.1',forecast:'2.1',previous:'0.9',result:'BEAT',score:1.25,highImpact:false,why:'Investor confidence beat strongly and offset part of the German industrial weakness.'},
@@ -126,6 +150,7 @@ const MANUAL_CATALYSTS=[
  {date:'2026-09-02T03:30:00+02:00',ccy:'AUD',event:'Q2 GDP q/q',kind:'GDP',actual:'0.4%',forecast:'0.3%',previous:'0.3%',result:'BEAT',score:2,highImpact:true,why:'Growth beat consensus; with sticky inflation this reinforces RBA tightening risk.'},
  {date:'2026-09-02T03:30:00+02:00',ccy:'JPY',event:'BoJ Takata Speech',kind:'POLICY',actual:'Nimble hikes',forecast:'—',previous:'—',result:'HAWKISH',score:1.5,highImpact:true,why:'Takata backed agile, meeting-by-meeting rate hikes, strengthening the BoJ normalization narrative.'},
  {date:'2026-09-02T04:00:00+02:00',ccy:'NZD',event:'RBNZ OCR + Monetary Policy Statement',kind:'RATE',actual:'2.75%',forecast:'2.75%',previous:'2.50%',result:'DOVISH HIKE',score:-1.5,highImpact:true,why:'The 25bp hike was expected, but the future path was less aggressive and not predetermined; NZD sold off.'},
+ {date:'2026-09-04T10:30:00+02:00',ccy:'GBP',event:'UK Construction PMI · Aug',kind:'CONSTRUCTION PMI',actual:'44.3',forecast:'45.5',previous:'44.7',result:'MISS',score:-1.0,highImpact:false,why:'Construction PMI fell further below 50 and missed consensus; a secondary negative GBP activity signal.'},
  {date:'2026-09-04T14:30:00+02:00',ccy:'USD',event:'Nonfarm Payrolls · Aug',kind:'NFP',actual:'+162k',forecast:'~56k',previous:'Jul revised',result:'BEAT',score:3,highImpact:true,why:'August payrolls materially beat expectations, validating part of the hawkish Fed repricing.'},
  {date:'2026-09-04T14:30:00+02:00',ccy:'USD',event:'Unemployment Rate · Aug',kind:'UNEMPLOYMENT',actual:'4.1%',forecast:'4.1%',previous:'4.1%',result:'NEUTRAL',score:0,highImpact:true,why:'Unemployment stayed at 4.1%; labor did not weaken enough to challenge the stronger payroll print.'},
  {date:'2026-09-04T14:30:00+02:00',ccy:'USD',event:'Average Hourly Earnings · Aug',kind:'WAGES',actual:'3.1% y/y',forecast:'—',previous:'3.2% y/y',result:'COOLER',score:-0.5,highImpact:true,why:'Wage growth cooled slightly, preventing the labor report from becoming an unambiguously inflationary signal.'},
@@ -162,9 +187,51 @@ function table(){let order=currentOrder();return `<div class="card"><div class="
 function overview(){let order=currentOrder(),top=order.slice(0,3),low=order.slice(-3).reverse();let fresh=[...order].map(c=>latestFor(c)).filter(Boolean).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);$('#overview').innerHTML=`<div class="weekhero"><div class="kicker">WEEK OF 7–11 SEP 2026</div><h2>ECB + US Inflation Week · Guidance → CPI → 2Y Confirmation</h2><div class="mini" style="font-size:12px">EUR starts with the cleanest broad macro. USD has repriced sharply higher after PCE + Warsh but still needs Friday labor confirmation. US labor has now materially strengthened the Fed-hike case, but CPI is the deciding confirmation. ECB is Thursday's main EUR catalyst; JPY remains supported by BoJ normalization while CAD labor weakened sharply.</div></div><div class="grid"><div class="card s4"><h3>Strongest 3M Macro</h3>${top.map((c,i)=>`<div class="pair"><div><div class="mini">#${i+1} · Confidence ${RES[c].confidence}</div><b>${c} · ${RES[c].final}</b><div class="mini">${RES[c].macro}</div></div><div class="rank good">${i+1}</div></div>`).join('')}</div><div class="card s4"><h3>Weakest 3M Macro</h3>${low.map((c,i)=>`<div class="pair"><div><div class="mini">#${currentOrder().length-i}</div><b>${c} · ${RES[c].final}</b><div class="mini">${RES[c].macro}</div></div><div class="rank bad">${currentOrder().length-i}</div></div>`).join('')}</div><div class="card s4"><h3>This Week's Hierarchy</h3><div class="call"><b>1. USD labor</b> · Friday CPI confirms or rejects whether the stronger August labor report can justify a September Fed hike.<br><br><b>2. EUR inflation</b> · Thursday ECB is largely priced; guidance and projections decide the EUR reaction.<br><br><b>3. RBNZ</b> · Wednesday guidance matters more than the expected hike.<br><br><b>4. AUD GDP</b> · separates broad strength from stagflation.<br><br><b>5. BoC</b> · Wednesday hold is expected; guidance decides whether strong GDP/jobs matter for policy.<br><br><b>6. JPY policy / intervention</b> · BoJ + FX risk can override data.</div></div><div class="card s12"><h3>Newest Catalysts</h3><div class="feed">${fresh.map(renderRelease).join('')}</div></div></div>`}
 function renderRelease(x){let cls=impactClass(x);return `<div class="release"><div class="time">${esc((x.date||'').replace('T',' ').slice(0,16))}</div><div><b>${esc(x.currency)}</b></div><div class="event">${esc(x.event)}</div><div>Prev <b>${esc(x.previous)}</b></div><div>Fcst <b>${esc(x.forecast)}</b></div><div class="actual ${cls}">${esc(x.actual)}</div><div class="impact ${cls}">${esc(x.impact||x.label||x.surprise||'Update')}</div></div>`}
 
+
+let RATE_STATE=null;
+const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v1';
+function rateProbFmt(n){n=Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
+function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}%`:'—'}
+function rateHistory(payload){
+  let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
+  let next={};
+  let cards=(payload.cards||[]).map(card=>{
+    let old=saved[card.id]||null,seed=card.rows||[],previousMap={};
+    if(old&&old.snapshot===payload.snapshot&&(old.previous||[]).length){for(let r of old.previous)previousMap[r.rate]=r.value}
+    else if(old&&(old.latest||[]).length){for(let r of old.latest)previousMap[r.rate]=r.value}
+    let rows=seed.map(r=>({...r,previous:Object.prototype.hasOwnProperty.call(previousMap,r.rate)?Number(previousMap[r.rate]):Number(r.previous)}));
+    next[card.id]={snapshot:payload.snapshot,latest:rows.map(r=>({rate:r.rate,value:Number(r.latest)})),previous:rows.map(r=>({rate:r.rate,value:Number(r.previous)}))};
+    return {...card,rows};
+  });
+  try{localStorage.setItem(RATE_SNAPSHOT_KEY,JSON.stringify(next))}catch(e){}
+  return {...payload,cards};
+}
+function rateRepricing(card){
+  let hike=(card.rows||[]).find(r=>r.direction==='hike'),cut=(card.rows||[]).find(r=>r.direction==='cut');
+  let h=hike?Number(hike.latest)-Number(hike.previous):0,c=cut?Number(cut.latest)-Number(cut.previous):0,net=h-c;
+  if(net>.05)return {label:'HAWKISH REPRICING',tone:'good',delta:net};
+  if(net<-.05)return {label:'DOVISH REPRICING',tone:'bad',delta:net};
+  return {label:'PRICING STABLE',tone:'warn',delta:net};
+}
+function ratesDesk(){
+  let el=$('#rates');if(!el)return;
+  if(!RATE_STATE){el.innerHTML='<div class="card"><h3>Interest Rate Probabilities</h3><div class="mini">Loading market-implied probabilities…</div></div>';return}
+  let stamp=new Date(RATE_STATE.updatedAt||Date.now()).toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false});
+  el.innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB · RATES PROBABILITIES</div><h2>Latest → Previous → Change</h2><div class="mini" style="font-size:12px">Market-implied central-bank decision probabilities. Positive/negative values in Change show the movement in probability points versus the previous stored/reference snapshot — the same fast repricing read you use around CPI, labor data and central-bank headlines.</div></div><div class="rates-status"><div><b>${RATE_STATE.mode==='live'?'LIVE / MARKET-IMPLIED':'REFERENCE SNAPSHOT'}</b><div class="mini">Sources: CentralBank.Watch futures/OIS models; BoC fallback can use RateProbability.</div></div><div class="mini" style="text-align:right">Updated ${esc(stamp)} · Prilep, Macedonia<br>Probabilities are pricing, not a forecast.</div></div><div class="rates-grid">${(RATE_STATE.cards||[]).map(card=>{let read=rateRepricing(card);return `<div class="rate-card"><div class="rate-head"><div><div class="rate-bank">${esc(card.id)} · ${esc(card.ccy)}</div><b>${esc(card.name)} Interest Rate Probabilities</b><div class="mini" style="margin-top:4px">Current ${esc(card.current)} · Source ${esc(card.source)}</div></div><div class="rate-meta">NEXT DECISION<br><b style="color:#ddd">${esc(card.nextMeeting)}</b></div></div><div class="rate-table"><div class="rate-cell rate-colhead">Rate</div><div class="rate-cell rate-colhead">Latest</div><div class="rate-cell rate-colhead">Previous</div><div class="rate-cell rate-colhead">Change</div>${(card.rows||[]).map(r=>{let d=Number(r.latest)-Number(r.previous),cls=d>.0001?'pos':d<-.0001?'neg':'flat';return `<div class="rate-cell ${r.current?'rate-current':''}">${esc(r.rate)}${r.current?' · NOW':''}</div><div class="rate-cell ${r.current?'rate-current':''}">${rateProbFmt(r.latest)}</div><div class="rate-cell">${rateProbFmt(r.previous)}</div><div class="rate-cell rate-change ${cls}">${rateDeltaFmt(d)}</div>`}).join('')}</div><div class="rate-read"><b class="${read.tone}">${read.label}</b> · net policy repricing ${read.delta>0?'+':''}${read.delta.toFixed(2)}pp. <span class="muted">Read the direction together with the macro base and 2Y/front-end yields.</span></div></div>`}).join('')}</div><div class="call" style="margin-top:8px"><b>How to read it:</b> if probability shifts from the current rate toward the higher-rate row, the market is repricing more hawkish. If probability shifts toward the lower-rate row, it is more dovish. A large probability change after a release is a much cleaner policy-confirmation signal than looking at the headline alone.</div>`;
+}
+async function loadRates(){
+  try{let r=await fetch('/api/rates',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);RATE_STATE=rateHistory(await r.json());ratesDesk()}catch(e){if(!RATE_STATE&&$('#rates'))$('#rates').innerHTML=`<div class="card"><h3>Interest Rate Probabilities</h3><div class="call"><b>Rates feed unavailable.</b> ${esc(String(e.message||e))}</div></div>`}
+}
+
 function weekly(){let baseFocus=['USD','EUR','JPY','AUD','NZD','CAD','CHF'],order=currentOrder(),focus=order.filter(c=>baseFocus.includes(c)),pairs=[[order[0],order[order.length-1]],[order[1],order[order.length-2]],[order[2],order[order.length-3]]];$('#weekly').innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB WEEKLY OVERVIEW · LIVE</div><h2>Currency Focus updates after every macro catalyst</h2><div class="mini" style="font-size:12px">Current live hierarchy: ${order.join(' → ')}. The 3M thesis stays as the base, while this panel rewrites the live bias, focus and invalidation after new structured macro releases.</div></div><div class="grid"><div class="card s7"><h3>Currency Focus</h3><div class="focusgrid">${focus.map(c=>{let lb=liveBias(c),s=catalystScore(c);return `<div class="focusitem"><div>${tag(c+' · '+lb.label,lb.tone)} <span class="conf">${esc(RES[c].confidence)} · Δ ${s>0?'+':''}${s.toFixed(1)} · BASE ${esc(RES[c].final)}</span></div><div class="mini" style="margin-top:8px"><b>Focus:</b> ${esc(dynamicFocus(c))}</div><div class="mini" style="margin-top:7px;color:#f0c4c4"><b>Invalidation:</b> ${esc(dynamicInvalidation(c))}</div></div>`}).join('')}</div></div><div class="card s5"><h3>Live Pair Focus</h3><div class="call">${pairs.map(([a,b])=>`<b>${a} / ${b}</b> · live divergence ${a} ${liveBias(a).label} (Δ ${catalystScore(a)>0?'+':''}${catalystScore(a).toFixed(1)}) vs ${b} ${liveBias(b).label} (Δ ${catalystScore(b)>0?'+':''}${catalystScore(b).toFixed(1)}).`).join('<br><br>')}</div><h3>Risk Override</h3><div class="call">Global risk-off can temporarily strengthen <b>USD, JPY and CHF</b> regardless of domestic rank. Energy/geopolitical shocks can also reprice inflation faster than scheduled data. If price and 2Y yields reject the macro story, do not force the table.</div></div></div>`}
 const CAL_MACRO_STORE='tl_calendar_macro_v1';
 const CAL_RESULT_OVERRIDES=[
+ {date:'2026-09-04',ccy:'GBP',test:/UK Construction PMI/i,previous:'44.7',forecast:'45.5',actual:'44.3',verdict:'MISS',detail:'MISS -1.2 vs consensus · 20th month below 50'},
+
+ {date:'2026-09-08',ccy:'EUR',test:/Germany Trade Balance/i,previous:'€15.4B',forecast:'€16.0B',actual:'€21.3B',verdict:'BEAT / MIXED',detail:'Surplus beat · exports -0.8% m/m, imports -5.7% m/m'},
+ {date:'2026-09-08',ccy:'EUR',test:/France.*Trade Balance|French.*Trade Balance/i,previous:'-€5.75B rev.',forecast:'-€6.0B',actual:'-€6.67B',verdict:'MISS',detail:'Deficit wider than expected'},
+ {date:'2026-09-08',ccy:'EUR',test:/France.*Current Account|French.*Current Account/i,previous:'-€1.60B',forecast:'-€2.0B',actual:'-€4.70B',verdict:'MISS',detail:'Current-account deficit widened sharply'},
+
  {date:'2026-08-31',ccy:'JPY',test:/Retail Sales.*Industrial Production/i,previous:'Retail 0.6% · IP 1.9% m/m',forecast:'Retail 3.2% · IP -0.7% m/m',actual:'Retail 4.0% · IP 0.1% m/m',verdict:'BEAT',detail:'Retail BEAT +0.8pp · IP BEAT +0.8pp'},
  {date:'2026-08-31',ccy:'EUR',test:/Germany Preliminary CPI/i,previous:'2.8% y/y',forecast:'3.0% y/y',actual:'2.9% y/y',verdict:'MISS',detail:'MISS -0.1pp vs forecast'},
  {date:'2026-09-01',ccy:'SEK',test:/Manufacturing PMI/i,previous:'55.7',forecast:'55.1',actual:'56.1',verdict:'BEAT',detail:'BEAT +1.0 vs forecast'},
@@ -262,14 +329,14 @@ function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='
 function captureUiScroll(){let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');return{x:window.scrollX,y:window.scrollY,news:n?n.scrollTop:0,cat:c?c.scrollTop:0,drawer:d?d.scrollTop:0}}
 function restoreUiScroll(st){requestAnimationFrame(()=>{window.scrollTo(st.x,st.y);let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');if(n)n.scrollTop=st.news;if(c)c.scrollTop=st.cat;if(d)d.scrollTop=st.drawer})}
 function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='Live checked '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep, Macedonia'}
-function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
+function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
 async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Seed mode · provider not connected';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · seed mode';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
 function normalizeEvent(x){return {date:x.date||x.Date||'',time:x.time||x.Time||'',currency:x.currency||x.Currency||countryToCcy(x.country||x.Country),event:x.event||x.Event||x.Category||'',previous:x.previous??x.Previous??'—',forecast:x.forecast??x.Forecast??'—',actual:x.actual??x.Actual??'—',importance:x.importance??x.Importance??'',impact:x.impact||inferImpact(x),label:x.label||x.surprise||inferSurprise(x)}}
 function countryToCcy(c){c=String(c||'').toLowerCase();let m={"united states":"USD","euro area":"EUR","european union":"EUR","united kingdom":"GBP","japan":"JPY","switzerland":"CHF","australia":"AUD","new zealand":"NZD","canada":"CAD","sweden":"SEK","norway":"NOK"};return m[c]||''}
 function num(v){if(v==null)return NaN;let s=String(v).replace(/[^0-9+-.]/g,'');return Number(s)}
 function inferSurprise(x){let a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Update';if(Math.abs(a-f)<1e-9)return'Neutral';return a>f?'Beat':'Miss'}
 function inferImpact(x){let ev=String(x.event||x.Event||x.Category||'').toLowerCase(),a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Neutral';let goodHigher=!/unemployment|jobless|claims|deficit/.test(ev);let pos=goodHigher?a>f:a<f;return pos?'Strengthens':'Weakens'}
-const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',method:'Framework'};
+const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab).classList.add('active');$('#title').textContent=titles[b.dataset.tab]});
-setInterval(()=>{$('#clock').textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'},1000);render();loadMarkets();loadLive();loadNews();loadSectors();checkEventReminders();setInterval(loadMarkets,15000);setInterval(loadLive,30000);setInterval(loadNews,15000);setInterval(loadSectors,60000);setInterval(checkEventReminders,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadMarkets()});
+setInterval(()=>{$('#clock').textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'},1000);render();loadMarkets();loadLive();loadNews();loadSectors();loadRates();checkEventReminders();setInterval(loadMarkets,15000);setInterval(loadLive,30000);setInterval(loadNews,15000);setInterval(loadSectors,60000);setInterval(loadRates,900000);setInterval(checkEventReminders,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadMarkets()});
 </script></body></html>
