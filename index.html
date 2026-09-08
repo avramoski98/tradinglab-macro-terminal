@@ -54,6 +54,16 @@
 #rates .rates-status{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:8px;padding:9px 10px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);background:#090909}
 @media(max-width:950px){#rates .rates-grid{grid-template-columns:1fr}}
 
+
+#rates .rate-table{grid-template-columns:minmax(138px,1.25fr) 92px 92px 92px 100px 92px}
+#rates .rate-cell:nth-child(4n+1){text-align:right}
+#rates .rate-cell:nth-child(6n+1){text-align:left}
+#rates .rate-outcome b{display:block;color:#fff;font-size:10px}
+#rates .rate-outcome .mini{margin-top:2px}
+#rates .rate-current-pricing{color:var(--accent2);font-weight:900}
+#rates .rate-prior{color:#777}
+@media(max-width:700px){#rates .rate-table{min-width:760px}}
+
 </style>
 </head><body>
 <div class="app">
@@ -189,36 +199,59 @@ function renderRelease(x){let cls=impactClass(x);return `<div class="release"><d
 
 
 let RATE_STATE=null;
-const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v1';
+const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v2';
 function rateProbFmt(n){n=Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
-function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}%`:'—'}
+function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
+function rateValues(rows,field){let out={};for(let r of rows||[]){let v=Number(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
+function rateSnapshot(stamp,values,kind='market'){return {stamp:String(stamp||''),values,kind}}
 function rateHistory(payload){
   let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
-  let next={};
+  let next={},stamp=String(payload.updatedAt||new Date().toISOString());
   let cards=(payload.cards||[]).map(card=>{
-    let old=saved[card.id]||null,seed=card.rows||[],previousMap={};
-    if(old&&old.snapshot===payload.snapshot&&(old.previous||[]).length){for(let r of old.previous)previousMap[r.rate]=r.value}
-    else if(old&&(old.latest||[]).length){for(let r of old.latest)previousMap[r.rate]=r.value}
-    let rows=seed.map(r=>({...r,previous:Object.prototype.hasOwnProperty.call(previousMap,r.rate)?Number(previousMap[r.rate]):Number(r.previous)}));
-    next[card.id]={snapshot:payload.snapshot,latest:rows.map(r=>({rate:r.rate,value:Number(r.latest)})),previous:rows.map(r=>({rate:r.rate,value:Number(r.previous)}))};
-    return {...card,rows};
+    let seed=card.rows||[],old=(saved[card.id]&&Array.isArray(saved[card.id].history))?saved[card.id].history:[];
+    let currentValues=rateValues(seed,'latest'),referenceValues=rateValues(seed,'previous'),history=[...old];
+    if(!history.length){
+      history.push(rateSnapshot(stamp,currentValues,'market'));
+      if(Object.keys(referenceValues).length)history.push(rateSnapshot('REFERENCE',referenceValues,'reference'));
+    }else if(history[0].stamp===stamp){
+      history[0]=rateSnapshot(stamp,currentValues,'market');
+    }else{
+      history.unshift(rateSnapshot(stamp,currentValues,'market'));
+    }
+    history=history.slice(0,3);
+    let cur=history[0]||null,prev=history[1]||null,prior=history[2]||null;
+    let rows=seed.map(r=>({...r,
+      currentPricing:cur&&Object.prototype.hasOwnProperty.call(cur.values,r.rate)?Number(cur.values[r.rate]):Number(r.latest),
+      previousPricing:prev&&Object.prototype.hasOwnProperty.call(prev.values,r.rate)?Number(prev.values[r.rate]):NaN,
+      priorPricing:prior&&Object.prototype.hasOwnProperty.call(prior.values,r.rate)?Number(prior.values[r.rate]):NaN
+    }));
+    next[card.id]={history};
+    return {...card,rows,history};
   });
   try{localStorage.setItem(RATE_SNAPSHOT_KEY,JSON.stringify(next))}catch(e){}
   return {...payload,cards};
 }
-function rateRepricing(card){
+function rateOutcome(r){let label=r.direction==='hike'?'HIKE':r.direction==='cut'?'CUT':'HOLD';return `<div class="rate-outcome"><b>${label}${r.current?' · CURRENT RATE':''}</b><div class="mini">${esc(r.rate)}</div></div>`}
+function ratePolicyDelta(card,baseField){
   let hike=(card.rows||[]).find(r=>r.direction==='hike'),cut=(card.rows||[]).find(r=>r.direction==='cut');
-  let h=hike?Number(hike.latest)-Number(hike.previous):0,c=cut?Number(cut.latest)-Number(cut.previous):0,net=h-c;
-  if(net>.05)return {label:'HAWKISH REPRICING',tone:'good',delta:net};
-  if(net<-.05)return {label:'DOVISH REPRICING',tone:'bad',delta:net};
-  return {label:'PRICING STABLE',tone:'warn',delta:net};
+  if(!hike&&!cut)return NaN;
+  let hc=hike?Number(hike.currentPricing):0,hb=hike?Number(hike[baseField]):0,cc=cut?Number(cut.currentPricing):0,cb=cut?Number(cut[baseField]):0;
+  if((hike&&!Number.isFinite(hb))||(cut&&!Number.isFinite(cb)))return NaN;
+  return (hc-hb)-(cc-cb);
+}
+function rateRepricing(card){
+  let short=ratePolicyDelta(card,'previousPricing'),broad=ratePolicyDelta(card,'priorPricing'),signal=Number.isFinite(short)?short:0;
+  if(signal>.05)return {label:'HAWKISH REPRICING',tone:'good',short,broad};
+  if(signal<-.05)return {label:'DOVISH REPRICING',tone:'bad',short,broad};
+  return {label:'PRICING STABLE',tone:'warn',short,broad};
 }
 function ratesDesk(){
   let el=$('#rates');if(!el)return;
   if(!RATE_STATE){el.innerHTML='<div class="card"><h3>Interest Rate Probabilities</h3><div class="mini">Loading market-implied probabilities…</div></div>';return}
   let stamp=new Date(RATE_STATE.updatedAt||Date.now()).toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false});
-  el.innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB · RATES PROBABILITIES</div><h2>Latest → Previous → Change</h2><div class="mini" style="font-size:12px">Market-implied central-bank decision probabilities. Positive/negative values in Change show the movement in probability points versus the previous stored/reference snapshot — the same fast repricing read you use around CPI, labor data and central-bank headlines.</div></div><div class="rates-status"><div><b>${RATE_STATE.mode==='live'?'LIVE / MARKET-IMPLIED':'REFERENCE SNAPSHOT'}</b><div class="mini">Sources: CentralBank.Watch futures/OIS models; BoC fallback can use RateProbability.</div></div><div class="mini" style="text-align:right">Updated ${esc(stamp)} · Prilep, Macedonia<br>Probabilities are pricing, not a forecast.</div></div><div class="rates-grid">${(RATE_STATE.cards||[]).map(card=>{let read=rateRepricing(card);return `<div class="rate-card"><div class="rate-head"><div><div class="rate-bank">${esc(card.id)} · ${esc(card.ccy)}</div><b>${esc(card.name)} Interest Rate Probabilities</b><div class="mini" style="margin-top:4px">Current ${esc(card.current)} · Source ${esc(card.source)}</div></div><div class="rate-meta">NEXT DECISION<br><b style="color:#ddd">${esc(card.nextMeeting)}</b></div></div><div class="rate-table"><div class="rate-cell rate-colhead">Rate</div><div class="rate-cell rate-colhead">Latest</div><div class="rate-cell rate-colhead">Previous</div><div class="rate-cell rate-colhead">Change</div>${(card.rows||[]).map(r=>{let d=Number(r.latest)-Number(r.previous),cls=d>.0001?'pos':d<-.0001?'neg':'flat';return `<div class="rate-cell ${r.current?'rate-current':''}">${esc(r.rate)}${r.current?' · NOW':''}</div><div class="rate-cell ${r.current?'rate-current':''}">${rateProbFmt(r.latest)}</div><div class="rate-cell">${rateProbFmt(r.previous)}</div><div class="rate-cell rate-change ${cls}">${rateDeltaFmt(d)}</div>`}).join('')}</div><div class="rate-read"><b class="${read.tone}">${read.label}</b> · net policy repricing ${read.delta>0?'+':''}${read.delta.toFixed(2)}pp. <span class="muted">Read the direction together with the macro base and 2Y/front-end yields.</span></div></div>`}).join('')}</div><div class="call" style="margin-top:8px"><b>How to read it:</b> if probability shifts from the current rate toward the higher-rate row, the market is repricing more hawkish. If probability shifts toward the lower-rate row, it is more dovish. A large probability change after a release is a much cleaner policy-confirmation signal than looking at the headline alone.</div>`;
+  el.innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB · RATES PROBABILITIES</div><h2>Prior Pricing → Previous Pricing → Current Market Expectation</h2><div class="mini" style="font-size:12px"><b>Current Market Expectation</b> = what the market prices now. <b>Previous Pricing</b> = the immediately preceding snapshot. <b>Prior Pricing</b> = the snapshot before that. The two Δ columns show exactly how much today's expectation moved versus each of the last two observations.</div></div><div class="rates-status"><div><b>${RATE_STATE.mode==='live'?'LIVE / MARKET-IMPLIED':'REFERENCE SNAPSHOT'}</b><div class="mini">This is market pricing, not the central bank's official forecast or decision.</div></div><div class="mini" style="text-align:right">Current snapshot ${esc(stamp)} · Prilep, Macedonia<br>Snapshots are stored locally in this browser.</div></div><div class="rates-grid">${(RATE_STATE.cards||[]).map(card=>{let read=rateRepricing(card),short=Number.isFinite(read.short)?rateDeltaFmt(read.short):'—',broad=Number.isFinite(read.broad)?rateDeltaFmt(read.broad):'—';return `<div class="rate-card"><div class="rate-head"><div><div class="rate-bank">${esc(card.id)} · ${esc(card.ccy)}</div><b>${esc(card.name)} Interest Rate Probabilities</b><div class="mini" style="margin-top:4px">Policy rate now ${esc(card.current)} · Source ${esc(card.source)}</div></div><div class="rate-meta">NEXT DECISION<br><b style="color:#ddd">${esc(card.nextMeeting)}</b></div></div><div style="overflow:auto"><div class="rate-table"><div class="rate-cell rate-colhead">Policy Outcome</div><div class="rate-cell rate-colhead">Prior Pricing</div><div class="rate-cell rate-colhead">Previous Pricing</div><div class="rate-cell rate-colhead">Current Pricing</div><div class="rate-cell rate-colhead">Δ vs Previous</div><div class="rate-cell rate-colhead">Δ vs Prior</div>${(card.rows||[]).map(r=>{let dp=Number(r.currentPricing)-Number(r.previousPricing),d2=Number(r.currentPricing)-Number(r.priorPricing),cp=dp>.0001?'pos':dp<-.0001?'neg':'flat',c2=d2>.0001?'pos':d2<-.0001?'neg':'flat';return `<div class="rate-cell">${rateOutcome(r)}</div><div class="rate-cell rate-prior">${rateProbFmt(r.priorPricing)}</div><div class="rate-cell">${rateProbFmt(r.previousPricing)}</div><div class="rate-cell rate-current-pricing">${rateProbFmt(r.currentPricing)}</div><div class="rate-cell rate-change ${Number.isFinite(dp)?cp:'flat'}">${rateDeltaFmt(dp)}</div><div class="rate-cell rate-change ${Number.isFinite(d2)?c2:'flat'}">${rateDeltaFmt(d2)}</div>`}).join('')}</div></div><div class="rate-read"><b class="${read.tone}">${read.label}</b> · latest policy repricing <b>${short}</b>${Number.isFinite(read.broad)?` · vs prior <b>${broad}</b>`:''}. <span class="muted">If both deltas point the same way, the repricing has continuity; if they conflict, the latest move may be a short-term reversal/spike.</span></div></div>`}).join('')}</div><div class="call" style="margin-top:8px"><b>Example:</b> HIKE 48.2% prior → 55.6% previous → 57.4% current means the hike probability strengthened across both snapshots. Δ vs Previous = +1.8pp; Δ vs Prior = +9.2pp. That is much stronger confirmation than seeing 57.4% in isolation.</div>`;
 }
+
 async function loadRates(){
   try{let r=await fetch('/api/rates',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);RATE_STATE=rateHistory(await r.json());ratesDesk()}catch(e){if(!RATE_STATE&&$('#rates'))$('#rates').innerHTML=`<div class="card"><h3>Interest Rate Probabilities</h3><div class="call"><b>Rates feed unavailable.</b> ${esc(String(e.message||e))}</div></div>`}
 }
