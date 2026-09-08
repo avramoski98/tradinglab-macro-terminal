@@ -1,0 +1,42 @@
+name: Apply rates probabilities desk
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/add_rates_probabilities.py
+      - api/rates.js
+      - .github/workflows/apply-rates-probabilities.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply rates desk and latest macro releases
+        run: python tools/add_rates_probabilities.py
+      - name: Verify JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text()
+          Path('/tmp/terminal.js').write_text(s.split('<script>',1)[1].split('</script>',1)[0])
+          PY
+          node --check /tmp/terminal.js
+          node --check api/rates.js
+      - name: Commit terminal update
+        run: |
+          git config user.name "TradingLab Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No change needed"
+            exit 0
+          fi
+          git commit -m "Add rates probabilities desk and update Sep 8 releases"
+          git push origin HEAD:main
