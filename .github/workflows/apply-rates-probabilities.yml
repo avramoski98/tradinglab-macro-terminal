@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - tools/add_rates_probabilities.py
+      - tools/upgrade_rates_history_v2.py
       - api/rates.js
       - .github/workflows/apply-rates-probabilities.yml
 
@@ -20,6 +21,8 @@ jobs:
           ref: main
       - name: Apply rates desk and latest macro releases
         run: python tools/add_rates_probabilities.py
+      - name: Upgrade rates pricing history labels
+        run: python tools/upgrade_rates_history_v2.py
       - name: Verify JavaScript
         run: |
           python - <<'PY'
@@ -38,5 +41,5 @@ jobs:
             echo "No change needed"
             exit 0
           fi
-          git commit -m "Add rates probabilities desk and update Sep 8 releases"
+          git commit -m "Clarify rates pricing history and deltas"
           git push origin HEAD:main
