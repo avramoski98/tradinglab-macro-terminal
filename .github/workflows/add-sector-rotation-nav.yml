@@ -1,0 +1,35 @@
+name: Add Sector Rotation nav
+on:
+  push:
+    paths:
+      - '.github/workflows/add-sector-rotation-nav.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          sector='    <a href="/sector-rotation.html" style="display:block;border-left:3px solid transparent;color:#a6a6a6;text-decoration:none;padding:9px 9px;text-transform:uppercase;font-size:10px;letter-spacing:.5px">Sector Rotation</a>\n'
+          if '/sector-rotation.html' not in s:
+              marker='    <a href="/commodity-cycles.html" style="display:block;border-left:3px solid transparent;color:#a6a6a6;text-decoration:none;padding:9px 9px;text-transform:uppercase;font-size:10px;letter-spacing:.5px">Commodity Cycles</a>\n'
+              if marker not in s:
+                  raise SystemExit('Commodity Cycles nav marker not found')
+              s=s.replace(marker, marker+sector, 1)
+              p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add Sector Rotation to terminal navigation"
+          git push
