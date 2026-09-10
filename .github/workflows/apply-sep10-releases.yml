@@ -26,6 +26,7 @@ jobs:
           s=Path('index.html').read_text()
           Path('/tmp/terminal.js').write_text(s.split('<script>',1)[1].split('</script>',1)[0])
           PY
+          nl -ba /tmp/terminal.js | sed -n '24,38p'
           node --check /tmp/terminal.js
       - name: Verify locked Sep 10 releases
         run: |
