@@ -2,6 +2,7 @@ const FF_THIS_WEEK='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
 const FF_NEXT_WEEK='https://nfs.faireconomy.media/ff_calendar_nextweek.json';
 const G10=new Set(['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD','SEK','NOK']);
 const TARGET_TZ='Europe/Skopje';
+const RETRY_DELAYS=[0,250,750];
 
 function importance(v){
   const s=String(v||'').trim().toUpperCase();
@@ -46,14 +47,32 @@ function skopjeWeekday(){
   return day;
 }
 
+async function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
+async function fetchJsonWithRetry(url){
+  let lastError=new Error('Calendar provider unavailable');
+  for(let i=0;i<RETRY_DELAYS.length;i++){
+    if(RETRY_DELAYS[i])await sleep(RETRY_DELAYS[i]);
+    try{
+      const r=await fetch(url,{
+        headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.0'},
+        cache:'no-store'
+      });
+      if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
+      const raw=await r.json();
+      if(!Array.isArray(raw)||!raw.length)throw new Error('ForexFactory empty response');
+      return raw;
+    }catch(e){lastError=e;}
+  }
+  throw lastError;
+}
+
 async function fetchCalendar(url){
-  const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'TradingLabMacroTerminal/4.0'}});
-  if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
-  const raw=await r.json();
+  const raw=await fetchJsonWithRetry(url);
   return (Array.isArray(raw)?raw:[]).map(x=>{
     const currency=String(x.country||x.currency||'').toUpperCase();
     const imp=importance(x.impact||x.importance);
-    if(!G10.has(currency)||!imp||imp==='LOW')return null;
+    if(!G10.has(currency)||!imp)return null;
     const actual=x.actual??'—';
     const forecast=x.forecast??'—';
     const z=infer(x.title||x.event,actual,forecast);
@@ -67,7 +86,7 @@ async function fetchCalendar(url){
 }
 
 export default async function handler(req,res){
-  res.setHeader('Cache-Control','s-maxage=30, stale-while-revalidate=180');
+  res.setHeader('Cache-Control','s-maxage=20, stale-while-revalidate=60');
   const sunday=skopjeWeekday()==='Sun';
   const primary=sunday?FF_NEXT_WEEK:FF_THIS_WEEK;
   const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
@@ -75,7 +94,7 @@ export default async function handler(req,res){
     let events=[];let provider='ForexFactory weekly export';
     try{events=await fetchCalendar(primary);provider+=sunday?' · next week':' · this week';}
     catch(e){events=await fetchCalendar(secondary);provider+=' · fallback';}
-    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'Medium and High-impact G10 calendar only. On Sundays the terminal requests the coming week; Monday-Friday it requests the active week. Times are converted to Europe/Skopje.'});
+    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained so selected TradingLab calendar rows can receive their Actual values. The interface displays the configured Medium and High-impact calendar. Times are converted to Europe/Skopje.'});
   }catch(e){
     return res.status(200).json({mode:'seed',provider:'error',timeZone:TARGET_TZ,events:[],updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
   }
