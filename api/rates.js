@@ -6,10 +6,10 @@ const BANKS = [
     latest: { hike: 57.4, hold: 42.7, cut: 0.0 }, previous: { hike: 55.6, hold: 44.4, cut: 0.0 }
   },
   {
-    id: 'ECB', ccy: 'EUR', name: 'European Central Bank', nextMeeting: '10 Sep 2026',
-    current: '2.25%', currentRate: 2.25, holdRate: '2.25%', hikeRate: '2.50%', cutRate: '2.00%',
+    id: 'ECB', ccy: 'EUR', name: 'European Central Bank', nextMeeting: '29 Oct 2026',
+    current: '2.50%', currentRate: 2.50, holdRate: '2.50%', hikeRate: '2.75%', cutRate: '2.25%',
     url: 'https://centralbank.watch/european-central-bank/',
-    latest: { hike: 87.9, hold: 12.1, cut: 0.0 }, previous: { hike: 89.0, hold: 11.0, cut: 0.0 }
+    latest: { hike: 51.0, hold: 49.0, cut: 0.0 }, previous: { hike: 51.0, hold: 49.0, cut: 0.0 }
   },
   {
     id: 'BOJ', ccy: 'JPY', name: 'Bank of Japan', nextMeeting: '17 Sep 2026',
@@ -102,7 +102,8 @@ async function fetchBank(bank) {
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const text = cleanText(await r.text());
-    return { ...bank, latest: parseProbabilities(text, bank.latest), live: true };
+    const staleEcb=bank.id==='ECB'&&(/September 10, 2026/i.test(text)||/Current Rate:\s*2\.25%/i.test(text));
+    return { ...bank, latest: staleEcb?bank.latest:parseProbabilities(text, bank.latest), live: !staleEcb };
   } catch (_) {
     return { ...bank, live: false };
   } finally {
