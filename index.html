@@ -150,6 +150,39 @@ const STATIC_CAL=[
 ["2026-09-18","19:00","USD","Baker Hughes Rig Count","—","—","—","MED","U.S. oil and gas supply-response signal after the geopolitical price spike.","Rigs cannot replace lost Gulf barrels quickly, but a sustained rise matters for medium-term supply."],
 ["2026-09-18","21:30","USD","CFTC Commitments of Traders","—","—","—","MED","Weekly positioning context across energy, metals and agriculture.","Use as positioning confirmation only; physical balances and price structure remain primary."]
 ];
+const NEXT_WEEK_FORECASTS={
+ '2026-09-14|PPI m/m · Aug':'0.0% m/m est.',
+ '2026-09-14|CPI + Core CPI Measures · Aug':'Headline 2.9% y/y · Core near 2.0%',
+ '2026-09-14|Manufacturing Sales m/m · Jul':'-1.5% m/m advance',
+ '2026-09-14|USDA Crop Progress · weekly':'No fixed consensus',
+ '2026-09-15|German + Euro Area ZEW Sentiment · Sep':'Germany ~36 · EA ~32',
+ '2026-09-15|ADP Weekly Employment Change':'Consensus pending',
+ '2026-09-15|Empire State Manufacturing · Sep':'~18.0',
+ '2026-09-15|Wholesale Sales m/m · Jul':'~+0.8% m/m',
+ '2026-09-15|Current Account · Q2':'~-2.0B',
+ '2026-09-16|Trade Balance + Core Machinery Orders · Aug/Jul':'Trade ~-0.45T · Orders ~-5.0%',
+ '2026-09-16|UK CPI / Core CPI / Services CPI · Aug':'Headline ~3.1% · Core ~2.7% · Services ~3.6%',
+ '2026-09-16|Retail Sales + Control Group · Aug':'Headline ~+0.2% · Control ~+0.3%',
+ '2026-09-16|Initial Jobless Claims':'~207K',
+ '2026-09-16|Canada Crop Production Estimates · Aug':'No fixed consensus',
+ '2026-09-16|EIA Crude Oil Inventories':'Consensus updates Tuesday',
+ '2026-09-16|FOMC Rate Decision + Economic Projections':'3.75–4.00% · 25bp hike',
+ '2026-09-16|Fed Chair Warsh Press Conference':'Hawkish / data-dependent expected',
+ '2026-09-16|BoC Summary of Deliberations':'Neutral-hawkish balance expected',
+ '2026-09-16|GDP q/q · Q2':'+0.2% q/q',
+ '2026-09-17|Euro Area CPI + Core CPI · Aug final':'Headline 3.3% · Core 2.4%',
+ '2026-09-17|BoE Rate Decision + Monetary Policy Summary':'3.75% hold',
+ '2026-09-17|USDA Weekly Export Sales':'No fixed consensus',
+ '2026-09-17|EIA Natural Gas Storage':'Consensus updates Wednesday',
+ '2026-09-18|National Core CPI · Aug':'~2.0% y/y',
+ '2026-09-18|BoJ Policy Rate + Statement · tentative':'1.25% · 25bp hike',
+ '2026-09-18|UK Retail Sales m/m · Aug':'-0.3% m/m',
+ '2026-09-18|Germany PPI m/m · Aug':'~+0.5% m/m',
+ '2026-09-18|Industrial Production + Capacity Utilization · Aug':'~+0.1% · ~76.4%',
+ '2026-09-18|Baker Hughes Rig Count':'No fixed consensus',
+ '2026-09-18|CFTC Commitments of Traders':'No forecast · positioning report'
+};
+for(const row of STATIC_CAL){let f=NEXT_WEEK_FORECASTS[`${row[0]}|${row[3]}`];if(f)row[5]=f}
 const ORDER=Object.keys(RES).sort((a,b)=>RES[a].order-RES[b].order); // immutable 3M base order
 let liveEvents=[]; let sourceMode='seed'; let newsData={financialjuice:[],macroUpdates:[],reuters:[],reutersConfigured:false}; let newsMode='loading'; let alertsEnabled=localStorage.getItem('tl_alerts')==='1'; let calendarFilter='ALL';
 const MANUAL_CATALYSTS=[
