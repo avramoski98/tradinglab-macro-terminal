@@ -4,6 +4,11 @@ const G10=new Set(['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD','SEK','NOK'])
 const TARGET_TZ='Europe/Skopje';
 const RETRY_DELAYS=[0,250,750];
 
+const VERIFIED_OVERRIDES=[
+  {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI|Producer|Import Prices/i,actual:'0.7%',previous:'-0.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI m/m · Aug'},
+  {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI.*y\/y|Producer.*y\/y/i,actual:'-0.7%',previous:'-2.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI y/y · Aug'}
+];
+
 function importance(v){
   const s=String(v||'').trim().toUpperCase();
   if(s==='HIGH'||s==='3')return'HIGH';
@@ -42,9 +47,39 @@ function toPrilepIso(value){
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}${offset}`;
 }
 
+function localDate(iso){
+  const d=new Date(iso);
+  if(!Number.isFinite(d.getTime()))return'';
+  return new Intl.DateTimeFormat('en-CA',{timeZone:TARGET_TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+}
+
+function applyVerifiedOverrides(events){
+  const out=[...events];
+  for(const o of VERIFIED_OVERRIDES){
+    let matched=false;
+    for(let i=0;i<out.length;i++){
+      const e=out[i];
+      if(e.currency!==o.currency||localDate(e.date)!==o.date)continue;
+      if(!o.match.test(String(e.event||'')))continue;
+      // Avoid applying the YoY override to a generic MoM row.
+      if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
+      out[i]={...e,actual:o.actual,previous:o.previous,forecast:e.forecast&&e.forecast!=='—'?e.forecast:o.forecast,importance:e.importance||o.importance,lastUpdate:new Date().toISOString(),source:o.source};
+      matched=true;
+      break;
+    }
+    if(!matched&&/m\/m/i.test(o.event)){
+      out.push({
+        date:`${o.date}T${o.time}:00+02:00`,sourceDate:`${o.date}T${o.time}:00+02:00`,timeZone:TARGET_TZ,
+        country:o.currency,currency:o.currency,event:o.event,previous:o.previous,forecast:o.forecast,actual:o.actual,
+        importance:o.importance,label:'Update',impact:'Strengthens',lastUpdate:new Date().toISOString(),source:o.source
+      });
+    }
+  }
+  return out;
+}
+
 function skopjeWeekday(){
-  const day=new Intl.DateTimeFormat('en-US',{timeZone:TARGET_TZ,weekday:'short'}).format(new Date());
-  return day;
+  return new Intl.DateTimeFormat('en-US',{timeZone:TARGET_TZ,weekday:'short'}).format(new Date());
 }
 
 async function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -55,7 +90,7 @@ async function fetchJsonWithRetry(url){
     if(RETRY_DELAYS[i])await sleep(RETRY_DELAYS[i]);
     try{
       const r=await fetch(url,{
-        headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.0'},
+        headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.1'},
         cache:'no-store'
       });
       if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
@@ -69,7 +104,7 @@ async function fetchJsonWithRetry(url){
 
 async function fetchCalendar(url){
   const raw=await fetchJsonWithRetry(url);
-  return (Array.isArray(raw)?raw:[]).map(x=>{
+  const events=(Array.isArray(raw)?raw:[]).map(x=>{
     const currency=String(x.country||x.currency||'').toUpperCase();
     const imp=importance(x.impact||x.importance);
     if(!G10.has(currency)||!imp)return null;
@@ -83,6 +118,7 @@ async function fetchCalendar(url){
       lastUpdate:null,source:'ForexFactory'
     };
   }).filter(Boolean);
+  return applyVerifiedOverrides(events);
 }
 
 export default async function handler(req,res){
@@ -91,11 +127,12 @@ export default async function handler(req,res){
   const primary=sunday?FF_NEXT_WEEK:FF_THIS_WEEK;
   const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
   try{
-    let events=[];let provider='ForexFactory weekly export';
+    let events=[];let provider='ForexFactory weekly export + verified FinancialJuice overrides';
     try{events=await fetchCalendar(primary);provider+=sunday?' · next week':' · this week';}
     catch(e){events=await fetchCalendar(secondary);provider+=' · fallback';}
-    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained so selected TradingLab calendar rows can receive their Actual values. The interface displays the configured Medium and High-impact calendar. Times are converted to Europe/Skopje.'});
+    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified FinancialJuice actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
   }catch(e){
-    return res.status(200).json({mode:'seed',provider:'error',timeZone:TARGET_TZ,events:[],updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
+    const events=applyVerifiedOverrides([]);
+    return res.status(200).json({mode:'verified-fallback',provider:'FinancialJuice overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
   }
 }
