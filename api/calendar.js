@@ -28,7 +28,10 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI m\\/m|Inflation Rate m\\/m/i,actual:'0.5%',previous:'0.3%',forecast:'0.5%',importance:'MED',source:'ONS',event:'CPI m/m · Aug'},
   {date:'2026-09-16',time:'08:00',currency:'GBP',match:/Core CPI.*y\\/y|Core Inflation Rate.*y\\/y/i,actual:'2.6%',previous:'2.6%',forecast:'2.6%',importance:'HIGH',source:'ONS',event:'Core CPI y/y · Aug'},
   {date:'2026-09-16',time:'14:30',currency:'USD',match:/^Retail Sales m\\/m|Retail Sales.*Aug/i,actual:'1.2%',previous:'-0.5% rev.',forecast:'0.8%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales m/m · Aug'},
-  {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales Control Group m/m · Aug'}
+  {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Reuters',event:'Retail Sales Control Group m/m · Aug'},
+  {date:'2026-09-16',time:'20:00',currency:'USD',match:/FOMC|Federal Funds|Rate Decision/i,actual:'3.75–4.00% · +25bp',previous:'3.50–3.75%',forecast:'3.75–4.00%',importance:'HIGH',source:'Federal Reserve',event:'FOMC Rate Decision + Economic Projections'},
+  {date:'2026-09-16',time:'20:30',currency:'USD',match:/Fed Chair|Warsh|Press Conference/i,actual:'Hawkish · price stability focus',previous:'—',forecast:'Hawkish / data-dependent',importance:'HIGH',source:'Federal Reserve',event:'Fed Chair Warsh Press Conference'},
+  {date:'2026-09-16',time:'19:30',currency:'CAD',match:/Summary of Deliberations|BoC/i,actual:'Inflation risks increased',previous:'Hold 2.25%',forecast:'Neutral-hawkish',importance:'HIGH',source:'Bank of Canada',event:'BoC Summary of Deliberations'}
 ];
 
 function importance(v){
