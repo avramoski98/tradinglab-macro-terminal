@@ -1,11 +1,11 @@
-const SOURCE_UPDATED_AT = '2026-09-16T12:44:00Z';
+const SOURCE_UPDATED_AT = '2026-09-16T23:02:00Z';
 
 const BANKS = [
   {
-    id: 'FED', ccy: 'USD', name: 'Federal Reserve', nextMeeting: '16 Sep 2026',
-    current: '3.50–3.75%', currentRate: 3.625, holdRate: '3.50–3.75%', hikeRate: '3.75–4.00%', cutRate: '3.25–3.50%',
-    url: 'https://centralbank.watch/federal-reserve/', source: 'CME / Reuters',
-    latest: { hike: 93.0, hold: 7.0, cut: 0.0 }, previous: { hike: 89.0, hold: 11.0, cut: 0.0 }
+    id: 'FED', ccy: 'USD', name: 'Federal Reserve', nextMeeting: '28 Oct 2026',
+    current: '3.75–4.00%', currentRate: 3.875, holdRate: '3.75–4.00%', hikeRate: '4.00–4.25%', cutRate: '3.50–3.75%',
+    url: 'https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html', source: 'FOMC SEP / CME FedWatch',
+    latest: { hike: NaN, hold: NaN, cut: NaN }, previous: { hike: 93.0, hold: 7.0, cut: 0.0 }
   },
   {
     id: 'ECB', ccy: 'EUR', name: 'European Central Bank', nextMeeting: '29 Oct 2026',
