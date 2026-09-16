@@ -1,53 +1,53 @@
-const SOURCE_UPDATED_AT = '2026-09-14T10:25:00Z';
+const SOURCE_UPDATED_AT = '2026-09-16T12:44:00Z';
 
 const BANKS = [
   {
     id: 'FED', ccy: 'USD', name: 'Federal Reserve', nextMeeting: '16 Sep 2026',
     current: '3.50–3.75%', currentRate: 3.625, holdRate: '3.50–3.75%', hikeRate: '3.75–4.00%', cutRate: '3.25–3.50%',
     url: 'https://centralbank.watch/federal-reserve/', source: 'CME / Reuters',
-    latest: { hike: 89.0, hold: 11.0, cut: 0.0 }, previous: { hike: 85.5, hold: 14.5, cut: 0.0 }
+    latest: { hike: 93.0, hold: 7.0, cut: 0.0 }, previous: { hike: 89.0, hold: 11.0, cut: 0.0 }
   },
   {
     id: 'ECB', ccy: 'EUR', name: 'European Central Bank', nextMeeting: '29 Oct 2026',
     current: '2.50%', currentRate: 2.50, holdRate: '2.50%', hikeRate: '2.75%', cutRate: '2.25%',
-    url: 'https://centralbank.watch/european-central-bank/', source: 'LSEG / Reuters',
+    url: 'https://centralbank.watch/european-central-bank/', source: 'Futures / LSEG',
     latest: { hike: 60.0, hold: 40.0, cut: 0.0 }, previous: { hike: 51.0, hold: 49.0, cut: 0.0 }
   },
   {
     id: 'BOJ', ccy: 'JPY', name: 'Bank of Japan', nextMeeting: '18 Sep 2026',
     current: '1.00%', currentRate: 1.00, holdRate: '1.00%', hikeRate: '1.25%', cutRate: '0.75%',
-    url: 'https://centralbank.watch/bank-of-japan/', source: 'LSEG / Reuters',
-    latest: { hike: 76.0, hold: 24.0, cut: 0.0 }, previous: { hike: 64.1, hold: 35.9, cut: 0.0 }
+    url: 'https://centralbank.watch/bank-of-japan/', source: 'CentralBank.Watch / JPY rates',
+    latest: { hike: 62.9, hold: 37.1, cut: 0.0 }, previous: { hike: 61.5, hold: 38.5, cut: 0.0 }
   },
   {
     id: 'BOE', ccy: 'GBP', name: 'Bank of England', nextMeeting: '17 Sep 2026',
     current: '3.75%', currentRate: 3.75, holdRate: '3.75%', hikeRate: '4.00%', cutRate: '3.50%',
-    url: 'https://centralbank.watch/bank-of-england/', source: 'LSEG / Reuters',
-    latest: { hike: 30.0, hold: 70.0, cut: 0.0 }, previous: { hike: 10.3, hold: 89.7, cut: 0.0 }
+    url: 'https://centralbank.watch/bank-of-england/', source: 'CentralBank.Watch / GBP rates',
+    latest: { hike: 26.9, hold: 73.1, cut: 0.0 }, previous: { hike: 30.0, hold: 70.0, cut: 0.0 }
   },
   {
     id: 'BOC', ccy: 'CAD', name: 'Bank of Canada', nextMeeting: '28 Oct 2026',
     current: '2.25%', currentRate: 2.25, holdRate: '2.25%', hikeRate: '2.50%', cutRate: '2.00%',
     url: 'https://rateprobability.com/boc', source: 'RateProbability',
-    latest: { hike: 43.0, hold: 57.0, cut: 0.0 }, previous: { hike: 43.0, hold: 57.0, cut: 0.0 }
+    latest: { hike: 76.0, hold: 24.0, cut: 0.0 }, previous: { hike: 43.0, hold: 57.0, cut: 0.0 }
   },
   {
     id: 'RBA', ccy: 'AUD', name: 'Reserve Bank of Australia', nextMeeting: '29 Sep 2026',
     current: '4.35%', currentRate: 4.35, holdRate: '4.35%', hikeRate: '4.60%', cutRate: '4.10%',
-    url: 'https://centralbank.watch/reserve-bank-of-australia/', source: 'CentralBank.Watch',
-    latest: { hike: 66.0, hold: 34.0, cut: 0.0 }, previous: { hike: 62.0, hold: 38.0, cut: 0.0 }
+    url: 'https://centralbank.watch/reserve-bank-of-australia/', source: 'ASX / CentralBank.Watch',
+    latest: { hike: 76.0, hold: 24.0, cut: 0.0 }, previous: { hike: 66.0, hold: 34.0, cut: 0.0 }
   },
   {
     id: 'RBNZ', ccy: 'NZD', name: 'Reserve Bank of New Zealand', nextMeeting: '28 Oct 2026',
     current: '2.75%', currentRate: 2.75, holdRate: '2.75%', hikeRate: '3.00%', cutRate: '2.50%',
-    url: 'https://centralbank.watch/reserve-bank-of-new-zealand/', source: 'CentralBank.Watch',
-    latest: { hike: 0.0, hold: 88.1, cut: 11.9 }, previous: { hike: 0.0, hold: 96.5, cut: 3.5 }
+    url: 'https://centralbank.watch/reserve-bank-of-new-zealand/', source: 'ASX / CentralBank.Watch',
+    latest: { hike: 11.0, hold: 89.0, cut: 0.0 }, previous: { hike: 0.0, hold: 88.1, cut: 11.9 }
   },
   {
     id: 'SNB', ccy: 'CHF', name: 'Swiss National Bank', nextMeeting: '24 Sep 2026',
     current: '0.00%', currentRate: 0.00, holdRate: '0.00%', hikeRate: '0.25%', cutRate: '-0.25%',
-    url: 'https://centralbank.watch/swiss-national-bank/', source: 'CentralBank.Watch',
-    latest: { hike: 1.0, hold: 99.0, cut: 0.0 }, previous: { hike: 1.0, hold: 99.0, cut: 0.0 }
+    url: 'https://centralbank.watch/swiss-national-bank/', source: 'CentralBank.Watch / CHF rates',
+    latest: { hike: 5.7, hold: 94.3, cut: 0.0 }, previous: { hike: 1.0, hold: 99.0, cut: 0.0 }
   }
 ];
 
@@ -95,9 +95,9 @@ function rowsFor(bank, probs, previous) {
 }
 
 async function fetchBank(bank) {
-  // Reuters/LSEG/CME values above are the current verified snapshot for the four
-  // central banks meeting this week. Keep them as the source of truth so a stale
-  // CentralBank.Watch page cannot overwrite newer market pricing.
+  // Meeting-week snapshots are pinned to independently verified market pricing so
+  // a lagging public rate page cannot overwrite the newest data. Other banks are
+  // still refreshed from their upstream pricing pages on every API request.
   if (['FED', 'ECB', 'BOJ', 'BOE'].includes(bank.id)) {
     return { ...bank, live: true, verifiedSnapshot: true };
   }
@@ -106,7 +106,7 @@ async function fetchBank(bank) {
   const timer = setTimeout(() => ctrl.abort(), 4500);
   try {
     const r = await fetch(bank.url, {
-      headers: { 'User-Agent': 'TradingLabMacroTerminal/2.1', 'Accept': 'text/html,application/xhtml+xml' },
+      headers: { 'User-Agent': 'TradingLabMacroTerminal/2.2', 'Accept': 'text/html,application/xhtml+xml' },
       signal: ctrl.signal
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
