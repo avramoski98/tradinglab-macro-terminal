@@ -1,68 +1,45 @@
 name: Update Sep 17 Macro Terminal
-
 on:
   push:
-    paths:
-      - '.github/workflows/update-sep17-macro.yml'
+    paths: ['.github/workflows/update-sep17-macro.yml']
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply verified Sep 16-17 macro updates
+      - name: Patch terminal
         shell: python
         run: |
           from pathlib import Path
-          import re
-
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-
-          reps={
-            '"rate":"3.50–3.75%"':'"rate":"3.75–4.00%"',
-            '"lastDecision":"Hold · 29 Jul · 3 dissents for hike"':'"lastDecision":"Hike +25bp · 16 Sep · unanimous 12–0"',
-            '"cb":"HAWKISH REPRICING"':'"cb":"HAWKISH / PRICE STABILITY"',
-            '"next":"16 Sep FOMC: ~85% market pricing for +25bp; path after the meeting matters more than the hike itself"':'"next":"Post-FOMC: Fed delivered +25bp; next focus is whether inflation and activity validate another 2026 hike"',
-            '"pricing":"~85% HIKE PRICED"':'"pricing":"HIKE DELIVERED · FURTHER 2026 TIGHTENING STILL LIVE"',
-            '"weekly":"Hotter core CPI plus strong August payrolls lifted September hike pricing to roughly 85%. USD is fundamentally supported, but the hike is heavily priced and political pressure for lower rates creates a conflict. Watch US2Y after the FOMC."':'"weekly":"Fed delivered a unanimous 25bp hike to 3.75–4.00%. Warsh kept the focus on price stability, rejected mechanical forward guidance and described activity, investment and employment as resilient. Strong August retail sales reinforce the hawkish USD/rates backdrop; the next leg depends on inflation persistence and front-end yields."',
-            '"why":"USD ranks #3: labor, inflation and front-end yields all support tightening, but much of the September move is already priced. The next USD leg depends on Fed guidance, not simply the hike itself."':'"why":"USD remains one of the strongest G10 macro stories after the Fed hike: price stability is the priority, growth is resilient and consumer demand surprised higher. The main risk is that further tightening becomes over-priced versus incoming inflation data."',
-            '"inflation":"Above target but not accelerating cleanly"':'"inflation":"Headline CPI 3.1% · core 2.6% · services 3.4%"',
-            '"weekly":"UK front-end yields remain elevated and markets price substantial November hike risk, but labor weakness and fiscal/bond stress reduce conviction. This is a rate-supportive but conflict-heavy GBP backdrop."':'"weekly":"UK headline CPI rose to 3.1%, but core CPI stayed 2.6% and services inflation 3.4%. That keeps the BoE inflation problem alive without creating a clean immediate-hike signal; the 17 Sep vote split and guidance matter most."',
-            '"next":"14 Sep CPI is the key test after August employment -41.7k"':'"next":"BoC minutes: inflation risks increased; Macklem speech 21 Sep is the next policy signal"',
-            '"weekly":"August employment fell 41.7k, materially weakening CAD domestic momentum. Higher oil is an offset, not a full repair. CPI and Canada 2Y need to re-accelerate to restore conviction."':'"weekly":"BoC kept 2.25% but its September deliberations said inflation is likely to stay above target near term and the risk of broader pass-through has risen. Weak labor still conflicts with that hawkish inflation risk, keeping CAD mixed rather than cleanly bullish."'
+          p=Path('index.html'); s=p.read_text(encoding='utf-8')
+          R={
+          '"rate":"3.50–3.75%"':'"rate":"3.75–4.00%"',
+          '"lastDecision":"Hold · 29 Jul · 3 dissents for hike"':'"lastDecision":"Hike +25bp · 16 Sep · unanimous 12–0"',
+          '"cb":"HAWKISH REPRICING"':'"cb":"HAWKISH / PRICE STABILITY"',
+          '"next":"16 Sep FOMC: ~85% market pricing for +25bp; path after the meeting matters more than the hike itself"':'"next":"Post-FOMC: +25bp delivered; inflation, activity and US2Y now decide whether another 2026 hike is justified"',
+          '"pricing":"~85% HIKE PRICED"':'"pricing":"HIKE DELIVERED · FURTHER 2026 TIGHTENING LIVE"',
+          '"weekly":"Hotter core CPI plus strong August payrolls lifted September hike pricing to roughly 85%. USD is fundamentally supported, but the hike is heavily priced and political pressure for lower rates creates a conflict. Watch US2Y after the FOMC."':'"weekly":"Fed delivered a unanimous 25bp hike to 3.75–4.00%. Warsh kept the focus on price stability, resilient demand and investment, while avoiding mechanical forward guidance. Strong August retail sales reinforce the hawkish USD/rates backdrop."',
+          '"why":"USD ranks #3: labor, inflation and front-end yields all support tightening, but much of the September move is already priced. The next USD leg depends on Fed guidance, not simply the hike itself."':'"why":"USD is supported by the delivered Fed hike, persistent inflation risk, resilient labor and stronger consumer demand. Further upside needs confirmation from inflation and front-end yields rather than the hike itself."',
+          '"inflation":"Above target but not accelerating cleanly"':'"inflation":"Headline CPI 3.1% · core 2.6% · services 3.4%"',
+          '"next":"14 Sep CPI is the key test after August employment -41.7k"':'"next":"BoC minutes: inflation risks increased; Macklem speech 21 Sep is the next policy signal"'
           }
-          for a,b in reps.items():
-            if a in s:s=s.replace(a,b)
-
-          old='["2026-09-16","20:00","USD","FOMC Rate Decision + Economic Projections","3.50–3.75%","25bp hike risk dominant","—","EXTREME","The event of the week: decision, dot plot, inflation/growth projections and vote split.","Hike + higher dots / inflation path = USD and yields positive; hike with cautious guidance can become sell-the-news."]'
-          new='["2026-09-16","20:00","USD","FOMC Rate Decision + Economic Projections","3.50–3.75%","3.75–4.00% · +25bp","3.75–4.00% · +25bp","EXTREME","Fed raised rates unanimously 12–0. SEP lifted 2026 inflation and the median policy path to 4.1% year-end.","Hawkish confirmation: resilient activity + elevated inflation keep further 2026 tightening live."]'
-          s=s.replace(old,new)
-          old='["2026-09-16","20:30","USD","Fed Chair Warsh Press Conference","—","—","—","EXTREME","Tests whether the Fed signals a cycle or a one-off insurance hike.","Focus on reaction function, energy pass-through and whether December remains live—not generic hawkish words."]'
-          new='["2026-09-16","20:30","USD","Fed Chair Warsh Press Conference","—","Hawkish / price-stability focus","Delivered","EXTREME","Warsh stressed price stability, resilient demand/investment and avoided committing to mechanical forward guidance.","USD/rates positive while incoming inflation and activity keep another hike live; watch US2Y confirmation."]'
-          s=s.replace(old,new)
-          old='["2026-09-16","16:30","USD","EIA Crude Oil Inventories","—","—","—","HIGH","U.S. crude, gasoline, distillate, production and refinery-balance update.","Product stocks and implied demand matter more than crude alone while Gulf supply is disrupted."]'
-          new='["2026-09-16","16:30","USD","EIA Crude Oil Inventories","424.069M commercial","—","423.429M · -0.640M","HIGH","Commercial crude stocks fell 0.64M barrels in the week to 11 Sep; Cushing also declined.","Mildly supportive for crude on inventories, but geopolitics/refining and product balances remain the dominant energy drivers."]'
-          s=s.replace(old,new)
-
+          for a,b in R.items(): s=s.replace(a,b)
           marker='const MANUAL_CATALYSTS=[\n'
-          add="""const MANUAL_CATALYSTS=[\n {date:'2026-09-16T20:30:00+02:00',ccy:'USD',event:'Fed Chair Warsh Press Conference',kind:'POLICY',actual:'Hawkish / price-stability focus',forecast:'Hawkish / data-dependent',previous:'—',result:'HAWKISH CONFIRMATION',score:3,highImpact:true,why:'Warsh emphasized price stability, resilient activity and investment, and avoided committing to forward guidance; further tightening remains data-dependent.'},\n {date:'2026-09-16T20:00:00+02:00',ccy:'USD',event:'FOMC Rate Decision + SEP',kind:'RATE',actual:'3.75–4.00% · +25bp · 12–0',forecast:'3.75–4.00%',previous:'3.50–3.75%',result:'HAWKISH HIKE',score:3,highImpact:true,why:'Fed raised 25bp unanimously. The September projections lifted 2026 inflation and the median year-end funds-rate path to 4.1%.'},\n {date:'2026-09-16T14:30:00+02:00',ccy:'USD',event:'Retail Sales m/m · Aug',kind:'RETAIL SALES',actual:'+1.2%',forecast:'+0.8%',previous:'-0.5% rev.',result:'BEAT',score:2.5,highImpact:true,why:'Retail sales rebounded sharply, reinforcing the resilient-demand side of the Fed hawkish setup.'},\n {date:'2026-09-16T14:30:00+02:00',ccy:'USD',event:'Retail Sales Control Group m/m · Aug',kind:'RETAIL SALES',actual:'+1.4%',forecast:'+0.5%',previous:'—',result:'BEAT',score:2.5,highImpact:true,why:'The control group materially beat consensus and strengthened the Q3 consumption/GDP signal.'},\n {date:'2026-09-16T08:00:00+02:00',ccy:'GBP',event:'UK CPI y/y · Aug',kind:'INFLATION',actual:'3.1%',forecast:'3.1%',previous:'2.9%',result:'IN LINE / HIGHER',score:0.5,highImpact:true,why:'Headline inflation accelerated, but core CPI held 2.6% and services inflation held 3.4%, limiting the immediate hawkish impulse.'},\n {date:'2026-09-16T19:30:00+02:00',ccy:'CAD',event:'BoC Summary of Deliberations',kind:'POLICY',actual:'Inflation risks increased',forecast:'Neutral-hawkish',previous:'Hold 2.25%',result:'HAWKISH TILT',score:1.5,highImpact:true,why:'BoC judged inflation likely to remain above target near term and saw a greater risk that energy/trade costs spread into broader prices.'},\n {date:'2026-09-16T16:30:00+02:00',ccy:'USD',event:'EIA Commercial Crude Stocks',kind:'COMMODITY',actual:'-0.640M w/w',forecast:'—',previous:'424.069M',result:'DRAW',score:0.5,highImpact:false,why:'Commercial crude inventories fell to 423.429M barrels; a modest supportive inventory impulse for crude.'},\n"""
-          if "FOMC Rate Decision + SEP'" not in s:
-            s=s.replace(marker,add)
+          if "event:'FOMC Rate Decision + SEP'" not in s:
+            ins="""const MANUAL_CATALYSTS=[\n {date:'2026-09-16T20:30:00+02:00',ccy:'USD',event:'Fed Chair Warsh Press Conference',kind:'POLICY',actual:'Hawkish / price-stability focus',forecast:'Hawkish / data-dependent',previous:'—',result:'HAWKISH CONFIRMATION',score:3,highImpact:true,why:'Warsh emphasized price stability, resilient activity and investment, and avoided committing to forward guidance.'},\n {date:'2026-09-16T20:00:00+02:00',ccy:'USD',event:'FOMC Rate Decision + SEP',kind:'RATE',actual:'3.75–4.00% · +25bp · 12–0',forecast:'3.75–4.00%',previous:'3.50–3.75%',result:'HAWKISH HIKE',score:3,highImpact:true,why:'Fed raised 25bp unanimously; the SEP lifted 2026 inflation and the median year-end funds-rate path to 4.1%.'},\n {date:'2026-09-16T14:30:00+02:00',ccy:'USD',event:'Retail Sales m/m · Aug',kind:'RETAIL SALES',actual:'+1.2%',forecast:'+0.8%',previous:'-0.5% rev.',result:'BEAT',score:2.5,highImpact:true,why:'Retail sales rebounded sharply, reinforcing resilient demand.'},\n {date:'2026-09-16T14:30:00+02:00',ccy:'USD',event:'Retail Sales Control Group m/m · Aug',kind:'RETAIL SALES',actual:'+1.4%',forecast:'+0.5%',previous:'—',result:'BEAT',score:2.5,highImpact:true,why:'Control-group sales materially beat consensus and strengthened the Q3 consumption signal.'},\n {date:'2026-09-16T08:00:00+02:00',ccy:'GBP',event:'UK CPI y/y · Aug',kind:'INFLATION',actual:'3.1%',forecast:'3.1%',previous:'2.9%',result:'IN LINE / HIGHER',score:0.5,highImpact:true,why:'Headline inflation accelerated, while core stayed 2.6% and services 3.4%.'},\n {date:'2026-09-16T19:30:00+02:00',ccy:'CAD',event:'BoC Summary of Deliberations',kind:'POLICY',actual:'Inflation risks increased',forecast:'Neutral-hawkish',previous:'Hold 2.25%',result:'HAWKISH TILT',score:1.5,highImpact:true,why:'BoC saw inflation remaining above target near term and greater risk of broader price pass-through.'},\n {date:'2026-09-16T16:30:00+02:00',ccy:'USD',event:'EIA Commercial Crude Stocks',kind:'COMMODITY',actual:'-0.640M w/w',forecast:'—',previous:'424.069M',result:'DRAW',score:0.5,highImpact:false,why:'Commercial crude stocks fell to 423.429M barrels.'},\n"""
+            s=s.replace(marker,ins)
           p.write_text(s,encoding='utf-8')
 
-          c=Path('api/calendar.js')
-          x=c.read_text(encoding='utf-8')
+          c=Path('api/calendar.js'); x=c.read_text(encoding='utf-8')
           anchor="  {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales Control Group m/m · Aug'}"
-          extra="""  {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Reuters',event:'Retail Sales Control Group m/m · Aug'},\n  {date:'2026-09-16',time:'20:00',currency:'USD',match:/FOMC|Federal Funds|Rate Decision/i,actual:'3.75–4.00% · +25bp',previous:'3.50–3.75%',forecast:'3.75–4.00%',importance:'HIGH',source:'Federal Reserve',event:'FOMC Rate Decision + Economic Projections'},\n  {date:'2026-09-16',time:'20:30',currency:'USD',match:/Fed Chair|Warsh|Press Conference/i,actual:'Hawkish · price stability focus',previous:'—',forecast:'Hawkish / data-dependent',importance:'HIGH',source:'Federal Reserve',event:'Fed Chair Warsh Press Conference'},\n  {date:'2026-09-16',time:'19:30',currency:'CAD',match:/Summary of Deliberations|BoC/i,actual:'Inflation risks increased',previous:'Hold 2.25%',forecast:'Neutral-hawkish',importance:'HIGH',source:'Bank of Canada',event:'BoC Summary of Deliberations'}"""
-          if "actual:'3.75–4.00% · +25bp'" not in x:
+          if "event:'FOMC Rate Decision + Economic Projections'" not in x:
+            extra=anchor+",\n  {date:'2026-09-16',time:'20:00',currency:'USD',match:/FOMC|Federal Funds|Rate Decision/i,actual:'3.75–4.00% · +25bp',previous:'3.50–3.75%',forecast:'3.75–4.00%',importance:'HIGH',source:'Federal Reserve',event:'FOMC Rate Decision + Economic Projections'},\n  {date:'2026-09-16',time:'20:30',currency:'USD',match:/Fed Chair|Warsh|Press Conference/i,actual:'Hawkish · price stability focus',previous:'—',forecast:'Hawkish / data-dependent',importance:'HIGH',source:'Federal Reserve',event:'Fed Chair Warsh Press Conference'},\n  {date:'2026-09-16',time:'19:30',currency:'CAD',match:/Summary of Deliberations|BoC/i,actual:'Inflation risks increased',previous:'Hold 2.25%',forecast:'Neutral-hawkish',importance:'HIGH',source:'Bank of Canada',event:'BoC Summary of Deliberations'}"
             x=x.replace(anchor,extra)
           c.write_text(x,encoding='utf-8')
-      - name: Commit refreshed terminal
+      - name: Commit
         run: |
           git config user.name "TradingLab Macro Bot"
           git config user.email "actions@users.noreply.github.com"
