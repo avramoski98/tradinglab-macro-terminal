@@ -19,7 +19,16 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-09-15',time:'11:00',currency:'EUR',match:/German.*ZEW|ZEW.*Sentiment/i,actual:'Germany 34.7 · EA 25.8',previous:'Germany 34.2 · EA 31.4',forecast:'Germany 39.8 · EA 39.2',importance:'HIGH',source:'ZEW',event:'German + Euro Area ZEW Sentiment · Sep'},
   {date:'2026-09-15',time:'14:15',currency:'USD',match:/ADP Weekly Employment Change/i,actual:'16.3K',previous:'12.3K',forecast:'—',importance:'MED',source:'ADP',event:'ADP Weekly Employment Change'},
   {date:'2026-09-15',time:'14:30',currency:'CAD',match:/Wholesale Sales/i,actual:'0.3%',previous:'2.8%',forecast:'-0.5%',importance:'MED',source:'Statistics Canada',event:'Wholesale Sales m/m · Jul'},
-  {date:'2026-09-15',time:'14:30',currency:'USD',match:/Empire State Manufacturing/i,actual:'7.6',previous:'20.6',forecast:'14.8',importance:'MED',source:'Federal Reserve Bank of New York',event:'Empire State Manufacturing Index · Sep'}
+  {date:'2026-09-15',time:'14:30',currency:'USD',match:/Empire State Manufacturing/i,actual:'7.6',previous:'20.6',forecast:'14.8',importance:'MED',source:'Federal Reserve Bank of New York',event:'Empire State Manufacturing Index · Sep'},
+
+  // 16 Sep: verified releases available by 14:44 Europe/Skopje.
+  {date:'2026-09-16',time:'01:50',currency:'JPY',match:/Core Machinery Orders.*m\\/m/i,actual:'-3.7%',previous:'9.7%',forecast:'-1.2%',importance:'HIGH',source:'Cabinet Office / Investing',event:'Core Machinery Orders m/m · Jul'},
+  {date:'2026-09-16',time:'01:50',currency:'JPY',match:/Trade Balance/i,actual:'-1.106T',previous:'-0.69T',forecast:'—',importance:'HIGH',source:'Japan MOF / Reuters',event:'Trade Balance · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI y\\/y|Inflation Rate y\\/y/i,actual:'3.1%',previous:'2.9%',forecast:'3.1%',importance:'HIGH',source:'ONS',event:'CPI y/y · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI m\\/m|Inflation Rate m\\/m/i,actual:'0.5%',previous:'0.3%',forecast:'0.5%',importance:'MED',source:'ONS',event:'CPI m/m · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/Core CPI.*y\\/y|Core Inflation Rate.*y\\/y/i,actual:'2.6%',previous:'2.6%',forecast:'2.6%',importance:'HIGH',source:'ONS',event:'Core CPI y/y · Aug'},
+  {date:'2026-09-16',time:'14:30',currency:'USD',match:/^Retail Sales m\\/m|Retail Sales.*Aug/i,actual:'1.2%',previous:'-0.5% rev.',forecast:'0.8%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales m/m · Aug'},
+  {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales Control Group m/m · Aug'}
 ];
 
 function importance(v){
@@ -74,12 +83,12 @@ function applyVerifiedOverrides(events){
       const e=out[i];
       if(e.currency!==o.currency||localDate(e.date)!==o.date)continue;
       if(!o.match.test(String(e.event||'')))continue;
-      // Avoid applying the YoY override to a generic MoM row.
       if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
       out[i]={...e,actual:o.actual,previous:o.previous,forecast:e.forecast&&e.forecast!=='—'?e.forecast:o.forecast,importance:e.importance||o.importance,lastUpdate:new Date().toISOString(),source:o.source};
       matched=true;
       break;
     }
+    // Monthly verified releases are also inserted if the upstream provider omits them.
     if(!matched&&/m\/m/i.test(o.event)){
       out.push({
         date:`${o.date}T${o.time}:00+02:00`,sourceDate:`${o.date}T${o.time}:00+02:00`,timeZone:TARGET_TZ,
@@ -103,7 +112,7 @@ async function fetchJsonWithRetry(url){
     if(RETRY_DELAYS[i])await sleep(RETRY_DELAYS[i]);
     try{
       const r=await fetch(url,{
-        headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.1'},
+        headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.2'},
         cache:'no-store'
       });
       if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
@@ -140,12 +149,12 @@ export default async function handler(req,res){
   const primary=sunday?FF_NEXT_WEEK:FF_THIS_WEEK;
   const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
   try{
-    let events=[];let provider='ForexFactory weekly export + verified FinancialJuice overrides';
+    let events=[];let provider='ForexFactory weekly export + verified source overrides';
     try{events=await fetchCalendar(primary);provider+=sunday?' · next week':' · this week';}
     catch(e){events=await fetchCalendar(secondary);provider+=' · fallback';}
-    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified FinancialJuice actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
+    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
   }catch(e){
     const events=applyVerifiedOverrides([]);
-    return res.status(200).json({mode:'verified-fallback',provider:'FinancialJuice overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
+    return res.status(200).json({mode:'verified-fallback',provider:'Verified overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
   }
 }
