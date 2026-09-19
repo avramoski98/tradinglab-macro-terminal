@@ -1,4 +1,4 @@
-const SOURCE_UPDATED_AT = '2026-09-16T23:02:00Z';
+const SOURCE_UPDATED_AT = '2026-09-19T12:00:00Z';
 
 const BANKS = [
   {
@@ -14,13 +14,13 @@ const BANKS = [
     latest: { hike: 60.0, hold: 40.0, cut: 0.0 }, previous: { hike: 51.0, hold: 49.0, cut: 0.0 }
   },
   {
-    id: 'BOJ', ccy: 'JPY', name: 'Bank of Japan', nextMeeting: '18 Sep 2026',
-    current: '1.00%', currentRate: 1.00, holdRate: '1.00%', hikeRate: '1.25%', cutRate: '0.75%',
+    id: 'BOJ', ccy: 'JPY', name: 'Bank of Japan', nextMeeting: '30 Oct 2026',
+    current: '1.25%', currentRate: 1.25, holdRate: '1.25%', hikeRate: '1.50%', cutRate: '1.00%',
     url: 'https://centralbank.watch/bank-of-japan/', source: 'CentralBank.Watch / JPY rates',
-    latest: { hike: 62.9, hold: 37.1, cut: 0.0 }, previous: { hike: 61.5, hold: 38.5, cut: 0.0 }
+    latest: { hike: NaN, hold: NaN, cut: NaN }, previous: { hike: 62.9, hold: 37.1, cut: 0.0 }
   },
   {
-    id: 'BOE', ccy: 'GBP', name: 'Bank of England', nextMeeting: '17 Sep 2026',
+    id: 'BOE', ccy: 'GBP', name: 'Bank of England', nextMeeting: '5 Nov 2026',
     current: '3.75%', currentRate: 3.75, holdRate: '3.75%', hikeRate: '4.00%', cutRate: '3.50%',
     url: 'https://centralbank.watch/bank-of-england/', source: 'CentralBank.Watch / GBP rates',
     latest: { hike: 26.9, hold: 73.1, cut: 0.0 }, previous: { hike: 30.0, hold: 70.0, cut: 0.0 }
