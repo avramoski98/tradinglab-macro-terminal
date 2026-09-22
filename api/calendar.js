@@ -6,15 +6,15 @@ const RETRY_DELAYS=[0,250,750];
 
 const VERIFIED_OVERRIDES=[
   {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI|Producer|Import Prices/i,actual:'0.7%',previous:'-0.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI m/m · Aug'},
-  {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI.*y\\/y|Producer.*y\\/y/i,actual:'-0.7%',previous:'-2.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI y/y · Aug'},
-  {date:'2026-09-14',time:'14:30',currency:'CAD',match:/^CPI m\\/m/i,actual:'-0.1%',previous:'0.5%',forecast:'-0.1%',importance:'HIGH',source:'Statistics Canada',event:'CPI m/m · Aug'},
+  {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI.*y\/y|Producer.*y\/y/i,actual:'-0.7%',previous:'-2.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI y/y · Aug'},
+  {date:'2026-09-14',time:'14:30',currency:'CAD',match:/^CPI m\/m/i,actual:'-0.1%',previous:'0.5%',forecast:'-0.1%',importance:'HIGH',source:'Statistics Canada',event:'CPI m/m · Aug'},
   {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Median CPI/i,actual:'2.0%',previous:'2.0%',forecast:'2.0%',importance:'EXTREME',source:'Statistics Canada',event:'Median CPI y/y · Aug'},
   {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Trimmed CPI/i,actual:'1.9%',previous:'1.9%',forecast:'1.9%',importance:'HIGH',source:'Statistics Canada',event:'Trimmed CPI y/y · Aug'},
   {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Common CPI/i,actual:'2.7%',previous:'2.7%',forecast:'2.7%',importance:'MED',source:'Bank of Canada',event:'Common CPI y/y · Aug'},
-  {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Core CPI m\\/m/i,actual:'0.2%',previous:'0.2%',forecast:'0.2%',importance:'EXTREME',source:'Statistics Canada',event:'Core CPI m/m · Aug'},
+  {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Core CPI m\/m/i,actual:'0.2%',previous:'0.2%',forecast:'0.2%',importance:'EXTREME',source:'Statistics Canada',event:'Core CPI m/m · Aug'},
   {date:'2026-09-14',time:'14:30',currency:'CAD',match:/Manufacturing Sales/i,actual:'-0.4%',previous:'0.1%',forecast:'-0.2%',importance:'HIGH',source:'Statistics Canada',event:'Manufacturing Sales m/m · Jul'},
   {date:'2026-09-15',time:'08:00',currency:'GBP',match:/Claimant Count Change/i,actual:'27.8K',previous:'-11.8K',forecast:'8.3K',importance:'HIGH',source:'ONS',event:'Claimant Count Change · Aug'},
-  {date:'2026-09-15',time:'08:00',currency:'GBP',match:/Average Earnings.*3m\\/y|Average Earnings.*Bonus/i,actual:'3.9%',previous:'4.2%',forecast:'3.9%',importance:'HIGH',source:'ONS',event:'Average Earnings Index 3m/y · Jul'},
+  {date:'2026-09-15',time:'08:00',currency:'GBP',match:/Average Earnings.*3m\/y|Average Earnings.*Bonus/i,actual:'3.9%',previous:'4.2%',forecast:'3.9%',importance:'HIGH',source:'ONS',event:'Average Earnings Index 3m/y · Jul'},
   {date:'2026-09-15',time:'08:00',currency:'GBP',match:/Unemployment Rate/i,actual:'4.9%',previous:'4.9%',forecast:'5.0%',importance:'HIGH',source:'ONS',event:'Unemployment Rate · Jul'},
   {date:'2026-09-15',time:'11:00',currency:'EUR',match:/German.*ZEW|ZEW.*Sentiment/i,actual:'Germany 34.7 · EA 25.8',previous:'Germany 34.2 · EA 31.4',forecast:'Germany 39.8 · EA 39.2',importance:'HIGH',source:'ZEW',event:'German + Euro Area ZEW Sentiment · Sep'},
   {date:'2026-09-15',time:'14:15',currency:'USD',match:/ADP Weekly Employment Change/i,actual:'16.3K',previous:'12.3K',forecast:'—',importance:'MED',source:'ADP',event:'ADP Weekly Employment Change'},
@@ -22,16 +22,17 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-09-15',time:'14:30',currency:'USD',match:/Empire State Manufacturing/i,actual:'7.6',previous:'20.6',forecast:'14.8',importance:'MED',source:'Federal Reserve Bank of New York',event:'Empire State Manufacturing Index · Sep'},
 
   // 16 Sep: verified releases available by 14:44 Europe/Skopje.
-  {date:'2026-09-16',time:'01:50',currency:'JPY',match:/Core Machinery Orders.*m\\/m/i,actual:'-3.7%',previous:'9.7%',forecast:'-1.2%',importance:'HIGH',source:'Cabinet Office / Investing',event:'Core Machinery Orders m/m · Jul'},
+  {date:'2026-09-16',time:'01:50',currency:'JPY',match:/Core Machinery Orders.*m\/m/i,actual:'-3.7%',previous:'9.7%',forecast:'-1.2%',importance:'HIGH',source:'Cabinet Office / Investing',event:'Core Machinery Orders m/m · Jul'},
   {date:'2026-09-16',time:'01:50',currency:'JPY',match:/Trade Balance/i,actual:'-1.106T',previous:'-0.69T',forecast:'—',importance:'HIGH',source:'Japan MOF / Reuters',event:'Trade Balance · Aug'},
-  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI y\\/y|Inflation Rate y\\/y/i,actual:'3.1%',previous:'2.9%',forecast:'3.1%',importance:'HIGH',source:'ONS',event:'CPI y/y · Aug'},
-  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI m\\/m|Inflation Rate m\\/m/i,actual:'0.5%',previous:'0.3%',forecast:'0.5%',importance:'MED',source:'ONS',event:'CPI m/m · Aug'},
-  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/Core CPI.*y\\/y|Core Inflation Rate.*y\\/y/i,actual:'2.6%',previous:'2.6%',forecast:'2.6%',importance:'HIGH',source:'ONS',event:'Core CPI y/y · Aug'},
-  {date:'2026-09-16',time:'14:30',currency:'USD',match:/^Retail Sales m\\/m|Retail Sales.*Aug/i,actual:'1.2%',previous:'-0.5% rev.',forecast:'0.8%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales m/m · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI y\/y|Inflation Rate y\/y/i,actual:'3.1%',previous:'2.9%',forecast:'3.1%',importance:'HIGH',source:'ONS',event:'CPI y/y · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/^CPI m\/m|Inflation Rate m\/m/i,actual:'0.5%',previous:'0.3%',forecast:'0.5%',importance:'MED',source:'ONS',event:'CPI m/m · Aug'},
+  {date:'2026-09-16',time:'08:00',currency:'GBP',match:/Core CPI.*y\/y|Core Inflation Rate.*y\/y/i,actual:'2.6%',previous:'2.6%',forecast:'2.6%',importance:'HIGH',source:'ONS',event:'Core CPI y/y · Aug'},
+  {date:'2026-09-16',time:'14:30',currency:'USD',match:/^Retail Sales m\/m|Retail Sales.*Aug/i,actual:'1.2%',previous:'-0.5% rev.',forecast:'0.8%',importance:'HIGH',source:'U.S. Census Bureau / Barron’s',event:'Retail Sales m/m · Aug'},
   {date:'2026-09-16',time:'14:30',currency:'USD',match:/Control Group/i,actual:'1.4%',previous:'—',forecast:'0.5%',importance:'HIGH',source:'U.S. Census Bureau / Reuters',event:'Retail Sales Control Group m/m · Aug'},
   {date:'2026-09-16',time:'20:00',currency:'USD',match:/FOMC|Federal Funds|Rate Decision/i,actual:'3.75–4.00% · +25bp',previous:'3.50–3.75%',forecast:'3.75–4.00%',importance:'HIGH',source:'Federal Reserve',event:'FOMC Rate Decision + Economic Projections'},
   {date:'2026-09-16',time:'20:30',currency:'USD',match:/Fed Chair|Warsh|Press Conference/i,actual:'Hawkish · price stability focus',previous:'—',forecast:'Hawkish / data-dependent',importance:'HIGH',source:'Federal Reserve',event:'Fed Chair Warsh Press Conference'},
   {date:'2026-09-16',time:'19:30',currency:'CAD',match:/Summary of Deliberations|BoC/i,actual:'Inflation risks increased',previous:'Hold 2.25%',forecast:'Neutral-hawkish',importance:'HIGH',source:'Bank of Canada',event:'BoC Summary of Deliberations'}
+  ,{date:'2026-09-22',time:'08:00',currency:'GBP',match:/Public Sector Net Borrowing/i,actual:'18.3B',previous:'1.8B',forecast:'15.2B',importance:'LOW',source:'ONS / Reuters',event:'Public Sector Net Borrowing · Aug'}
 ];
 
 function importance(v){
@@ -80,6 +81,7 @@ function localDate(iso){
 
 function applyVerifiedOverrides(events){
   const out=[...events];
+  const activeDates=new Set(out.map(e=>localDate(e.date)).filter(Boolean));
   for(const o of VERIFIED_OVERRIDES){
     let matched=false;
     for(let i=0;i<out.length;i++){
@@ -92,7 +94,7 @@ function applyVerifiedOverrides(events){
       break;
     }
     // Monthly verified releases are also inserted if the upstream provider omits them.
-    if(!matched&&/m\/m/i.test(o.event)){
+    if(!matched&&activeDates.has(o.date)&&/m\/m/i.test(o.event)){
       out.push({
         date:`${o.date}T${o.time}:00+02:00`,sourceDate:`${o.date}T${o.time}:00+02:00`,timeZone:TARGET_TZ,
         country:o.currency,currency:o.currency,event:o.event,previous:o.previous,forecast:o.forecast,actual:o.actual,
