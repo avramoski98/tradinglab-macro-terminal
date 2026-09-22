@@ -64,6 +64,8 @@ const VERIFIED_OVERRIDES=[
   ,{date:'2026-09-21',time:'01:01',currency:'GBP',match:/Rightmove HPI m\/m/i,actual:'0.7%',previous:'-2.0%',forecast:'—',importance:'LOW',source:'ForexFactory',event:'Rightmove HPI m/m'}
   ,{date:'2026-09-21',time:'05:00',currency:'NZD',match:/Credit Card Spending y\/y/i,actual:'3.5%',previous:'5.3%',forecast:'—',importance:'LOW',source:'ForexFactory',event:'Credit Card Spending y/y'}
   ,{date:'2026-09-22',time:'08:00',currency:'GBP',match:/Public Sector Net Borrowing/i,actual:'18.3B',previous:'1.8B',forecast:'15.2B',importance:'LOW',source:'ONS / Reuters',event:'Public Sector Net Borrowing · Aug'}
+  ,{date:'2026-09-22',time:'12:00',currency:'GBP',match:/CBI Industrial Order Expectations/i,actual:'-9',previous:'-25',forecast:'-33',importance:'LOW',source:'CBI / Reuters',event:'CBI Industrial Order Expectations · Sep'}
+  ,{date:'2026-09-22',time:'16:00',currency:'EUR',match:/^Consumer Confidence$/i,actual:'-16.5',previous:'-15.5',forecast:'-16',importance:'LOW',source:'European Commission DG ECFIN',event:'Euro Area Consumer Confidence · Sep'}
 ];
 
 function importance(v){
