@@ -32,6 +32,8 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-09-16',time:'20:00',currency:'USD',match:/FOMC|Federal Funds|Rate Decision/i,actual:'3.75–4.00% · +25bp',previous:'3.50–3.75%',forecast:'3.75–4.00%',importance:'HIGH',source:'Federal Reserve',event:'FOMC Rate Decision + Economic Projections'},
   {date:'2026-09-16',time:'20:30',currency:'USD',match:/Fed Chair|Warsh|Press Conference/i,actual:'Hawkish · price stability focus',previous:'—',forecast:'Hawkish / data-dependent',importance:'HIGH',source:'Federal Reserve',event:'Fed Chair Warsh Press Conference'},
   {date:'2026-09-16',time:'19:30',currency:'CAD',match:/Summary of Deliberations|BoC/i,actual:'Inflation risks increased',previous:'Hold 2.25%',forecast:'Neutral-hawkish',importance:'HIGH',source:'Bank of Canada',event:'BoC Summary of Deliberations'}
+  ,{date:'2026-09-21',time:'01:01',currency:'GBP',match:/Rightmove HPI m\/m/i,actual:'0.7%',previous:'-2.0%',forecast:'—',importance:'LOW',source:'ForexFactory',event:'Rightmove HPI m/m'}
+  ,{date:'2026-09-21',time:'05:00',currency:'NZD',match:/Credit Card Spending y\/y/i,actual:'3.5%',previous:'5.3%',forecast:'—',importance:'LOW',source:'ForexFactory',event:'Credit Card Spending y/y'}
   ,{date:'2026-09-22',time:'08:00',currency:'GBP',match:/Public Sector Net Borrowing/i,actual:'18.3B',previous:'1.8B',forecast:'15.2B',importance:'LOW',source:'ONS / Reuters',event:'Public Sector Net Borrowing · Aug'}
 ];
 
@@ -45,7 +47,11 @@ function importance(v){
 
 function num(v){
   if(v==null)return NaN;
-  return Number(String(v).replace(/,/g,'').replace(/[^0-9+-.]/g,''));
+  const raw=String(v).trim();
+  if(!raw||raw==='—'||raw==='-'||/^n\/?a$/i.test(raw))return NaN;
+  const cleaned=raw.replace(/,/g,'').replace(/[^0-9+-.]/g,'');
+  if(!cleaned||cleaned==='-'||cleaned==='+'||cleaned==='.')return NaN;
+  return Number(cleaned);
 }
 
 function infer(ev,a0,f0){
