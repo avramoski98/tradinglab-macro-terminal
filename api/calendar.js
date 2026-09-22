@@ -1,8 +1,37 @@
-const FF_THIS_WEEK='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
-const FF_NEXT_WEEK='https://nfs.faireconomy.media/ff_calendar_nextweek.json';
+const FF_THIS_WEEK=[
+  'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
+  'https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.json'
+];
+const FF_NEXT_WEEK=[
+  'https://nfs.faireconomy.media/ff_calendar_nextweek.json',
+  'https://cdn-nfs.faireconomy.media/ff_calendar_nextweek.json'
+];
 const G10=new Set(['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD','SEK','NOK']);
 const TARGET_TZ='Europe/Skopje';
 const RETRY_DELAYS=[0,250,750];
+
+const TODAY_FALLBACK_EVENTS=[
+  ['05:10','AUD','RBA Gov Bullock Speaks','—','—','HIGH'],
+  ['08:00','GBP','Public Sector Net Borrowing','1.8B','15.2B','LOW'],
+  ['10:30','EUR','German Buba President Nagel Speaks','—','—','LOW'],
+  ['12:00','GBP','CBI Industrial Order Expectations','-25','-33','LOW'],
+  ['13:00','EUR','ECB President Lagarde Speaks','—','—','MED'],
+  ['14:15','USD','ADP Weekly Employment Change','16.3K','—','LOW'],
+  ['15:55','USD','President Trump Speaks','—','—','MED'],
+  ['16:00','EUR','Consumer Confidence','-16','-16','LOW'],
+  ['16:00','USD','Richmond Manufacturing Index','4','2','LOW'],
+  ['16:05','USD','FOMC Member Williams Speaks','—','—','LOW'],
+  ['16:20','USD','FOMC Member Jefferson Speaks','—','—','LOW'],
+  ['19:00','USD','FOMC Member Barkin Speaks','—','—','LOW'],
+  ['21:30','EUR','German Buba President Nagel Speaks','—','—','LOW'],
+  ['22:30','USD','API Weekly Statistical Bulletin','—','—','LOW']
+].map(([time,currency,event,previous,forecast,importance])=>({
+  date:`2026-09-22T${time}:00+02:00`,
+  sourceDate:`2026-09-22T${time}:00+02:00`,
+  timeZone:TARGET_TZ,country:currency,currency,event,previous,forecast,actual:'—',
+  importance,label:'Update',impact:'Neutral',lastUpdate:null,source:'TradingLab verified schedule fallback'
+}));
+
 
 const VERIFIED_OVERRIDES=[
   {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI|Producer|Import Prices/i,actual:'0.7%',previous:'-0.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI m/m · Aug'},
@@ -58,7 +87,7 @@ function infer(ev,a0,f0){
   const a=num(a0),f=num(f0);
   if(!Number.isFinite(a)||!Number.isFinite(f))return{label:'Update',impact:'Neutral'};
   if(Math.abs(a-f)<1e-12)return{label:'Neutral',impact:'Neutral'};
-  const lower=/unemployment|jobless|claims|deficit/i.test(ev||'');
+  const lower=/unemployment|jobless|claims|deficit|borrowing/i.test(ev||'');
   const positive=lower?a<f:a>f;
   return{label:positive?'Beat':'Miss',impact:positive?'Strengthens':'Weakens'};
 }
@@ -95,7 +124,9 @@ function applyVerifiedOverrides(events){
       if(e.currency!==o.currency||localDate(e.date)!==o.date)continue;
       if(!o.match.test(String(e.event||'')))continue;
       if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
-      out[i]={...e,actual:o.actual,previous:o.previous,forecast:e.forecast&&e.forecast!=='—'?e.forecast:o.forecast,importance:e.importance||o.importance,lastUpdate:new Date().toISOString(),source:o.source};
+      const resolvedForecast=e.forecast&&e.forecast!=='—'?e.forecast:o.forecast;
+      const z=infer(o.event,o.actual,resolvedForecast);
+      out[i]={...e,actual:o.actual,previous:o.previous,forecast:resolvedForecast,importance:e.importance||o.importance,label:z.label,impact:z.impact,lastUpdate:new Date().toISOString(),source:o.source};
       matched=true;
       break;
     }
@@ -135,6 +166,15 @@ async function fetchJsonWithRetry(url){
   throw lastError;
 }
 
+async function fetchCalendarAny(urls){
+  let lastError=new Error('Calendar provider unavailable');
+  for(const url of urls){
+    try{return await fetchCalendar(url);}
+    catch(e){lastError=e;}
+  }
+  throw lastError;
+}
+
 async function fetchCalendar(url){
   const raw=await fetchJsonWithRetry(url);
   const events=(Array.isArray(raw)?raw:[]).map(x=>{
@@ -161,11 +201,11 @@ export default async function handler(req,res){
   const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
   try{
     let events=[];let provider='ForexFactory weekly export + verified source overrides';
-    try{events=await fetchCalendar(primary);provider+=sunday?' · next week':' · this week';}
-    catch(e){events=await fetchCalendar(secondary);provider+=' · fallback';}
+    try{events=await fetchCalendarAny(primary);provider+=sunday?' · next week':' · this week';}
+    catch(e){events=await fetchCalendarAny(secondary);provider+=' · fallback';}
     return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
   }catch(e){
-    const events=applyVerifiedOverrides([]);
-    return res.status(200).json({mode:'verified-fallback',provider:'Verified overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:String(e?.message||e)});
+    const events=applyVerifiedOverrides(TODAY_FALLBACK_EVENTS);
+    return res.status(200).json({mode:'schedule-fallback',provider:'TradingLab schedule fallback + verified overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:`Live provider unavailable: ${String(e?.message||e)}`});
   }
 }
