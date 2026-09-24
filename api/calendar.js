@@ -11,29 +11,53 @@ const TARGET_TZ='Europe/Skopje';
 const RETRY_DELAYS=[0,250,750];
 
 const TODAY_FALLBACK_EVENTS=[
-  ['05:10','AUD','RBA Gov Bullock Speaks','—','—','HIGH'],
-  ['08:00','GBP','Public Sector Net Borrowing','1.8B','15.2B','LOW'],
-  ['10:30','EUR','German Buba President Nagel Speaks','—','—','LOW'],
-  ['12:00','GBP','CBI Industrial Order Expectations','-25','-33','LOW'],
-  ['13:00','EUR','ECB President Lagarde Speaks','—','—','MED'],
-  ['14:15','USD','ADP Weekly Employment Change','16.3K','—','LOW'],
-  ['15:55','USD','President Trump Speaks','—','—','MED'],
-  ['16:00','EUR','Consumer Confidence','-16','-16','LOW'],
-  ['16:00','USD','Richmond Manufacturing Index','4','2','LOW'],
-  ['16:05','USD','FOMC Member Williams Speaks','—','—','LOW'],
-  ['16:20','USD','FOMC Member Jefferson Speaks','—','—','LOW'],
-  ['19:00','USD','FOMC Member Barkin Speaks','—','—','LOW'],
-  ['21:30','EUR','German Buba President Nagel Speaks','—','—','LOW'],
-  ['22:30','USD','API Weekly Statistical Bulletin','—','—','LOW']
-].map(([time,currency,event,previous,forecast,importance])=>({
-  date:`2026-09-22T${time}:00+02:00`,
-  sourceDate:`2026-09-22T${time}:00+02:00`,
+  ['2026-09-21','17:05','CAD','BoC Governor Macklem Speech + Q&A','—','Policy / economic outlook','HIGH'],
+  ['2026-09-21','22:00','USD','USDA Crop Progress · weekly','Harvest underway','No fixed consensus','MED'],
+  ['2026-09-22','05:10','AUD','RBA Gov Bullock Speaks','—','Policy / inflation outlook','HIGH'],
+  ['2026-09-22','13:00','EUR','ECB President Lagarde Speaks','—','Policy / inflation outlook','MED'],
+  ['2026-09-22','15:55','USD','President Trump Speaks','—','Policy / geopolitical headlines','MED'],
+  ['2026-09-22','19:00','USD','Fed Barkin Speech','—','Post-FOMC policy signal','HIGH'],
+  ['2026-09-22','22:30','USD','API Crude Oil Inventories','—','No fixed consensus','MED'],
+  ['2026-09-23','01:00','AUD','S&P Global Flash Manufacturing + Services PMI · Sep','Mfg 52.0 · Services 53.2','No published consensus','HIGH'],
+  ['2026-09-23','09:15','EUR','France Flash Manufacturing + Services PMI · Sep','Mfg 51.1 · Services 48.0','Mfg 50.9 · Services 48.3','HIGH'],
+  ['2026-09-23','09:30','EUR','Germany Flash Manufacturing + Services PMI · Sep','Mfg 54.3 · Services 49.7','Mfg 54.1 · Services 49.9','HIGH'],
+  ['2026-09-23','10:00','EUR','Euro Area Flash Manufacturing + Services PMI · Sep','Mfg 52.7 · Services 51.6','Mfg 52.6 · Services 51.4','HIGH'],
+  ['2026-09-23','10:30','GBP','UK Flash Manufacturing + Services PMI · Sep','Mfg 51.7 · Services 52.5','Mfg 51.5 · Services 52.0','HIGH'],
+  ['2026-09-23','15:45','USD','US Flash Manufacturing + Services PMI · Sep','Mfg 53.9 · Services 56.5','Mfg 53.4 · Services 56.0','HIGH'],
+  ['2026-09-23','16:30','USD','EIA Crude Oil Inventories','-0.640M','-0.700M','HIGH'],
+  ['2026-09-24','02:30','JPY','Jibun Bank Flash Manufacturing PMI · Sep','54.9','55.0','HIGH'],
+  ['2026-09-24','03:30','AUD','Employment Change + Unemployment Rate · Aug','Employment -15.8K · Unemployment 4.5%','Employment +20.0K · Unemployment 4.5%','HIGH'],
+  ['2026-09-24','09:30','CHF','SNB Policy Rate + Assessment','0.00%','Hold 0.00%','HIGH'],
+  ['2026-09-24','09:30','SEK','Riksbank Policy Rate + Monetary Policy Report','1.75%','Hold 1.75%','HIGH'],
+  ['2026-09-24','10:00','NOK','Norges Bank Rate Decision + MPR','4.25%','4.50% hike risk / decision split','HIGH'],
+  ['2026-09-24','14:30','CAD','Retail Sales + Core Retail Sales m/m · Jul','Headline +0.6% · Core +0.5%','Headline -0.8% · Core -0.5%','HIGH'],
+  ['2026-09-24','14:30','USD','Initial Jobless Claims','196K','201K','HIGH'],
+  ['2026-09-24','14:30','USD','Current Account · Q2','-227B','-259B','MED'],
+  ['2026-09-24','14:30','USD','USDA Weekly Export Sales','—','No fixed consensus','MED'],
+  ['2026-09-24','16:00','USD','New Home Sales · Aug','607K','619K','HIGH'],
+  ['2026-09-24','16:30','USD','EIA Natural Gas Storage','44 Bcf','Forecast updates Wednesday','HIGH'],
+  ['2026-09-25','14:30','USD','Durable + Core Durable Goods Orders · Aug prelim','Headline +1.1% · Core +0.4%','Headline -0.3% · Core +0.5%','HIGH'],
+  ['2026-09-25','16:00','USD','University of Michigan Sentiment · Sep final','47.8 prelim','47.5','HIGH'],
+  ['2026-09-25','19:00','USD','Baker Hughes Rig Count','595','No fixed consensus','MED'],
+  ['2026-09-25','21:30','USD','CFTC Commitments of Traders','—','No forecast · positioning report','MED']
+].map(([day,time,currency,event,previous,forecast,importance])=>({
+  date:`${day}T${time}:00+02:00`,
+  sourceDate:`${day}T${time}:00+02:00`,
   timeZone:TARGET_TZ,country:currency,currency,event,previous,forecast,actual:'—',
-  importance,label:'Update',impact:'Neutral',lastUpdate:null,source:'TradingLab verified schedule fallback'
+  importance,label:'Update',impact:'Neutral',lastUpdate:null,source:'TradingLab verified weekly schedule fallback'
 }));
 
 
 const VERIFIED_OVERRIDES=[
+  {date:'2026-09-23',time:'01:00',currency:'AUD',match:/S&P Global Flash Manufacturing \+ Services PMI/i,actual:'Mfg 49.3 · Services 51.4',previous:'Mfg 52.0 · Services 53.2',forecast:'No published consensus',importance:'HIGH',source:'S&P Global / Investing',event:'S&P Global Flash Manufacturing + Services PMI · Sep',label:'Softer',impact:'Mixed'},
+  {date:'2026-09-23',time:'09:15',currency:'EUR',match:/France Flash Manufacturing \+ Services PMI/i,actual:'Mfg 50.3 · Services 51.4',previous:'Mfg 51.1 · Services 48.0',forecast:'Mfg 50.9 · Services 48.3',importance:'HIGH',source:'S&P Global / Reuters',event:'France Flash Manufacturing + Services PMI · Sep',label:'Mixed',impact:'Strengthens'},
+  {date:'2026-09-23',time:'09:30',currency:'EUR',match:/Germany Flash Manufacturing \+ Services PMI/i,actual:'Mfg 53.8 · Services 52.9',previous:'Mfg 54.3 · Services 49.7',forecast:'Mfg 54.1 · Services 49.9',importance:'HIGH',source:'S&P Global / Reuters',event:'Germany Flash Manufacturing + Services PMI · Sep',label:'Mixed',impact:'Strengthens'},
+  {date:'2026-09-23',time:'10:00',currency:'EUR',match:/Euro Area Flash Manufacturing \+ Services PMI/i,actual:'Mfg 52.7 · Services 53.0',previous:'Mfg 52.7 · Services 51.6',forecast:'Mfg 52.6 · Services 51.4',importance:'HIGH',source:'S&P Global / Reuters',event:'Euro Area Flash Manufacturing + Services PMI · Sep',label:'Beat',impact:'Strengthens'},
+  {date:'2026-09-23',time:'10:30',currency:'GBP',match:/UK Flash Manufacturing \+ Services PMI/i,actual:'Mfg 52.0 · Services 51.7',previous:'Mfg 51.7 · Services 52.5',forecast:'Mfg 51.5 · Services 52.0',importance:'HIGH',source:'S&P Global / Reuters',event:'UK Flash Manufacturing + Services PMI · Sep',label:'Mixed',impact:'Neutral'},
+  {date:'2026-09-23',time:'15:45',currency:'USD',match:/US Flash Manufacturing \+ Services PMI/i,actual:'Mfg 57.0 · Services 58.7',previous:'Mfg 53.9 · Services 56.5',forecast:'Mfg 53.4 · Services 56.0',importance:'HIGH',source:'S&P Global / Reuters',event:'US Flash Manufacturing + Services PMI · Sep',label:'Beat',impact:'Strengthens'},
+  {date:'2026-09-23',time:'16:30',currency:'USD',match:/EIA Crude Oil Inventories/i,actual:'+2.969M',previous:'-0.640M',forecast:'-0.700M',importance:'HIGH',source:'EIA / Investing',event:'EIA Crude Oil Inventories',label:'Large build',impact:'Oil bearish'},
+  {date:'2026-09-24',time:'02:30',currency:'JPY',match:/Jibun Bank Flash Manufacturing PMI/i,actual:'54.1',previous:'54.9',forecast:'55.0',importance:'HIGH',source:'S&P Global / Reuters',event:'Jibun Bank Flash Manufacturing PMI · Sep',label:'Miss',impact:'Weakens'},
+  {date:'2026-09-24',time:'03:30',currency:'AUD',match:/Employment Change \+ Unemployment Rate/i,actual:'Employment +39.5K · Unemployment 4.6%',previous:'Employment -15.8K · Unemployment 4.5%',forecast:'Employment +20.0K · Unemployment 4.5%',importance:'HIGH',source:'ABS / Reuters',event:'Employment Change + Unemployment Rate · Aug',label:'Mixed',impact:'Neutral'},
   {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI|Producer|Import Prices/i,actual:'0.7%',previous:'-0.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI m/m · Aug'},
   {date:'2026-09-14',time:'08:30',currency:'CHF',match:/PPI.*y\/y|Producer.*y\/y/i,actual:'-0.7%',previous:'-2.1%',forecast:'—',importance:'MED',source:'FinancialJuice',event:'Swiss PPI y/y · Aug'},
   {date:'2026-09-14',time:'14:30',currency:'CAD',match:/^CPI m\/m/i,actual:'-0.1%',previous:'0.5%',forecast:'-0.1%',importance:'HIGH',source:'Statistics Canada',event:'CPI m/m · Aug'},
@@ -127,7 +151,7 @@ function applyVerifiedOverrides(events){
       if(!o.match.test(String(e.event||'')))continue;
       if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
       const resolvedForecast=e.forecast&&e.forecast!=='—'?e.forecast:o.forecast;
-      const z=infer(o.event,o.actual,resolvedForecast);
+      const z=o.label?{label:o.label,impact:o.impact||'Neutral'}:infer(o.event,o.actual,resolvedForecast);
       out[i]={...e,actual:o.actual,previous:o.previous,forecast:resolvedForecast,importance:e.importance||o.importance,label:z.label,impact:z.impact,lastUpdate:new Date().toISOString(),source:o.source};
       matched=true;
       break;
