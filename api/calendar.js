@@ -156,6 +156,13 @@ function localDate(iso){
   return new Intl.DateTimeFormat('en-CA',{timeZone:TARGET_TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
 }
 
+function cleanEventName(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\b(final|prelim|preliminary|flash|estimate|index|change|rate|price)\b/g,' ').replace(/\s+/g,' ').trim()}
+function eventTokens(v){const stop=new Set(['m','y','q','the','of','and','index','change','rate','price','final','prelim','preliminary','flash','estimate']);return cleanEventName(v).split(' ').filter(x=>x.length>1&&!stop.has(x))}
+function fuzzyEventMatch(a,b){const A=eventTokens(a),B=eventTokens(b);if(!A.length||!B.length)return false;const bs=new Set(B),hits=A.filter(x=>bs.has(x)).length,score=hits/Math.min(A.length,B.length);return score>=0.6||cleanEventName(a).includes(cleanEventName(b))||cleanEventName(b).includes(cleanEventName(a))}
+function usableActual(v){const s=String(v??'').trim().toUpperCase();return !!s&&!['—','-','PENDING','N/A','NA','NULL','UNDEFINED'].includes(s)}
+function minutesAfterScheduled(e,now=Date.now()){const t=new Date(e.date).getTime();return Number.isFinite(t)?(now-t)/60000:-Infinity}
+function reconcileScheduledFallback(events){const out=[...events],now=Date.now();for(const s of TODAY_FALLBACK_EVENTS){const elapsed=minutesAfterScheduled(s,now);if(elapsed<0)continue;let best=-1;for(let i=0;i<out.length;i++){const e=out[i];if(e.currency!==s.currency||localDate(e.date)!==localDate(s.date))continue;if(fuzzyEventMatch(e.event,s.event)){best=i;break}const dt=Math.abs(new Date(e.date).getTime()-new Date(s.date).getTime())/60000;if(dt<=20&&eventTokens(e.event).some(t=>eventTokens(s.event).includes(t))){best=i;break}}if(best>=0){const e=out[best];if(!usableActual(e.actual)&&usableActual(s.actual))out[best]={...e,actual:s.actual,previous:usableActual(e.previous)?e.previous:s.previous,forecast:usableActual(e.forecast)?e.forecast:s.forecast,lastUpdate:new Date().toISOString(),source:(e.source||'provider')+' + TradingLab timed fallback'}}else out.push({...s,lastUpdate:new Date().toISOString(),source:'TradingLab timed schedule fallback'})}return out}
+
 function applyVerifiedOverrides(events){
   const out=[...events];
   const activeDates=new Set(out.map(e=>localDate(e.date)).filter(Boolean));
@@ -233,7 +240,7 @@ async function fetchCalendar(url){
       lastUpdate:null,source:'ForexFactory'
     };
   }).filter(Boolean);
-  return applyVerifiedOverrides(events);
+  return reconcileScheduledFallback(applyVerifiedOverrides(events));
 }
 
 export default async function handler(req,res){
@@ -247,7 +254,7 @@ export default async function handler(req,res){
     catch(e){events=await fetchCalendarAny(secondary);provider+=' · fallback';}
     return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
   }catch(e){
-    const events=applyVerifiedOverrides(TODAY_FALLBACK_EVENTS);
+    const events=reconcileScheduledFallback(applyVerifiedOverrides(TODAY_FALLBACK_EVENTS));
     return res.status(200).json({mode:'schedule-fallback',provider:'TradingLab schedule fallback + verified overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:`Live provider unavailable: ${String(e?.message||e)}`});
   }
 }
