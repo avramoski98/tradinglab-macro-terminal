@@ -106,6 +106,13 @@ const VERIFIED_OVERRIDES=[
   ,{date:'2026-09-22',time:'08:00',currency:'GBP',match:/Public Sector Net Borrowing/i,actual:'18.3B',previous:'1.8B',forecast:'15.2B',importance:'LOW',source:'ONS / Reuters',event:'Public Sector Net Borrowing · Aug'}
   ,{date:'2026-09-22',time:'12:00',currency:'GBP',match:/CBI Industrial Order Expectations/i,actual:'-9',previous:'-25',forecast:'-33',importance:'LOW',source:'CBI / Reuters',event:'CBI Industrial Order Expectations · Sep'}
   ,{date:'2026-09-22',time:'16:00',currency:'EUR',match:/^Consumer Confidence$/i,actual:'-16.5',previous:'-15.5',forecast:'-16',importance:'LOW',source:'European Commission DG ECFIN',event:'Euro Area Consumer Confidence · Sep'}
+  ,{date:'2026-10-01',time:'16:00',currency:'USD',match:/ISM Manufacturing PMI/i,actual:'54.5',previous:'54.6',forecast:'55.0',importance:'HIGH',source:'ISM / Reuters',event:'ISM Manufacturing PMI · Sep',label:'Miss',impact:'Weakens'}
+  ,{date:'2026-10-02',time:'01:30',currency:'JPY',match:/Tokyo Core CPI/i,actual:'2.7%',previous:'1.8%',forecast:'2.4%',importance:'HIGH',source:'Statistics Bureau of Japan / Reuters',event:'Tokyo Core CPI y/y · Sep',label:'Beat',impact:'Strengthens'}
+  ,{date:'2026-10-02',time:'11:00',currency:'EUR',match:/Core CPI Flash Estimate|Core.*HICP/i,actual:'2.5%',previous:'2.4%',forecast:'2.5%',importance:'HIGH',source:'Eurostat / Reuters',event:'Core CPI Flash Estimate y/y · Sep',label:'Neutral',impact:'Neutral'}
+  ,{date:'2026-10-02',time:'11:00',currency:'EUR',match:/CPI Flash Estimate|HICP/i,actual:'3.8%',previous:'3.2%',forecast:'3.6%',importance:'HIGH',source:'Eurostat / Reuters',event:'CPI Flash Estimate y/y · Sep',label:'Beat',impact:'Strengthens'}
+  ,{date:'2026-10-02',time:'14:30',currency:'USD',match:/Non-Farm Employment Change|Nonfarm Payroll/i,actual:'29K',previous:'133K rev.',forecast:'90K',importance:'HIGH',source:'U.S. BLS / Reuters',event:'Non-Farm Employment Change · Sep',label:'Miss',impact:'Weakens'}
+  ,{date:'2026-10-02',time:'14:30',currency:'USD',match:/^Unemployment Rate$/i,actual:'4.2%',previous:'4.1%',forecast:'4.1%',importance:'HIGH',source:'U.S. BLS / Reuters',event:'Unemployment Rate · Sep',label:'Miss',impact:'Weakens'}
+  ,{date:'2026-10-02',time:'14:30',currency:'USD',match:/Average Hourly Earnings/i,actual:'0.1%',previous:'0.3%',forecast:'0.3%',importance:'HIGH',source:'U.S. BLS / Reuters',event:'Average Hourly Earnings m/m · Sep',label:'Miss',impact:'Weakens'}
 ];
 
 function importance(v){
