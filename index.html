@@ -163,6 +163,7 @@ const STATIC_CAL=[
 ["2026-10-08","13:30","USD","Unemployment Claims","197K","205K","—","VERY HIGH","First timely US labor confirmation after weak NFP.","Claims rising materially confirms cooling; another low print argues against treating one payroll report as regime change."],
 ["2026-10-09","13:30","CAD","Employment Change","-41.7K","10K","—","EXTREME","Primary confirmation test for CAD weakness.","Another weak print reinforces CAD as a weak G10 leg; strong rebound reduces conviction."],
 ["2026-10-09","13:30","CAD","Unemployment Rate","6.4%","6.5%","—","EXTREME","Labor slack is central to the CAD 3M thesis.","Rise confirms slack; unexpected decline with strong jobs is CAD-positive."]
+];
 
 function calendarMacroHistory(){try{return JSON.parse(localStorage.getItem(CAL_MACRO_STORE)||'[]')}catch(e){return[]}}
 function saveCalendarMacro(items){try{let all=[...(items||[]),...calendarMacroHistory()],seen=new Set(),out=[];for(const u of all){let k=[u.date,u.ccy,u.event,u.actual].join('|');if(seen.has(k))continue;seen.add(k);out.push(u)}localStorage.setItem(CAL_MACRO_STORE,JSON.stringify(out.slice(0,240)))}catch(e){}}
