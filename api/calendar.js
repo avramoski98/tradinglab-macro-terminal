@@ -12,18 +12,18 @@ const RETRY_DELAYS=[0,250,750];
 
 const TODAY_FALLBACK_EVENTS=[
   // Week ahead · 05–09 Oct 2026 · Europe/Skopje
-  ['2026-10-05','16:00','USD','ISM Services PMI','—','—','HIGH'],
-  ['2026-10-05','16:00','USD','ISM Services Prices','—','—','MED'],
-  ['2026-10-06','08:00','EUR','German Factory Orders m/m','—','—','MED'],
+  ['2026-10-05','16:00','USD','ISM Services PMI','55.4','55.7','HIGH'],
+  ['2026-10-05','16:00','USD','ISM Services Prices','72.6','—','MED'],
+  ['2026-10-06','08:00','EUR','German Factory Orders m/m','2.5%','—','MED'],
   ['2026-10-06','11:00','EUR','Retail Sales m/m','—','—','MED'],
   ['2026-10-06','14:30','USD','Trade Balance','—','—','MED'],
   ['2026-10-07','08:00','EUR','German Industrial Production m/m','—','—','MED'],
   ['2026-10-07','14:30','CAD','Trade Balance','—','—','MED'],
   ['2026-10-07','20:00','USD','FOMC Meeting Minutes','—','—','HIGH'],
-  ['2026-10-08','14:30','USD','Unemployment Claims','197K','—','HIGH'],
+  ['2026-10-08','14:30','USD','Unemployment Claims','197K','200K','HIGH'],
   ['2026-10-08','13:30','EUR','ECB Monetary Policy Meeting Accounts','—','—','HIGH'],
   ['2026-10-09','14:30','CAD','Employment Change','-41.7K','—','HIGH'],
-  ['2026-10-09','14:30','CAD','Unemployment Rate','—','—','HIGH']
+  ['2026-10-09','14:30','CAD','Unemployment Rate','6.4%','—','HIGH']
 ].map(([day,time,currency,event,previous,forecast,importance])=>({
   date:`${day}T${time}:00+02:00`,
   sourceDate:`${day}T${time}:00+02:00`,
