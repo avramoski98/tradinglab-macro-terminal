@@ -83,6 +83,34 @@
 #inflation .source-note{margin-top:8px;color:#777;font-size:9px;line-height:1.5}
 @media(max-width:850px){#inflation .infl-legend{grid-template-columns:repeat(2,minmax(100px,1fr))}}
 
+
+/* Economic Trend Holograms */
+.trend-hero{border-top:1px solid #6b461a;border-bottom:1px solid #6b461a;background:#0b0906;padding:12px 2px;margin-bottom:10px}
+.trend-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:8px 0}
+.trend-actions{display:flex;gap:6px;flex-wrap:wrap}
+.trend-btn{border:1px solid #3a3a3a;background:#0b0b0b;color:#aaa;padding:6px 9px;cursor:pointer;font-size:9px;text-transform:uppercase}
+.trend-btn:hover,.trend-btn.on{border-color:var(--accent);color:var(--accent2);background:#171008}
+.holo-stage{position:relative;height:390px;border:1px solid var(--line);background:linear-gradient(180deg,#080808,#060606);overflow-x:auto;padding:18px 12px 46px 54px}
+.holo-gridline{position:absolute;left:54px;right:12px;border-top:1px solid #202020}
+.holo-ylabel{position:absolute;left:8px;transform:translateY(50%);font-size:9px;color:#6f6f6f}
+.holo-cols{position:absolute;left:58px;right:16px;top:18px;bottom:46px;display:flex;align-items:flex-end;gap:12px;min-width:780px}
+.holo-col{flex:1;min-width:56px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center}
+.holo-value{font-size:11px;font-weight:900;margin-bottom:6px;color:#fff}
+.holo-beam{width:32px;min-height:3px;border:1px solid currentColor;background:linear-gradient(to top,currentColor 0%,rgba(255,255,255,.04) 90%);opacity:.76;box-shadow:0 0 12px currentColor,inset 0 0 12px currentColor;position:relative;transition:height .35s ease}
+.holo-beam:before{content:"";position:absolute;left:-5px;right:-5px;top:-3px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+.holo-beam:after{content:"";position:absolute;left:-6px;right:-6px;bottom:-4px;height:8px;border:1px solid currentColor;border-radius:50%;opacity:.6}
+.holo-beam.na{height:5px!important;opacity:.18;box-shadow:none}
+.holo-ccy{font-size:10px;font-weight:900;margin-top:9px;color:#eee}
+.holo-trend{font-size:8px;margin-top:3px;color:#777;white-space:nowrap}
+.trend-slider{width:min(640px,100%);accent-color:var(--accent)}
+.trend-date{font-size:18px;font-weight:900;color:var(--accent2)}
+.trend-summary{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:1px;background:var(--line);margin-top:8px}
+.trend-summary>div{background:#090909;padding:9px}
+.trend-summary b{display:block;color:#fff;font-size:11px;margin-top:3px}
+.trend-note{margin-top:8px;color:#777;font-size:9px;line-height:1.5}
+@media(max-width:900px){.trend-summary{grid-template-columns:repeat(2,minmax(120px,1fr))}.holo-stage{height:360px}}
+@media(prefers-reduced-motion:reduce){.holo-beam{transition:none}}
+
 </style>
 </head><body>
 <div class="app">
@@ -93,6 +121,8 @@
     <button class="active" data-tab="overview">Overview</button>
     <button data-tab="g10">G10 Macro Monitor</button>
     <button data-tab="inflation">Inflation Trends</button>
+    <button data-tab="labortrends">Labor Trends</button>
+    <button data-tab="growthtrends">Growth Trends</button>
     <button data-tab="rates">Rates Probabilities</button>
     <button data-tab="weekly">Weekly Focus</button>
     <button data-tab="calendar">Next Week Calendar</button>
@@ -114,6 +144,8 @@
   <section id="overview" class="section active"></section>
   <section id="g10" class="section"></section>
   <section id="inflation" class="section"></section>
+  <section id="labortrends" class="section"></section>
+  <section id="growthtrends" class="section"></section>
   <section id="rates" class="section"></section>
   <section id="weekly" class="section"></section>
   <section id="calendar" class="section"></section>
@@ -504,6 +536,10 @@ async function loadSectors(){try{let r=await fetch('/api/sectors',{cache:'no-sto
 
 
 
+
+const G10_ORDER=['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD','SEK','NOK'];
+const TREND_COLORS={USD:'#39a0ff',EUR:'#e0c42f',GBP:'#16b58a',JPY:'#e45757',CHF:'#d9d9d9',CAD:'#ff8b3d',AUD:'#9b7cff',NZD:'#60c1c7',SEK:'#ef77b3',NOK:'#a9d55b'};
+
 const INFLATION_SERIES={
  USD:[['2026-05',4.2],['2026-06',3.5],['2026-07',3.4],['2026-08',3.4]],
  EUR:[['2026-04',3.0],['2026-05',3.2],['2026-06',2.8],['2026-07',2.9],['2026-08',3.2],['2026-09',3.8]],
@@ -516,34 +552,63 @@ const INFLATION_SERIES={
  SEK:[['2026-07',0.2],['2026-08',0.3]],
  NOK:[['2026-04',3.4],['2026-05',3.1],['2026-06',2.7],['2026-07',3.0],['2026-08',3.3]]
 };
-const INFLATION_COLORS={USD:'#39a0ff',EUR:'#e0c42f',GBP:'#16b58a',JPY:'#e45757',CHF:'#d9d9d9',CAD:'#ff8b3d',AUD:'#9b7cff',NZD:'#60c1c7',SEK:'#ef77b3',NOK:'#a9d55b'};
-let INFLATION_VISIBLE=new Set(Object.keys(INFLATION_SERIES));
-function inflTrend(arr){if(!arr||arr.length<2)return{label:'INSUFFICIENT',cls:'trend-flat',delta:0};let d=arr[arr.length-1][1]-arr[0][1];return Math.abs(d)<.15?{label:'STABLE',cls:'trend-flat',delta:d}:d>0?{label:'RISING',cls:'trend-up',delta:d}:{label:'COOLING',cls:'trend-down',delta:d}}
-function inflDateLabel(v){let [y,m]=v.split('-'),names=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return names[Number(m)-1]+' '+String(y).slice(2)}
-function drawInflationChart(){
- let svg=document.getElementById('inflationSvg'); if(!svg)return;
- let W=980,H=390,L=48,R=20,T=24,B=48,all=[...INFLATION_VISIBLE].flatMap(c=>INFLATION_SERIES[c]||[]);
- if(!all.length){svg.innerHTML='';return}
- let dates=[...new Set(all.map(x=>x[0]))].sort(), vals=all.map(x=>x[1]),min=Math.min(0,...vals)-.2,max=Math.max(5,...vals)+.2,ns='http://www.w3.org/2000/svg';
- svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
- const x=d=>L+(dates.indexOf(d)/Math.max(1,dates.length-1))*(W-L-R),y=v=>T+(max-v)/(max-min)*(H-T-B);
- for(let i=0;i<=5;i++){let v=min+(max-min)*i/5,yy=y(v),ln=document.createElementNS(ns,'line');ln.setAttribute('x1',L);ln.setAttribute('x2',W-R);ln.setAttribute('y1',yy);ln.setAttribute('y2',yy);ln.setAttribute('stroke','#252525');svg.appendChild(ln);let tx=document.createElementNS(ns,'text');tx.setAttribute('x',8);tx.setAttribute('y',yy+3);tx.setAttribute('fill','#777');tx.setAttribute('font-size','10');tx.textContent=v.toFixed(1)+'%';svg.appendChild(tx)}
- dates.forEach((d,i)=>{let tx=document.createElementNS(ns,'text');tx.setAttribute('x',x(d));tx.setAttribute('y',H-18);tx.setAttribute('text-anchor','middle');tx.setAttribute('fill','#777');tx.setAttribute('font-size','9');tx.textContent=inflDateLabel(d);svg.appendChild(tx)});
- for(const c of INFLATION_VISIBLE){let arr=INFLATION_SERIES[c],path=document.createElementNS(ns,'path'),d='';arr.forEach((p,i)=>d+=(i?' L ':'M ')+x(p[0])+' '+y(p[1]));path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',INFLATION_COLORS[c]);path.setAttribute('stroke-width','3');path.setAttribute('stroke-linejoin','round');path.setAttribute('stroke-linecap','round');svg.appendChild(path);arr.forEach(p=>{let dot=document.createElementNS(ns,'circle');dot.setAttribute('cx',x(p[0]));dot.setAttribute('cy',y(p[1]));dot.setAttribute('r','3.5');dot.setAttribute('fill',INFLATION_COLORS[c]);let title=document.createElementNS(ns,'title');title.textContent=c+' · '+p[0]+' · '+p[1].toFixed(1)+'%';dot.appendChild(title);svg.appendChild(dot)})}
+
+const LABOR_SERIES={
+ USD:[['2026-08',4.1],['2026-10',4.2]],
+ EUR:[['2026-07',6.4]],
+ AUD:[['2026-08',4.6]]
+};
+
+const GROWTH_SERIES={
+ USD:[['2026-09',57.0]],
+ EUR:[['2026-08',52.7],['2026-09',52.7]],
+ GBP:[['2026-08',51.7]],
+ SEK:[['2026-08',56.1]]
+};
+
+const TREND_STATE={
+ inflation:{idx:null,timer:null,playing:false},
+ labortrends:{idx:null,timer:null,playing:false},
+ growthtrends:{idx:null,timer:null,playing:false}
+};
+
+function monthLabel(v){if(!v)return'—';let [y,m]=String(v).split('-'),names=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return (names[Number(m)-1]||m)+' '+String(y).slice(-2)}
+function seriesTimeline(series){return [...new Set(Object.values(series).flat().map(x=>x[0]))].sort()}
+function valueAt(series,c,date){let a=series[c]||[],x=a.find(p=>p[0]===date);return x?Number(x[1]):null}
+function latestPoint(series,c,upTo){let a=(series[c]||[]).filter(p=>!upTo||p[0]<=upTo);return a.length?a[a.length-1]:null}
+function pointBefore(series,c,date){let a=(series[c]||[]).filter(p=>p[0]<date);return a.length?a[a.length-1]:null}
+function dirFor(series,c,date){let now=valueAt(series,c,date),prev=pointBefore(series,c,date);if(now==null||!prev)return'—';let d=now-prev[1];return Math.abs(d)<.05?'→ Stable':d>0?'↑ Rising':'↓ Cooling'}
+function rangeTrend(series,c){let a=series[c]||[];if(a.length<2)return'Insufficient';let d=a[a.length-1][1]-a[0][1];return Math.abs(d)<.05?'Stable':d>0?'Rising':'Cooling'}
+
+function trendSectorConfig(id){
+ if(id==='inflation')return{title:'G10 Inflation Trends',sub:'Headline CPI / HICP · historical hologram playback',series:INFLATION_SERIES,unit:'%',maxFloor:5,meaning:'Higher column = higher inflation pressure. Height is always measured from a true 0% baseline.',metric:'Headline inflation'};
+ if(id==='labortrends')return{title:'G10 Labor Trends',sub:'Unemployment rate · verified historical points currently stored in terminal',series:LABOR_SERIES,unit:'%',maxFloor:8,meaning:'Higher column = higher unemployment / more labor slack. Missing months remain blank; the terminal does not invent or forward-fill data.',metric:'Unemployment rate'};
+ return{title:'G10 Growth Trends',sub:'Manufacturing PMI · verified historical points currently stored in terminal',series:GROWTH_SERIES,unit:'',maxFloor:60,meaning:'PMI above 50 = expansion; below 50 = contraction. Missing countries stay blank until verified data is available.',metric:'Manufacturing PMI'};
 }
-function inflationTrends(){
- let el=document.getElementById('inflation');if(!el)return;
- let order=['USD','EUR','GBP','JPY','CHF','CAD','AUD','NZD','SEK','NOK'];
- let rows=order.map(c=>{let a=INFLATION_SERIES[c],last=a[a.length-1],t=inflTrend(a);return `<tr><td><b style="color:${INFLATION_COLORS[c]}">${c}</b></td><td>${last[1].toFixed(1)}%</td><td>${inflDateLabel(last[0])}</td><td class="${t.cls}">${t.label}</td><td>${t.delta>0?'+':''}${t.delta.toFixed(1)}pp</td><td class="mini">${a.length} verified trend points</td></tr>`}).join('');
- let toggles=order.map(c=>`<button type="button" class="infl-toggle on" data-infl="${c}"><span class="infl-swatch" style="background:${INFLATION_COLORS[c]}"></span> ${c}</button>`).join('');
- let legend=order.map(c=>`<div class="infl-leg"><span class="infl-swatch" style="background:${INFLATION_COLORS[c]}"></span><b>${c}</b><span>${INFLATION_SERIES[c].slice(-1)[0][1].toFixed(1)}%</span></div>`).join('');
- el.innerHTML=`<div class="infl-hero"><div class="kicker">TRADINGLAB · G10 INFLATION COMPARISON</div><h2 style="margin:3px 0 7px;font-size:17px">Headline CPI / HICP · Historical Trend</h2><div class="mini" style="font-size:12px">Different line for each G10 currency. Use the direction and relative level to compare inflation pressure across central banks.</div></div>
- <div class="infl-controls">${toggles}</div>
- <div class="infl-chart-card"><div class="infl-chart-wrap"><svg id="inflationSvg" class="infl-chart" role="img" aria-label="G10 headline inflation historical comparison"></svg></div><div class="infl-legend">${legend}</div><div class="source-note">Source set: official statistical releases used for the latest available 2026 observations (BLS, Eurostat, ONS, Statistics Bureau of Japan, Swiss FSO, Statistics Canada, ABS, Stats NZ/RBNZ, Statistics Sweden, Statistics Norway). NZD is quarterly; other series use available monthly observations. This section is an inflation-comparison layer, not a standalone currency signal.</div></div>
- <div class="card infl-table" style="margin-top:8px"><h3>Latest Inflation Trend Read</h3><div class="tablewrap"><table><thead><tr><th>CCY</th><th>Latest</th><th>Latest Date</th><th>Trend</th><th>Change Across Shown Window</th><th>Coverage</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
- el.querySelectorAll('.infl-toggle').forEach(b=>b.addEventListener('click',()=>{let c=b.dataset.infl;if(INFLATION_VISIBLE.has(c)){if(INFLATION_VISIBLE.size===1)return;INFLATION_VISIBLE.delete(c);b.classList.remove('on')}else{INFLATION_VISIBLE.add(c);b.classList.add('on')}drawInflationChart()}));
- drawInflationChart();
+
+function stopTrendPlayback(id){let st=TREND_STATE[id];if(st&&st.timer){clearInterval(st.timer);st.timer=null}if(st)st.playing=false}
+function trendSector(id){
+ let el=document.getElementById(id);if(!el)return;
+ let cfg=trendSectorConfig(id),timeline=seriesTimeline(cfg.series),st=TREND_STATE[id];
+ if(!timeline.length){el.innerHTML='<div class="card"><h3>'+cfg.title+'</h3><div class="mini">No verified history available.</div></div>';return}
+ if(st.idx==null||st.idx>=timeline.length)st.idx=timeline.length-1;
+ let date=timeline[st.idx],allVals=Object.values(cfg.series).flat().map(x=>Number(x[1])).filter(Number.isFinite),max=Math.max(cfg.maxFloor,...allVals),step=max/5;
+ let grid=Array.from({length:6},(_,i)=>{let v=step*i,bottom=46+(v/max)*326;return '<div class="holo-gridline" style="bottom:'+bottom+'px"></div><span class="holo-ylabel" style="bottom:'+(bottom-4)+'px">'+v.toFixed(id==='growthtrends'?0:1)+cfg.unit+'</span>'}).join('');
+ let cols=G10_ORDER.map(c=>{let v=valueAt(cfg.series,c,date),h=v==null?0:Math.max(1,Math.min(100,v/max*100)),dir=dirFor(cfg.series,c,date),color=TREND_COLORS[c];return '<div class="holo-col" style="color:'+color+'"><div class="holo-value">'+(v==null?'N/A':v.toFixed(1)+cfg.unit)+'</div><div class="holo-beam '+(v==null?'na':'')+'" style="height:'+h+'%"></div><div class="holo-ccy">'+c+'</div><div class="holo-trend">'+dir+'</div></div>'}).join('');
+ let cards=G10_ORDER.map(c=>{let a=cfg.series[c]||[],lp=latestPoint(cfg.series,c),t=rangeTrend(cfg.series,c);return '<div><span class="mini">'+c+'</span><b>'+(lp?lp[1].toFixed(1)+cfg.unit:'N/A')+'</b><span class="mini">'+t+' · '+a.length+' pts</span></div>'}).join('');
+ el.innerHTML='<div class="trend-hero"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+cfg.title+'</h2><div class="mini" style="font-size:12px">'+cfg.sub+'</div></div>'
+ +'<div class="trend-toolbar"><div><div class="trend-date">'+monthLabel(date)+'</div><div class="mini">'+cfg.metric+' · playback point '+(st.idx+1)+' / '+timeline.length+'</div></div><div class="trend-actions"><button class="trend-btn" data-act="prev">◀ Prev</button><button class="trend-btn '+(st.playing?'on':'')+'" data-act="play">'+(st.playing?'Pause':'Play')+'</button><button class="trend-btn" data-act="next">Next ▶</button></div></div>'
+ +'<input class="trend-slider" type="range" min="0" max="'+(timeline.length-1)+'" value="'+st.idx+'" step="1" aria-label="'+cfg.title+' historical date">'
+ +'<div class="holo-stage">'+grid+'<div class="holo-cols">'+cols+'</div></div>'
+ +'<div class="trend-summary">'+cards+'</div><div class="trend-note">'+cfg.meaning+' Historical playback uses only the dated points currently stored in the terminal. Gaps are intentionally shown as N/A.</div>';
+ let slider=el.querySelector('.trend-slider');slider.addEventListener('input',()=>{stopTrendPlayback(id);st.idx=Number(slider.value);trendSector(id)});
+ el.querySelector('[data-act="prev"]').addEventListener('click',()=>{stopTrendPlayback(id);st.idx=(st.idx-1+timeline.length)%timeline.length;trendSector(id)});
+ el.querySelector('[data-act="next"]').addEventListener('click',()=>{stopTrendPlayback(id);st.idx=(st.idx+1)%timeline.length;trendSector(id)});
+ el.querySelector('[data-act="play"]').addEventListener('click',()=>{if(st.playing){stopTrendPlayback(id);trendSector(id);return}st.playing=true;trendSector(id);st.timer=setInterval(()=>{st.idx=(st.idx+1)%timeline.length;trendSector(id)},1300)});
 }
+function inflationTrends(){trendSector('inflation')}
+function laborTrends(){trendSector('labortrends')}
+function growthTrends(){trendSector('growthtrends')}
 
 function divergence(){let order=currentOrder(),pairs=[];for(let i=0;i<3;i++)pairs.push([order[i],order[order.length-1-i]]);$('#divergence').innerHTML=`<div class="grid"><div class="card s7"><h3>Macro Divergence Monitor</h3>${pairs.map(([a,b])=>`<div class="pair"><div><b class="good">${a}</b><div class="mini">${esc(RES[a].final)} · ${esc(RES[a].macro)}</div></div><div class="arrow">VS</div><div style="text-align:right"><b class="bad">${b}</b><div class="mini">${esc(RES[b].final)} · ${esc(RES[b].macro)}</div></div></div>`).join('')}</div><div class="card s5"><h3>Execution Rule</h3><div class="call"><b>1.</b> Rank the 3M macro state.<br><br><b>2.</b> Read the latest catalyst.<br><br><b>3.</b> Check whether 2Y pricing confirms the story.<br><br><b>4.</b> Compare strongest vs weakest.<br><br><b>5.</b> Only then move to technical execution.</div></div></div>`}
 function method(){$('#method').innerHTML=`<div class="grid"><div class="card s6"><h3>Macro Framework</h3><div class="call"><b>3M Macro</b> = primary underlying trend.<br><br><b>Growth / Labor / Activity</b> = breadth of the real economy.<br><br><b>Core Inflation</b> = policy pressure relative to target.<br><br><b>Central Bank</b> = reaction function.<br><br><b>2Y / Pricing</b> = market confirmation, not the source of the bias.<br><br><b>Latest Catalyst</b> = newest data shock, shown separately from the base thesis.<br><br><b>Weekly Invalidation</b> = what would force us to reduce or reverse conviction.</div></div><div class="card s6"><h3>Live Engine</h3><div class="call"><b>3M base + FinancialJuice catalyst layer.</b> FinancialJuice headlines refresh every 15 seconds. Ordinary headlines never overwrite macro data. Only structured G10 releases with Actual / Forecast / Previous receive a Beat / Miss / Neutral catalyst value and can re-rank the live G10 table. High-impact macro / policy / regime headlines glow red. The underlying 3M macro state remains the base thesis.</div></div></div>`}
@@ -555,14 +620,14 @@ function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='
 function captureUiScroll(){let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');return{x:window.scrollX,y:window.scrollY,news:n?n.scrollTop:0,cat:c?c.scrollTop:0,drawer:d?d.scrollTop:0}}
 function restoreUiScroll(st){requestAnimationFrame(()=>{window.scrollTo(st.x,st.y);let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');if(n)n.scrollTop=st.news;if(c)c.scrollTop=st.cat;if(d)d.scrollTop=st.drawer})}
 function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='Live checked '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep, Macedonia';let w=$('#weekLabel');if(w){let [start,end]=activeCalendarRange(),a=new Date(start+'T12:00:00Z'),b=new Date(end+'T12:00:00Z');b.setUTCDate(b.getUTCDate()-1);let f=d=>d.toLocaleDateString('en-GB',{timeZone:'UTC',day:'2-digit',month:'short'});w.textContent='Week of '+f(a)+'–'+f(b)}}
-function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();inflationTrends();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
+function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();inflationTrends();laborTrends();growthTrends();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
 async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);saveCalendarMacro(rawLiveReleaseObjects());sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Seed mode · provider not connected';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · seed mode';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
 function normalizeEvent(x){return {date:x.date||x.Date||'',time:x.time||x.Time||'',currency:x.currency||x.Currency||countryToCcy(x.country||x.Country),event:x.event||x.Event||x.Category||'',previous:x.previous??x.Previous??'—',forecast:x.forecast??x.Forecast??'—',actual:x.actual??x.Actual??'—',importance:x.importance??x.Importance??'',impact:x.impact||inferImpact(x),label:x.label||x.surprise||inferSurprise(x)}}
 function countryToCcy(c){c=String(c||'').toLowerCase();let m={"united states":"USD","euro area":"EUR","european union":"EUR","united kingdom":"GBP","japan":"JPY","switzerland":"CHF","australia":"AUD","new zealand":"NZD","canada":"CAD","sweden":"SEK","norway":"NOK"};return m[c]||''}
 function num(v){if(v==null)return NaN;let s=String(v).replace(/[^0-9+-.]/g,'');return Number(s)}
 function inferSurprise(x){let a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Update';if(Math.abs(a-f)<1e-9)return'Neutral';return a>f?'Beat':'Miss'}
 function inferImpact(x){let ev=String(x.event||x.Event||x.Category||'').toLowerCase(),a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Neutral';let goodHigher=!/unemployment|jobless|claims|deficit/.test(ev);let pos=goodHigher?a>f:a<f;return pos?'Strengthens':'Weakens'}
-const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',inflation:'G10 Inflation Trends',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab).classList.add('active');$('#title').textContent=titles[b.dataset.tab]});
+const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',inflation:'G10 Inflation Trends',labortrends:'G10 Labor Trends',growthtrends:'G10 Growth Trends',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{['inflation','labortrends','growthtrends'].forEach(id=>{if(id!==b.dataset.tab)stopTrendPlayback(id)});document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab).classList.add('active');$('#title').textContent=titles[b.dataset.tab]});
 setInterval(()=>{$('#clock').textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'},1000);render();loadMarkets();loadLive();loadNews();loadSectors();loadRates();checkEventReminders();setInterval(loadMarkets,15000);setInterval(loadLive,30000);setInterval(loadNews,15000);setInterval(loadSectors,60000);setInterval(loadRates,900000);setInterval(checkEventReminders,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadMarkets()});
 </script></body></html>
