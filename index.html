@@ -630,7 +630,7 @@ const ECON_TRENDS={
  }
 };
 
-function econMonth(v){if(!v)return'—';let [y,m]=String(v).split('-'),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return (n[+m-1]||m)+' '+String(y).slice(-2)}
+function econMonth(v){if(!v)return'—';let [y,m,d]=String(v).split('-'),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d?String(Number(d))+' '+(n[+m-1]||m):(n[+m-1]||m)+' '+String(y).slice(-2)}
 function monthNum(s){let [y,m]=String(s).split('-').map(Number);return y*12+m}
 function fmtTrendVal(cfg,v){if(v==null||!Number.isFinite(v))return'—';return v.toFixed(cfg.decimals)+(cfg.unit||'')}
 function pointAgo(points,months){if(!points.length)return null;let last=points[points.length-1],target=monthNum(last[0])-months,best=null;for(const p of points){if(monthNum(p[0])<=target)best=p}return best}
@@ -698,13 +698,16 @@ function parseActualNumber(v,mode){
  let m=s.match(/([+-]?\d+(?:\.\d+)?)/);return m?Number(m[1]):NaN
 }
 function monthKeyFromDate(d){let x=String(d||'').slice(0,7);return /^\d{4}-\d{2}$/.test(x)?x:''}
+function prevMonthKey(m){let [y,mo]=String(m).split('-').map(Number);mo--;if(mo<1){mo=12;y--}return y+'-'+String(mo).padStart(2,'0')}
 function dynamicIndicatorSeries(ccy,def){
- let out=[];
- for(const u of MANUAL_CATALYSTS||[]){
-  if(u.ccy!==ccy||!def.re.test(String(u.event||'')))continue;
+ let out=[],sources=[...(MANUAL_CATALYSTS||[]),...(typeof VERIFIED_OVERRIDES!=='undefined'?(VERIFIED_OVERRIDES||[]):[])];
+ for(const u of sources){
+  if((u.ccy||u.currency)!==ccy||!def.re.test(String(u.event||'')))continue;
   let v=parseActualNumber(u.actual,def.mode||'first'),m=monthKeyFromDate(u.date);
   if(!m||!Number.isFinite(v))continue;
   out.push([m,v]);
+  let pv=parseActualNumber(u.previous,def.mode||'first'),pm=prevMonthKey(m);
+  if(Number.isFinite(pv))out.push([pm,pv]);
  }
  out.sort((a,b)=>a[0].localeCompare(b[0]));
  let seen=new Map();for(const p of out)seen.set(p[0],p[1]);
@@ -736,12 +739,15 @@ const ECON_INDICATOR_DEFS={
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
-  let p=d.primary?(base?.p||[]):dynamicIndicatorSeries(ccy,d);
+  let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],p=d.primary?(base?.p||[]):st?.p||dynamicIndicatorSeries(ccy,d);
   if(d.primary||p.length){
    out.push({
-    id:d.id,label:d.primary?(base?.metric||d.label):d.label,p,
-    unit:d.primary?(cfg.unit||''):(d.unit||''),decimals:d.primary?cfg.decimals:(d.decimals??1),
-    source:d.primary?cfg.source:'Structured verified releases stored in TradingLab terminal calendar/history.'
+    id:d.id,
+    label:d.primary?(base?.metric||d.label):(st?.label||d.label),
+    p,
+    unit:d.primary?(cfg.unit||''):(st?.unit??d.unit??''),
+    decimals:d.primary?cfg.decimals:(st?.decimals??d.decimals??1),
+    source:d.primary?cfg.source:(st?.source||'Structured verified releases stored in TradingLab terminal calendar/history.')
    });
   }
  }
