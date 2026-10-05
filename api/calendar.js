@@ -74,7 +74,7 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-10-05',time:'06:00',currency:'JPY',match:/Consumer Confidence/i,actual:'35.4',previous:'35.5',forecast:'35.3',importance:'HIGH',source:'Japan Cabinet Office / market reports',event:'Consumer Confidence · Sep',label:'Beat',impact:'Strengthens'},
   {date:'2026-10-05',time:'08:15',currency:'EUR',match:/Spanish Services PMI/i,actual:'58.3',previous:'57.8',forecast:'57.1',importance:'MED',source:'S&P Global / Reuters',event:'Spanish Services PMI · Sep',label:'Beat',impact:'Strengthens'},
   {date:'2026-10-05',time:'08:45',currency:'EUR',match:/Nagel Speaks/i,actual:'Inflation risks elevated; no second-round effects yet',previous:'—',forecast:'Policy / inflation outlook',importance:'HIGH',source:'Reuters / Bundesbank',event:'Bundesbank President Nagel Speaks',label:'Hawkish-leaning',impact:'Strengthens'},
-  {date:'2026-10-05',time:'08:45',currency:'EUR',match:/Italian Services PMI/i,actual:'51.7',previous:'55.2',forecast:'54.6',importance:'MED',source:'S&P Global / Reuters',event:'Italian Services PMI · Sep',label:'Miss',impact:'Weakens'},
+  {date:'2026-10-05',time:'08:45',currency:'EUR',match:/Italian Services PMI/i,actual:'51.7',previous:'55.2',forecast:'54.7',importance:'MED',source:'S&P Global / Reuters',event:'Italian Services PMI · Sep',label:'Miss',impact:'Weakens'},
   {date:'2026-10-05',time:'08:50',currency:'EUR',match:/French Final Services PMI/i,actual:'51.2',previous:'48.0',forecast:'51.4',importance:'MED',source:'S&P Global / Reuters',event:'French Final Services PMI · Sep',label:'Slight miss',impact:'Neutral'},
   {date:'2026-10-05',time:'08:55',currency:'EUR',match:/German Final Services PMI/i,actual:'52.9',previous:'49.7',forecast:'52.9',importance:'MED',source:'S&P Global / Reuters',event:'German Final Services PMI · Sep',label:'In line',impact:'Strengthens'},
   {date:'2026-10-05',time:'09:00',currency:'EUR',match:/^Final Services PMI$/i,actual:'53.0',previous:'51.6',forecast:'53.0',importance:'MED',source:'S&P Global / Reuters',event:'Euro Area Final Services PMI · Sep',label:'In line',impact:'Strengthens'},
@@ -83,7 +83,7 @@ const VERIFIED_OVERRIDES=[
   {date:'2026-10-05',time:'10:00',currency:'EUR',match:/^PPI m\/m$/i,actual:'1.9%',previous:'1.6%',forecast:'1.9%',importance:'HIGH',source:'Eurostat',event:'Euro Area PPI m/m · Aug',label:'In line',impact:'Neutral'},
   {date:'2026-10-05',time:'10:00',currency:'EUR',match:/^PPI y\/y$/i,actual:'8.2%',previous:'5.8%',forecast:'8.1%',importance:'MED',source:'Eurostat',event:'Euro Area PPI y/y · Aug',label:'Hotter',impact:'Strengthens'},
   {date:'2026-10-05',time:'15:45',currency:'USD',match:/Final Services PMI/i,actual:'58.8',previous:'56.5',forecast:'58.7',importance:'MED',source:'S&P Global / market calendar',event:'S&P Global Services PMI · Sep final',label:'Beat',impact:'Strengthens'},
-  {date:'2026-10-05',time:'16:00',currency:'USD',match:/^ISM Services PMI$/i,actual:'54.9',previous:'55.4',forecast:'55.3',importance:'HIGH',source:'ISM / Reuters',event:'ISM Services PMI · Sep',label:'Miss',impact:'Weakens'},
+  {date:'2026-10-05',time:'16:00',currency:'USD',match:/^ISM Services PMI$/i,actual:'54.9',previous:'55.4',forecast:'55.2',importance:'HIGH',source:'ISM / Reuters',event:'ISM Services PMI · Sep',label:'Miss',impact:'Weakens'},
   {date:'2026-10-05',time:'16:00',currency:'USD',match:/ISM Services Prices Paid/i,actual:'74.0',previous:'72.6',forecast:'—',importance:'HIGH',source:'ISM',event:'ISM Services Prices Paid · Sep',label:'Hotter',impact:'Strengthens'},
   {date:'2026-10-05',time:'16:00',currency:'USD',match:/ISM Services Employment Index/i,actual:'50.1',previous:'47.8',forecast:'—',importance:'MED',source:'ISM',event:'ISM Services Employment Index · Sep',label:'Improved',impact:'Strengthens'},
   {date:'2026-09-23',time:'01:00',currency:'AUD',match:/^Flash Manufacturing PMI$/i,actual:'49.3',previous:'52.0',forecast:'—',importance:'LOW',source:'S&P Global',event:'Flash Manufacturing PMI · Sep',label:'Miss',impact:'Weakens'},
@@ -210,6 +210,11 @@ function reconcileScheduledFallback(events){const out=[...events],now=Date.now()
 function applyVerifiedOverrides(events){
   const out=[...events];
   const activeDates=new Set(out.map(e=>localDate(e.date)).filter(Boolean));
+  const impRank={LOW:1,MED:2,HIGH:3,EXTREME:4,'VERY HIGH':4};
+  const betterImportance=(a,b)=>{
+    const A=String(a||'').toUpperCase(),B=String(b||'').toUpperCase();
+    return (impRank[B]||0)>(impRank[A]||0)?B:(A||B);
+  };
   for(const o of VERIFIED_OVERRIDES){
     let matched=false;
     for(let i=0;i<out.length;i++){
@@ -217,24 +222,22 @@ function applyVerifiedOverrides(events){
       if(e.currency!==o.currency||localDate(e.date)!==o.date)continue;
       if(!o.match.test(String(e.event||'')))continue;
       if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
-      const resolvedForecast=e.forecast&&e.forecast!=='—'?e.forecast:o.forecast;
+      const resolvedForecast=usableActual(o.forecast)?o.forecast:(usableActual(e.forecast)?e.forecast:'—');
       const z=o.label?{label:o.label,impact:o.impact||'Neutral'}:infer(o.event,o.actual,resolvedForecast);
-      out[i]={...e,actual:o.actual,previous:o.previous,forecast:resolvedForecast,importance:e.importance||o.importance,label:z.label,impact:z.impact,lastUpdate:new Date().toISOString(),source:o.source};
+      out[i]={...e,event:o.event||e.event,actual:o.actual,previous:usableActual(o.previous)?o.previous:e.previous,forecast:resolvedForecast,importance:betterImportance(e.importance,o.importance),label:z.label,impact:z.impact,lastUpdate:new Date().toISOString(),source:o.source};
       matched=true;
       break;
     }
-    // Monthly verified releases are also inserted if the upstream provider omits them.
-    if(!matched&&activeDates.has(o.date)&&/m\/m/i.test(o.event)){
+    if(!matched&&activeDates.has(o.date)){
       out.push({
-        date:`${o.date}T${o.time}:00+02:00`,sourceDate:`${o.date}T${o.time}:00+02:00`,timeZone:TARGET_TZ,
+        date:o.date+'T'+o.time+':00+02:00',sourceDate:o.date+'T'+o.time+':00+02:00',timeZone:TARGET_TZ,
         country:o.currency,currency:o.currency,event:o.event,previous:o.previous,forecast:o.forecast,actual:o.actual,
-        importance:o.importance,label:'Update',impact:'Strengthens',lastUpdate:new Date().toISOString(),source:o.source
+        importance:o.importance,label:o.label||'Released',impact:o.impact||'Neutral',lastUpdate:new Date().toISOString(),source:o.source
       });
     }
   }
-  return out;
+  return out.sort((a,b)=>new Date(a.date)-new Date(b.date));
 }
-
 function skopjeWeekday(){
   return new Intl.DateTimeFormat('en-US',{timeZone:TARGET_TZ,weekday:'short'}).format(new Date());
 }
