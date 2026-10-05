@@ -713,6 +713,18 @@ function dynamicIndicatorSeries(ccy,def){
  let seen=new Map();for(const p of out)seen.set(p[0],p[1]);
  return [...seen.entries()];
 }
+const ECON_STATIC_HISTORY={
+ 'USD|inflation|core':{label:'Core CPI y/y',unit:'%',decimals:1,source:'U.S. BLS CPI releases, Apr–Aug 2026',p:[['2026-04',2.8],['2026-05',2.9],['2026-06',2.6],['2026-07',2.5],['2026-08',2.4]]},
+ 'USD|inflation|ppi':{label:'PPI Final Demand y/y',unit:'%',decimals:1,source:'U.S. BLS PPI historical series, Apr–Aug 2026',p:[['2026-04',5.7],['2026-05',5.9],['2026-06',5.6],['2026-07',4.8],['2026-08',5.4]]},
+ 'USD|inflation|pce':{label:'Core PCE y/y',unit:'%',decimals:1,source:'U.S. BEA Personal Income and Outlays, Apr–Aug 2026',p:[['2026-04',3.3],['2026-05',3.2],['2026-06',3.0],['2026-07',3.0],['2026-08',3.0]]},
+ 'USD|labor|employment':{label:'Nonfarm Payrolls',unit:'K',decimals:0,source:'U.S. BLS Employment Situation; later revisions used where available',p:[['2026-04',148],['2026-05',63],['2026-06',31],['2026-07',-10],['2026-08',133],['2026-09',29]]},
+ 'USD|labor|claims':{label:'Initial Jobless Claims',unit:'K',decimals:0,source:'U.S. Department of Labor weekly claims releases',p:[['2026-07-25',197],['2026-08-01',199],['2026-08-15',206],['2026-08-22',203],['2026-08-29',206],['2026-09-05',206],['2026-09-12',196],['2026-09-19',197],['2026-09-26',197]]},
+ 'USD|labor|wages':{label:'Average Hourly Earnings y/y',unit:'%',decimals:1,source:'U.S. BLS Employment Situation, Apr–Sep 2026',p:[['2026-04',3.6],['2026-05',3.4],['2026-06',3.5],['2026-07',3.2],['2026-08',3.1],['2026-09',3.0]]},
+ 'USD|labor|jolts':{label:'JOLTS Job Openings',unit:'M',decimals:3,source:'U.S. BLS JOLTS historical series, Apr–Aug 2026',p:[['2026-04',7.585],['2026-05',7.537],['2026-06',7.182],['2026-07',7.335],['2026-08',7.079]]},
+ 'USD|growth|services':{label:'ISM Services PMI',unit:'',decimals:1,source:'Institute for Supply Management, Apr–Sep 2026',p:[['2026-04',53.6],['2026-05',54.5],['2026-06',54.0],['2026-07',54.1],['2026-08',55.4],['2026-09',54.9]]},
+ 'USD|growth|gdp':{label:'Real GDP q/q annualized',unit:'%',decimals:1,source:'U.S. BEA latest revised GDP estimates',p:[['2026-03',2.5],['2026-06',2.2]]},
+ 'USD|growth|retail':{label:'Retail Sales m/m',unit:'%',decimals:1,source:'U.S. Census Bureau advance retail sales releases',p:[['2026-04',0.5],['2026-06',0.2],['2026-07',-0.5],['2026-08',1.2]]}
+};
 const ECON_INDICATOR_DEFS={
  inflation:[
   {id:'headline',label:'Headline CPI / HICP',primary:true},
