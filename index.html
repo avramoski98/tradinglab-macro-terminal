@@ -116,8 +116,8 @@
 
 /* Country Economic Trends */
 #economic .econ-countrybar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-#economic .econ-ccy,#economic .econ-cat,#economic .econ-focus{border:1px solid #3c3218;background:#090909;color:#9f936f;padding:7px 10px;cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}
-#economic .econ-ccy.on,#economic .econ-cat.on,#economic .econ-focus.on,#economic .econ-ccy:hover,#economic .econ-cat:hover,#economic .econ-focus:hover{border-color:#ffb000;color:#ffcf57;background:#171006}
+#economic .econ-ccy,#economic .econ-cat,#economic .econ-focus,#economic .econ-indicator{border:1px solid #3c3218;background:#090909;color:#9f936f;padding:7px 10px;cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}
+#economic .econ-ccy.on,#economic .econ-cat.on,#economic .econ-focus.on,#economic .econ-indicator.on,#economic .econ-ccy:hover,#economic .econ-cat:hover,#economic .econ-focus:hover,#economic .econ-indicator:hover{border-color:#ffb000;color:#ffcf57;background:#171006}
 #economic .econ-header{border-top:1px solid #6b461a;border-bottom:1px solid #6b461a;background:#0b0906;padding:12px 2px;margin-bottom:10px}
 #economic .econ-summary{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:1px;background:#2b2414;border:1px solid #2b2414;margin:10px 0}
 #economic .econ-summary>div{background:#080808;padding:10px}
@@ -681,49 +681,124 @@ function laborTrends(){econTrendSection('labortrends')}
 function growthTrends(){econTrendSection('growthtrends')}
 function stopTrendPlayback(){}
 
-let ECON_UI={ccy:'USD',cat:'inflation',focus:'latest'};
+
+let ECON_UI={ccy:'USD',cat:'inflation',focus:'latest',indicator:{}};
 function econCfg(cat){return ECON_TRENDS[cat==='inflation'?'inflation':cat==='labor'?'labortrends':'growthtrends']}
-function econSeries(ccy,cat){let cfg=econCfg(cat),o=cfg.data[ccy];return{cfg,o,p:o?.p||[]}}
-function econTrendLabel(cat,p){
+function parseActualNumber(v,mode){
+ let s=String(v||'');
+ if(mode==='mfg'){let m=s.match(/Mfg\s*([+-]?\d+(?:\.\d+)?)/i);return m?Number(m[1]):NaN}
+ if(mode==='services'){let m=s.match(/Services\s*([+-]?\d+(?:\.\d+)?)/i);return m?Number(m[1]):NaN}
+ if(mode==='unemp'){let m=s.match(/(?:Unemployment(?: Rate)?[^0-9+-]*)?([+-]?\d+(?:\.\d+)?)%/i);return m?Number(m[1]):NaN}
+ if(mode==='employment'){let m=s.match(/([+-]?\d+(?:\.\d+)?)\s*[Kk]/);return m?Number(m[1]):NaN}
+ if(mode==='headline'){let m=s.match(/Headline\s*([+-]?\d+(?:\.\d+)?)%/i);if(m)return Number(m[1])}
+ if(mode==='core'){let m=s.match(/Core\s*([+-]?\d+(?:\.\d+)?)%/i);if(m)return Number(m[1])}
+ let m=s.match(/([+-]?\d+(?:\.\d+)?)/);return m?Number(m[1]):NaN
+}
+function monthKeyFromDate(d){let x=String(d||'').slice(0,7);return /^\d{4}-\d{2}$/.test(x)?x:''}
+function dynamicIndicatorSeries(ccy,def){
+ let out=[];
+ for(const u of MANUAL_CATALYSTS||[]){
+  if(u.ccy!==ccy||!def.re.test(String(u.event||'')))continue;
+  let v=parseActualNumber(u.actual,def.mode||'first'),m=monthKeyFromDate(u.date);
+  if(!m||!Number.isFinite(v))continue;
+  out.push([m,v]);
+ }
+ out.sort((a,b)=>a[0].localeCompare(b[0]));
+ let seen=new Map();for(const p of out)seen.set(p[0],p[1]);
+ return [...seen.entries()];
+}
+const ECON_INDICATOR_DEFS={
+ inflation:[
+  {id:'headline',label:'Headline CPI / HICP',primary:true},
+  {id:'core',label:'Core CPI / HICP',re:/core cpi|core inflation|cpi \+ core cpi/i,mode:'core',unit:'%',decimals:1},
+  {id:'ppi',label:'PPI',re:/\bppi\b|producer price/i,unit:'%',decimals:1},
+  {id:'pce',label:'PCE / Core PCE',re:/\bpce\b/i,unit:'%',decimals:1}
+ ],
+ labor:[
+  {id:'unemployment',label:'Unemployment Rate',primary:true},
+  {id:'employment',label:'Employment / Payrolls',re:/nonfarm payrolls|employment change/i,mode:'employment',unit:'K',decimals:0},
+  {id:'claims',label:'Jobless Claims',re:/claims/i,unit:'K',decimals:0},
+  {id:'wages',label:'Wage Growth',re:/hourly earnings|wage/i,unit:'%',decimals:1},
+  {id:'jolts',label:'JOLTS / Job Openings',re:/jolts|job openings/i,unit:'M',decimals:3}
+ ],
+ growth:[
+  {id:'mfg',label:'Manufacturing PMI / Proxy',primary:true},
+  {id:'services',label:'Services PMI',re:/services pmi|manufacturing \+ services pmi/i,mode:'services',unit:'',decimals:1},
+  {id:'gdp',label:'GDP',re:/\bgdp\b/i,unit:'%',decimals:1},
+  {id:'retail',label:'Retail Sales',re:/retail sales/i,unit:'%',decimals:1},
+  {id:'industrial',label:'Industrial Production',re:/industrial production/i,unit:'%',decimals:1},
+  {id:'construction',label:'Construction PMI',re:/construction pmi/i,unit:'',decimals:1}
+ ]
+};
+function econIndicatorList(ccy,cat){
+ let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
+ for(const d of defs){
+  let p=d.primary?(base?.p||[]):dynamicIndicatorSeries(ccy,d);
+  if(d.primary||p.length){
+   out.push({
+    id:d.id,label:d.primary?(base?.metric||d.label):d.label,p,
+    unit:d.primary?(cfg.unit||''):(d.unit||''),decimals:d.primary?cfg.decimals:(d.decimals??1),
+    source:d.primary?cfg.source:'Structured verified releases stored in TradingLab terminal calendar/history.'
+   });
+  }
+ }
+ return out;
+}
+function activeIndicator(ccy,cat){
+ let list=econIndicatorList(ccy,cat),key=ccy+'|'+cat,want=ECON_UI.indicator[key];
+ let x=list.find(z=>z.id===want)||list[0]; if(x)ECON_UI.indicator[key]=x.id; return x
+}
+function metricDelta(p,months){return deltaFrom(p,months)}
+function econTrendLabel(cat,p,ind){
  if(p.length<2)return{label:'INSUFFICIENT',cls:'econ-trend-flat'};
- let d6=deltaFrom(p,6)||deltaFrom(p,3)||deltaFrom(p,1),d=d6?.v||0,last=p[p.length-1][1];
+ let d6=metricDelta(p,6)||metricDelta(p,3)||metricDelta(p,1),d=d6?.v||0,last=p[p.length-1][1];
  if(cat==='inflation')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'RISING',cls:'econ-trend-up'}:{label:'COOLING',cls:'econ-trend-down'};
- if(cat==='labor')return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WEAKENING',cls:'econ-trend-up'}:{label:'IMPROVING',cls:'econ-trend-down'};
+ if(cat==='labor'){
+  if(ind?.id==='employment'||ind?.id==='wages'||ind?.id==='jolts')return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-down'}:{label:'WEAKENING',cls:'econ-trend-up'};
+  return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WEAKENING',cls:'econ-trend-up'}:{label:'IMPROVING',cls:'econ-trend-down'};
+ }
+ if(ind?.id==='gdp'||ind?.id==='retail'||ind?.id==='industrial')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-up'}:{label:'SLOWING',cls:'econ-trend-down'};
  let state=last>=50?'EXPANSION':'CONTRACTION';
  return Math.abs(d)<.5?{label:state+' / STABLE',cls:'econ-trend-flat'}:d>0?{label:state+' / IMPROVING',cls:'econ-trend-up'}:{label:state+' / SLOWING',cls:'econ-trend-down'};
 }
-function econFocusValue(cat,p,focus){
- let cfg=econCfg(cat),d=focus==='1m'?deltaFrom(p,1):focus==='3m'?deltaFrom(p,3):focus==='6m'?deltaFrom(p,6):null,last=p[p.length-1];
- if(focus==='latest')return last?fmtTrendVal(cfg,last[1]):'—';
+function fmtIndVal(ind,v){if(v==null||!Number.isFinite(v))return'—';return v.toFixed(ind.decimals)+(ind.unit||'')}
+function econFocusValue(cat,p,focus,ind){
+ let d=focus==='1m'?metricDelta(p,1):focus==='3m'?metricDelta(p,3):focus==='6m'?metricDelta(p,6):null,last=p[p.length-1];
+ if(focus==='latest')return last?fmtIndVal(ind,last[1]):'—';
  if(!d)return'—';
- return (d.v>0?'+':'')+d.v.toFixed(1)+(cat==='growth'?' pts':'pp');
+ let suf=ind.unit==='%'?'pp':ind.unit==='K'?'K':ind.unit==='M'?'M':' pts';
+ return (d.v>0?'+':'')+d.v.toFixed(ind.decimals)+suf;
 }
-function econBarSvg(cat,p){
- let cfg=econCfg(cat),W=980,H=350,L=48,R=20,T=28,B=48;
- if(!p.length)return'<div class="mini">No verified history.</div>';
+function econBarSvg(cat,p,ind){
+ let W=980,H=350,L=54,R=20,T=28,B=48;
+ if(!p.length)return'<div class="mini">No verified history for this indicator yet.</div>';
  let vals=p.map(x=>Number(x[1])).filter(Number.isFinite),min=Math.min(0,...vals),max=Math.max(...vals);
- if(cat==='growth'&&min>0)min=Math.min(45,min-2);
- let pad=Math.max(.5,(max-min)*.12),lo=min<0?min-pad:0,hi=max+pad,range=Math.max(.01,hi-lo);
- let y=v=>T+(hi-v)/range*(H-T-B),zero=y(0),plotW=W-L-R,gap=16,bw=Math.min(90,(plotW-gap*(p.length+1))/p.length);
+ if((ind.id==='mfg'||ind.id==='services'||ind.id==='construction')&&min>0)min=Math.min(45,min-2);
+ let pad=Math.max(ind.unit==='K'?10:ind.unit==='M'?.1:.5,(max-min)*.12),lo=min<0?min-pad:0,hi=max+pad,range=Math.max(.01,hi-lo);
+ let y=v=>T+(hi-v)/range*(H-T-B),zero=y(0),plotW=W-L-R,gap=16,bw=Math.min(90,(plotW-gap*(p.length+1))/Math.max(1,p.length));
  let grid='',bars='',labels='';
- for(let i=0;i<=5;i++){let v=lo+(hi-lo)*i/5,yy=y(v);grid+='<line class="bar-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line><text class="bar-axis" x="6" y="'+(yy+3)+'">'+v.toFixed(cat==='growth'?0:1)+(cfg.unit||'')+'</text>'}
+ for(let i=0;i<=5;i++){let v=lo+(hi-lo)*i/5,yy=y(v),axis=v.toFixed(ind.unit==='K'?0:ind.decimals)+(ind.unit||'');grid+='<line class="bar-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line><text class="bar-axis" x="6" y="'+(yy+3)+'">'+axis+'</text>'}
  if(lo<0&&hi>0)grid+='<line class="bar-zero" x1="'+L+'" y1="'+zero+'" x2="'+(W-R)+'" y2="'+zero+'"></line>';
- p.forEach((pt,i)=>{let x=L+gap+i*(bw+gap),v=pt[1],yv=y(v),top=Math.min(yv,zero),h=Math.max(2,Math.abs(zero-yv));bars+='<rect class="bar-fill" x="'+x+'" y="'+top+'" width="'+bw+'" height="'+h+'"></rect>';let ty=v>=0?top-7:top+h+14;labels+='<text class="bar-value" text-anchor="middle" x="'+(x+bw/2)+'" y="'+ty+'">'+v.toFixed(cfg.decimals)+(cfg.unit||'')+'</text><text class="bar-label" text-anchor="middle" x="'+(x+bw/2)+'" y="'+(H-18)+'">'+econMonth(pt[0])+'</text>'});
- return'<svg class="bar-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(cfg.title)+' bar chart">'+grid+bars+labels+'</svg>';
+ p.forEach((pt,i)=>{let x=L+gap+i*(bw+gap),v=pt[1],yv=y(v),top=Math.min(yv,zero),h=Math.max(2,Math.abs(zero-yv));bars+='<rect class="bar-fill" x="'+x+'" y="'+top+'" width="'+bw+'" height="'+h+'"></rect>';let ty=v>=0?top-7:top+h+14;labels+='<text class="bar-value" text-anchor="middle" x="'+(x+bw/2)+'" y="'+ty+'">'+fmtIndVal(ind,v)+'</text><text class="bar-label" text-anchor="middle" x="'+(x+bw/2)+'" y="'+(H-18)+'">'+econMonth(pt[0])+'</text>'});
+ return'<svg class="bar-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(ind.label)+' bar chart">'+grid+bars+labels+'</svg>';
 }
 function economicTrends(){
  let el=document.getElementById('economic');if(!el)return;
- let ccy=ECON_UI.ccy,cat=ECON_UI.cat,focus=ECON_UI.focus,{cfg,o,p}=econSeries(ccy,cat),last=p[p.length-1],prev=p.length>1?p[p.length-2]:null,d1=deltaFrom(p,1),d3=deltaFrom(p,3),d6=deltaFrom(p,6),tr=econTrendLabel(cat,p);
+ let ccy=ECON_UI.ccy,cat=ECON_UI.cat,focus=ECON_UI.focus,ind=activeIndicator(ccy,cat),p=ind?.p||[],last=p[p.length-1],prev=p.length>1?p[p.length-2]:null,d1=metricDelta(p,1),d3=metricDelta(p,3),d6=metricDelta(p,6),tr=econTrendLabel(cat,p,ind);
  let countries=G10_ORDER.map(c=>'<button class="econ-ccy '+(c===ccy?'on':'')+'" data-ccy="'+c+'">'+c+'</button>').join('');
  let cats=[['inflation','Inflation'],['labor','Labor'],['growth','Growth']].map(x=>'<button class="econ-cat '+(cat===x[0]?'on':'')+'" data-cat="'+x[0]+'">'+x[1]+'</button>').join('');
  let focuses=['latest','1m','3m','6m'].map(v=>'<button class="econ-focus '+(focus===v?'on':'')+'" data-focus="'+v+'">'+v.toUpperCase()+'</button>').join('');
- el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">One country · one macro block · six-month bar history. Bloomberg-style yellow bars, no line overlay.</div></div>'
+ let inds=econIndicatorList(ccy,cat).map(x=>'<button class="econ-indicator '+(ind&&x.id===ind.id?'on':'')+'" data-ind="'+x.id+'">'+esc(x.label)+'</button>').join('');
+ let deltaFmt=d=>{if(!d)return'—';let suf=ind.unit==='%'?'pp':ind.unit==='K'?'K':ind.unit==='M'?'M':' pts';return(d.v>0?'+':'')+d.v.toFixed(ind.decimals)+suf};
+ el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">Country-first macro history · choose an indicator · Bloomberg-style yellow bars · no line overlay.</div></div>'
  +'<div class="econ-countrybar">'+countries+'</div><div class="trend-toolbar"><div class="trend-actions">'+cats+'</div><div class="trend-actions">'+focuses+'</div></div>'
- +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(o?.metric||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtTrendVal(cfg,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtTrendVal(cfg,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+(d1?((d1.v>0?'+':'')+d1.v.toFixed(1)+(cat==='growth'?' pts':'pp')):'—')+'</div></div><div><div class="k">3M Δ</div><div class="v">'+(d3?((d3.v>0?'+':'')+d3.v.toFixed(1)+(cat==='growth'?' pts':'pp')):'—')+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
- +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(o?.metric||'Economic indicator')+'</h3><div class="mini">'+(last?econMonth(last[0]):'—')+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+econFocusValue(cat,p,focus)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+cfg.source+' · Bar history uses only verified dated observations stored in the terminal; no interpolation or invented monthly values.</div></div>';
+ +'<div class="econ-countrybar">'+inds+'</div>'
+ +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(ind?.label||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtIndVal(ind,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtIndVal(ind,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+deltaFmt(d1)+'</div></div><div><div class="k">3M Δ</div><div class="v">'+deltaFmt(d3)+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
+ +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">'+(last?econMonth(last[0]):'—')+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Where six months of history are not yet stored, the available verified releases are shown rather than fabricated values.</div></div>';
  el.querySelectorAll('.econ-ccy').forEach(b=>b.addEventListener('click',()=>{ECON_UI.ccy=b.dataset.ccy;economicTrends()}));
  el.querySelectorAll('.econ-cat').forEach(b=>b.addEventListener('click',()=>{ECON_UI.cat=b.dataset.cat;economicTrends()}));
  el.querySelectorAll('.econ-focus').forEach(b=>b.addEventListener('click',()=>{ECON_UI.focus=b.dataset.focus;economicTrends()}));
+ el.querySelectorAll('.econ-indicator').forEach(b=>b.addEventListener('click',()=>{ECON_UI.indicator[ccy+'|'+cat]=b.dataset.ind;economicTrends()}));
 }
 
 function divergence(){let order=currentOrder(),pairs=[];for(let i=0;i<3;i++)pairs.push([order[i],order[order.length-1-i]]);$('#divergence').innerHTML=`<div class="grid"><div class="card s7"><h3>Macro Divergence Monitor</h3>${pairs.map(([a,b])=>`<div class="pair"><div><b class="good">${a}</b><div class="mini">${esc(RES[a].final)} · ${esc(RES[a].macro)}</div></div><div class="arrow">VS</div><div style="text-align:right"><b class="bad">${b}</b><div class="mini">${esc(RES[b].final)} · ${esc(RES[b].macro)}</div></div></div>`).join('')}</div><div class="card s5"><h3>Execution Rule</h3><div class="call"><b>1.</b> Rank the 3M macro state.<br><br><b>2.</b> Read the latest catalyst.<br><br><b>3.</b> Check whether 2Y pricing confirms the story.<br><br><b>4.</b> Compare strongest vs weakest.<br><br><b>5.</b> Only then move to technical execution.</div></div></div>`}
