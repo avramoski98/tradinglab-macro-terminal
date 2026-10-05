@@ -113,6 +113,34 @@
 .trend-source{color:#8a7443}
 @media(max-width:900px){.trend-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.spark{width:130px}}
 
+
+/* Country Economic Trends */
+#economic .econ-countrybar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+#economic .econ-ccy,#economic .econ-cat,#economic .econ-focus{border:1px solid #3c3218;background:#090909;color:#9f936f;padding:7px 10px;cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}
+#economic .econ-ccy.on,#economic .econ-cat.on,#economic .econ-focus.on,#economic .econ-ccy:hover,#economic .econ-cat:hover,#economic .econ-focus:hover{border-color:#ffb000;color:#ffcf57;background:#171006}
+#economic .econ-header{border-top:1px solid #6b461a;border-bottom:1px solid #6b461a;background:#0b0906;padding:12px 2px;margin-bottom:10px}
+#economic .econ-summary{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:1px;background:#2b2414;border:1px solid #2b2414;margin:10px 0}
+#economic .econ-summary>div{background:#080808;padding:10px}
+#economic .econ-summary .k{font-size:8px;color:#777;text-transform:uppercase;letter-spacing:.65px}
+#economic .econ-summary .v{font-size:14px;font-weight:900;color:#ffb000;margin-top:4px}
+#economic .econ-chart-card{border:1px solid #292929;background:#070707;padding:12px}
+#economic .econ-chart-title{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:8px}
+#economic .econ-chart-title h3{margin:0;color:#ffb000}
+#economic .barwrap{overflow-x:auto}
+#economic .bar-svg{display:block;width:100%;min-width:780px;height:350px}
+#economic .bar-grid{stroke:#242424;stroke-width:1}
+#economic .bar-zero{stroke:#6a5520;stroke-width:1.2}
+#economic .bar-fill{fill:#ffb000}
+#economic .bar-value{fill:#f5f5f5;font-size:11px;font-weight:800}
+#economic .bar-label{fill:#777;font-size:9px}
+#economic .bar-axis{fill:#777;font-size:9px}
+#economic .econ-trend-up{color:#ffcf57}
+#economic .econ-trend-down{color:#baa66f}
+#economic .econ-trend-flat{color:#858585}
+#economic .econ-note{margin-top:9px;color:#777;font-size:9px;line-height:1.55}
+#economic .econ-badge{display:inline-block;border:1px solid #4a3813;background:#100d06;color:#ffbf32;padding:2px 6px;font-size:9px;font-weight:900;text-transform:uppercase}
+@media(max-width:900px){#economic .econ-summary{grid-template-columns:repeat(2,minmax(110px,1fr))}}
+
 </style>
 </head><body>
 <div class="app">
@@ -122,9 +150,7 @@
   <div class="nav">
     <button class="active" data-tab="overview">Overview</button>
     <button data-tab="g10">G10 Macro Monitor</button>
-    <button data-tab="inflation">Inflation Trends</button>
-    <button data-tab="labortrends">Labor Trends</button>
-    <button data-tab="growthtrends">Growth Trends</button>
+    <button data-tab="economic">Economic Trends</button>
     <button data-tab="rates">Rates Probabilities</button>
     <button data-tab="weekly">Weekly Focus</button>
     <button data-tab="calendar">Next Week Calendar</button>
@@ -145,6 +171,7 @@
   <div id="marketTape" class="market-tape"></div>
   <section id="overview" class="section active"></section>
   <section id="g10" class="section"></section>
+  <section id="economic" class="section"></section>
   <section id="inflation" class="section"></section>
   <section id="labortrends" class="section"></section>
   <section id="growthtrends" class="section"></section>
@@ -654,6 +681,51 @@ function laborTrends(){econTrendSection('labortrends')}
 function growthTrends(){econTrendSection('growthtrends')}
 function stopTrendPlayback(){}
 
+let ECON_UI={ccy:'USD',cat:'inflation',focus:'latest'};
+function econCfg(cat){return ECON_TRENDS[cat==='inflation'?'inflation':cat==='labor'?'labortrends':'growthtrends']}
+function econSeries(ccy,cat){let cfg=econCfg(cat),o=cfg.data[ccy];return{cfg,o,p:o?.p||[]}}
+function econTrendLabel(cat,p){
+ if(p.length<2)return{label:'INSUFFICIENT',cls:'econ-trend-flat'};
+ let d6=deltaFrom(p,6)||deltaFrom(p,3)||deltaFrom(p,1),d=d6?.v||0,last=p[p.length-1][1];
+ if(cat==='inflation')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'RISING',cls:'econ-trend-up'}:{label:'COOLING',cls:'econ-trend-down'};
+ if(cat==='labor')return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WEAKENING',cls:'econ-trend-up'}:{label:'IMPROVING',cls:'econ-trend-down'};
+ let state=last>=50?'EXPANSION':'CONTRACTION';
+ return Math.abs(d)<.5?{label:state+' / STABLE',cls:'econ-trend-flat'}:d>0?{label:state+' / IMPROVING',cls:'econ-trend-up'}:{label:state+' / SLOWING',cls:'econ-trend-down'};
+}
+function econFocusValue(cat,p,focus){
+ let cfg=econCfg(cat),d=focus==='1m'?deltaFrom(p,1):focus==='3m'?deltaFrom(p,3):focus==='6m'?deltaFrom(p,6):null,last=p[p.length-1];
+ if(focus==='latest')return last?fmtTrendVal(cfg,last[1]):'—';
+ if(!d)return'—';
+ return (d.v>0?'+':'')+d.v.toFixed(1)+(cat==='growth'?' pts':'pp');
+}
+function econBarSvg(cat,p){
+ let cfg=econCfg(cat),W=980,H=350,L=48,R=20,T=28,B=48;
+ if(!p.length)return'<div class="mini">No verified history.</div>';
+ let vals=p.map(x=>Number(x[1])).filter(Number.isFinite),min=Math.min(0,...vals),max=Math.max(...vals);
+ if(cat==='growth'&&min>0)min=Math.min(45,min-2);
+ let pad=Math.max(.5,(max-min)*.12),lo=min<0?min-pad:0,hi=max+pad,range=Math.max(.01,hi-lo);
+ let y=v=>T+(hi-v)/range*(H-T-B),zero=y(0),plotW=W-L-R,gap=16,bw=Math.min(90,(plotW-gap*(p.length+1))/p.length);
+ let grid='',bars='',labels='';
+ for(let i=0;i<=5;i++){let v=lo+(hi-lo)*i/5,yy=y(v);grid+='<line class="bar-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line><text class="bar-axis" x="6" y="'+(yy+3)+'">'+v.toFixed(cat==='growth'?0:1)+(cfg.unit||'')+'</text>'}
+ if(lo<0&&hi>0)grid+='<line class="bar-zero" x1="'+L+'" y1="'+zero+'" x2="'+(W-R)+'" y2="'+zero+'"></line>';
+ p.forEach((pt,i)=>{let x=L+gap+i*(bw+gap),v=pt[1],yv=y(v),top=Math.min(yv,zero),h=Math.max(2,Math.abs(zero-yv));bars+='<rect class="bar-fill" x="'+x+'" y="'+top+'" width="'+bw+'" height="'+h+'"></rect>';let ty=v>=0?top-7:top+h+14;labels+='<text class="bar-value" text-anchor="middle" x="'+(x+bw/2)+'" y="'+ty+'">'+v.toFixed(cfg.decimals)+(cfg.unit||'')+'</text><text class="bar-label" text-anchor="middle" x="'+(x+bw/2)+'" y="'+(H-18)+'">'+econMonth(pt[0])+'</text>'});
+ return'<svg class="bar-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(cfg.title)+' bar chart">'+grid+bars+labels+'</svg>';
+}
+function economicTrends(){
+ let el=document.getElementById('economic');if(!el)return;
+ let ccy=ECON_UI.ccy,cat=ECON_UI.cat,focus=ECON_UI.focus,{cfg,o,p}=econSeries(ccy,cat),last=p[p.length-1],prev=p.length>1?p[p.length-2]:null,d1=deltaFrom(p,1),d3=deltaFrom(p,3),d6=deltaFrom(p,6),tr=econTrendLabel(cat,p);
+ let countries=G10_ORDER.map(c=>'<button class="econ-ccy '+(c===ccy?'on':'')+'" data-ccy="'+c+'">'+c+'</button>').join('');
+ let cats=[['inflation','Inflation'],['labor','Labor'],['growth','Growth']].map(x=>'<button class="econ-cat '+(cat===x[0]?'on':'')+'" data-cat="'+x[0]+'">'+x[1]+'</button>').join('');
+ let focuses=['latest','1m','3m','6m'].map(v=>'<button class="econ-focus '+(focus===v?'on':'')+'" data-focus="'+v+'">'+v.toUpperCase()+'</button>').join('');
+ el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">One country · one macro block · six-month bar history. Bloomberg-style yellow bars, no line overlay.</div></div>'
+ +'<div class="econ-countrybar">'+countries+'</div><div class="trend-toolbar"><div class="trend-actions">'+cats+'</div><div class="trend-actions">'+focuses+'</div></div>'
+ +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(o?.metric||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtTrendVal(cfg,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtTrendVal(cfg,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+(d1?((d1.v>0?'+':'')+d1.v.toFixed(1)+(cat==='growth'?' pts':'pp')):'—')+'</div></div><div><div class="k">3M Δ</div><div class="v">'+(d3?((d3.v>0?'+':'')+d3.v.toFixed(1)+(cat==='growth'?' pts':'pp')):'—')+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
+ +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(o?.metric||'Economic indicator')+'</h3><div class="mini">'+(last?econMonth(last[0]):'—')+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+econFocusValue(cat,p,focus)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+cfg.source+' · Bar history uses only verified dated observations stored in the terminal; no interpolation or invented monthly values.</div></div>';
+ el.querySelectorAll('.econ-ccy').forEach(b=>b.addEventListener('click',()=>{ECON_UI.ccy=b.dataset.ccy;economicTrends()}));
+ el.querySelectorAll('.econ-cat').forEach(b=>b.addEventListener('click',()=>{ECON_UI.cat=b.dataset.cat;economicTrends()}));
+ el.querySelectorAll('.econ-focus').forEach(b=>b.addEventListener('click',()=>{ECON_UI.focus=b.dataset.focus;economicTrends()}));
+}
+
 function divergence(){let order=currentOrder(),pairs=[];for(let i=0;i<3;i++)pairs.push([order[i],order[order.length-1-i]]);$('#divergence').innerHTML=`<div class="grid"><div class="card s7"><h3>Macro Divergence Monitor</h3>${pairs.map(([a,b])=>`<div class="pair"><div><b class="good">${a}</b><div class="mini">${esc(RES[a].final)} · ${esc(RES[a].macro)}</div></div><div class="arrow">VS</div><div style="text-align:right"><b class="bad">${b}</b><div class="mini">${esc(RES[b].final)} · ${esc(RES[b].macro)}</div></div></div>`).join('')}</div><div class="card s5"><h3>Execution Rule</h3><div class="call"><b>1.</b> Rank the 3M macro state.<br><br><b>2.</b> Read the latest catalyst.<br><br><b>3.</b> Check whether 2Y pricing confirms the story.<br><br><b>4.</b> Compare strongest vs weakest.<br><br><b>5.</b> Only then move to technical execution.</div></div></div>`}
 function method(){$('#method').innerHTML=`<div class="grid"><div class="card s6"><h3>Macro Framework</h3><div class="call"><b>3M Macro</b> = primary underlying trend.<br><br><b>Growth / Labor / Activity</b> = breadth of the real economy.<br><br><b>Core Inflation</b> = policy pressure relative to target.<br><br><b>Central Bank</b> = reaction function.<br><br><b>2Y / Pricing</b> = market confirmation, not the source of the bias.<br><br><b>Latest Catalyst</b> = newest data shock, shown separately from the base thesis.<br><br><b>Weekly Invalidation</b> = what would force us to reduce or reverse conviction.</div></div><div class="card s6"><h3>Live Engine</h3><div class="call"><b>3M base + FinancialJuice catalyst layer.</b> FinancialJuice headlines refresh every 15 seconds. Ordinary headlines never overwrite macro data. Only structured G10 releases with Actual / Forecast / Previous receive a Beat / Miss / Neutral catalyst value and can re-rank the live G10 table. High-impact macro / policy / regime headlines glow red. The underlying 3M macro state remains the base thesis.</div></div></div>`}
 function openDrawer(c){let r=RES[c],lc=latestFor(c),historyTitle=c==='USD'?'Recent US Releases':`Recent ${c} Releases`;$('#drawerBody').innerHTML=`<div class="kicker">${c} · MACRO BREAKDOWN</div><h2>${esc(r.country)}</h2><div style="margin-bottom:14px">${tag(liveBias(c).label,liveBias(c).tone)} <span class="conf">BASE ${esc(r.final)}</span></div><div class="call">${esc(r.why)}</div>${[['3M Macro',r.macro],['Growth',r.growth],['Labor',r.labor],['Activity',r.activity],['Core Inflation',r.core],['Inflation regime',r.inflation],['Policy Rate',r.rate],['Central Bank',r.cb],['Next Expectation',r.next],['2Y / Pricing',`${r.y2} · ${r.pricing}`],['Confidence',r.confidence],['Live Catalyst Value',`${catalystScore(c)>0?'+':''}${catalystScore(c).toFixed(1)} · ${adjustedBiasNote(c)}`],['Live Bias',`${liveBias(c).label} · base ${r.final}`],['Weekly Focus',dynamicFocus(c)],['Invalidation',dynamicInvalidation(c)],['Latest Catalyst',lc?`${lc.event}: ${lc.actual} vs ${lc.forecast} · ${lc.impact||lc.label||'Update'}`:'—']].map(x=>`<div class="detail-row"><span>${esc(x[0])}</span><b>${esc(x[1])}</b></div>`).join('')}<h3 style="margin-top:20px">3M Evidence</h3><div class="mini" style="font-size:12px;line-height:1.7">${esc(r.trendDetail)}</div><h3 style="margin-top:20px">${esc(historyTitle)}</h3>${releaseHistoryRows(c,8)}`;$('#drawer').classList.add('open')}
@@ -664,14 +736,14 @@ function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='
 function captureUiScroll(){let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');return{x:window.scrollX,y:window.scrollY,news:n?n.scrollTop:0,cat:c?c.scrollTop:0,drawer:d?d.scrollTop:0}}
 function restoreUiScroll(st){requestAnimationFrame(()=>{window.scrollTo(st.x,st.y);let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');if(n)n.scrollTop=st.news;if(c)c.scrollTop=st.cat;if(d)d.scrollTop=st.drawer})}
 function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='Live checked '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep, Macedonia';let w=$('#weekLabel');if(w){let [start,end]=activeCalendarRange(),a=new Date(start+'T12:00:00Z'),b=new Date(end+'T12:00:00Z');b.setUTCDate(b.getUTCDate()-1);let f=d=>d.toLocaleDateString('en-GB',{timeZone:'UTC',day:'2-digit',month:'short'});w.textContent='Week of '+f(a)+'–'+f(b)}}
-function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();inflationTrends();laborTrends();growthTrends();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
+function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();economicTrends();inflationTrends();laborTrends();growthTrends();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
 async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);saveCalendarMacro(rawLiveReleaseObjects());sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Seed mode · provider not connected';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · seed mode';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
 function normalizeEvent(x){return {date:x.date||x.Date||'',time:x.time||x.Time||'',currency:x.currency||x.Currency||countryToCcy(x.country||x.Country),event:x.event||x.Event||x.Category||'',previous:x.previous??x.Previous??'—',forecast:x.forecast??x.Forecast??'—',actual:x.actual??x.Actual??'—',importance:x.importance??x.Importance??'',impact:x.impact||inferImpact(x),label:x.label||x.surprise||inferSurprise(x)}}
 function countryToCcy(c){c=String(c||'').toLowerCase();let m={"united states":"USD","euro area":"EUR","european union":"EUR","united kingdom":"GBP","japan":"JPY","switzerland":"CHF","australia":"AUD","new zealand":"NZD","canada":"CAD","sweden":"SEK","norway":"NOK"};return m[c]||''}
 function num(v){if(v==null)return NaN;let s=String(v).replace(/[^0-9+-.]/g,'');return Number(s)}
 function inferSurprise(x){let a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Update';if(Math.abs(a-f)<1e-9)return'Neutral';return a>f?'Beat':'Miss'}
 function inferImpact(x){let ev=String(x.event||x.Event||x.Category||'').toLowerCase(),a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Neutral';let goodHigher=!/unemployment|jobless|claims|deficit/.test(ev);let pos=goodHigher?a>f:a<f;return pos?'Strengthens':'Weakens'}
-const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',inflation:'G10 Inflation Trends',labortrends:'G10 Labor Trends',growthtrends:'G10 Growth Trends',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
+const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',economic:'Economic Trends',inflation:'G10 Inflation Trends',labortrends:'G10 Labor Trends',growthtrends:'G10 Growth Trends',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{['inflation','labortrends','growthtrends'].forEach(id=>{if(id!==b.dataset.tab)stopTrendPlayback(id)});document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab).classList.add('active');$('#title').textContent=titles[b.dataset.tab]});
 setInterval(()=>{$('#clock').textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'},1000);render();loadMarkets();loadLive();loadNews();loadSectors();loadRates();checkEventReminders();setInterval(loadMarkets,15000);setInterval(loadLive,30000);setInterval(loadNews,15000);setInterval(loadSectors,60000);setInterval(loadRates,900000);setInterval(checkEventReminders,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadMarkets()});
 </script></body></html>
