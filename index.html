@@ -725,7 +725,7 @@ const ECON_STATIC_HISTORY={
  'USD|growth|gdp':{label:'Real GDP q/q annualized',unit:'%',decimals:1,source:'U.S. BEA latest revised GDP estimates',p:[['2026-03',2.5],['2026-06',2.2]]},
  'USD|growth|retail':{label:'Retail Sales m/m',unit:'%',decimals:1,source:'U.S. Census Bureau advance retail sales releases; latest available Aug 2026 released 16 Sep',p:[['2026-03',0.6],['2026-04',0.5],['2026-05',-0.9],['2026-06',0.2],['2026-07',-0.5],['2026-08',1.2]]},
  'USD|growth|industrial':{label:'Industrial Production m/m',unit:'%',decimals:1,source:'Federal Reserve G.17; Mar–Aug 2026, latest available released 18 Sep',p:[['2026-03',-0.2],['2026-04',0.8],['2026-05',0.1],['2026-06',0.2],['2026-07',0.2],['2026-08',0.0]]},
- 'USD|growth|trade':{label:'Trade Balance',unit:'B',decimals:1,source:'U.S. BEA / Census international trade; latest available Aug 2026 released 6 Oct',p:[['2026-07',-92.8],['2026-08',-105.6]]}
+ 'USD|growth|trade':{label:'Trade Balance',unit:'B',decimals:1,source:'U.S. BEA / Census international trade; Aug 2026 released 6 Oct; July revised to -92.8B',p:[['2026-07',-92.8],['2026-08',-105.6]]}
 };
 const ECON_INDICATOR_DEFS={
  inflation:[
@@ -751,10 +751,15 @@ const ECON_INDICATOR_DEFS={
   {id:'trade',label:'Trade Balance',re:/trade balance|international trade/i,unit:'B',decimals:1}
  ]
 };
+function mergeEconHistory(staticPts,dynamicPts){
+ let seen=new Map();
+ for(const p of [...(staticPts||[]),...(dynamicPts||[])]) if(p&&p[0]!=null&&Number.isFinite(Number(p[1]))) seen.set(String(p[0]),Number(p[1]));
+ return [...seen.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+}
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
-  let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],p=d.primary?(base?.p||[]):st?.p||dynamicIndicatorSeries(ccy,d);
+  let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=dynamicIndicatorSeries(ccy,d),p=d.primary?(base?.p||[]):mergeEconHistory(st?.p||[],dyn);
   if(d.primary||p.length){
    out.push({
     id:d.id,
