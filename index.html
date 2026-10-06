@@ -759,7 +759,7 @@ function mergeEconHistory(staticPts,dynamicPts){
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
-  let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=dynamicIndicatorSeries(ccy,d),p=d.primary?(base?.p||[]):mergeEconHistory(st?.p||[],dyn);
+  let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=dynamicIndicatorSeries(ccy,d),p=d.primary?mergeEconHistory(base?.p||[],dyn):mergeEconHistory(st?.p||[],dyn);
   if(d.primary||p.length){
    out.push({
     id:d.id,
