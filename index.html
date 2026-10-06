@@ -723,7 +723,9 @@ const ECON_STATIC_HISTORY={
  'USD|labor|jolts':{label:'JOLTS Job Openings',unit:'M',decimals:3,source:'U.S. BLS JOLTS historical series, Apr–Aug 2026',p:[['2026-04',7.585],['2026-05',7.537],['2026-06',7.182],['2026-07',7.335],['2026-08',7.079]]},
  'USD|growth|services':{label:'ISM Services PMI',unit:'',decimals:1,source:'Institute for Supply Management, Apr–Sep 2026',p:[['2026-04',53.6],['2026-05',54.5],['2026-06',54.0],['2026-07',54.1],['2026-08',55.4],['2026-09',54.9]]},
  'USD|growth|gdp':{label:'Real GDP q/q annualized',unit:'%',decimals:1,source:'U.S. BEA latest revised GDP estimates',p:[['2026-03',2.5],['2026-06',2.2]]},
- 'USD|growth|retail':{label:'Retail Sales m/m',unit:'%',decimals:1,source:'U.S. Census Bureau advance retail sales releases',p:[['2026-04',0.5],['2026-06',0.2],['2026-07',-0.5],['2026-08',1.2]]}
+ 'USD|growth|retail':{label:'Retail Sales m/m',unit:'%',decimals:1,source:'U.S. Census Bureau advance retail sales releases; latest available Aug 2026 released 16 Sep',p:[['2026-03',0.6],['2026-04',0.5],['2026-05',-0.9],['2026-06',0.2],['2026-07',-0.5],['2026-08',1.2]]},
+ 'USD|growth|industrial':{label:'Industrial Production m/m',unit:'%',decimals:1,source:'Federal Reserve G.17; Mar–Aug 2026, latest available released 18 Sep',p:[['2026-03',-0.2],['2026-04',0.8],['2026-05',0.1],['2026-06',0.2],['2026-07',0.2],['2026-08',0.0]]},
+ 'USD|growth|trade':{label:'Trade Balance',unit:'B',decimals:1,source:'U.S. BEA / Census international trade; latest available Aug 2026 released 6 Oct',p:[['2026-07',-92.8],['2026-08',-105.6]]}
 };
 const ECON_INDICATOR_DEFS={
  inflation:[
@@ -745,7 +747,8 @@ const ECON_INDICATOR_DEFS={
   {id:'gdp',label:'GDP',re:/\bgdp\b/i,unit:'%',decimals:1},
   {id:'retail',label:'Retail Sales',re:/retail sales/i,unit:'%',decimals:1},
   {id:'industrial',label:'Industrial Production',re:/industrial production/i,unit:'%',decimals:1},
-  {id:'construction',label:'Construction PMI',re:/construction pmi/i,unit:'',decimals:1}
+  {id:'construction',label:'Construction PMI',re:/construction pmi/i,unit:'',decimals:1},
+  {id:'trade',label:'Trade Balance',re:/trade balance|international trade/i,unit:'B',decimals:1}
  ]
 };
 function econIndicatorList(ccy,cat){
@@ -778,7 +781,7 @@ function econTrendLabel(cat,p,ind){
   if(ind?.id==='employment'||ind?.id==='wages'||ind?.id==='jolts')return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-down'}:{label:'WEAKENING',cls:'econ-trend-up'};
   return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WEAKENING',cls:'econ-trend-up'}:{label:'IMPROVING',cls:'econ-trend-down'};
  }
- if(ind?.id==='gdp'||ind?.id==='retail'||ind?.id==='industrial')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-up'}:{label:'SLOWING',cls:'econ-trend-down'};
+ if(ind?.id==='gdp'||ind?.id==='retail'||ind?.id==='industrial'||ind?.id==='trade')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-up'}:{label:'SLOWING',cls:'econ-trend-down'};
  let state=last>=50?'EXPANSION':'CONTRACTION';
  return Math.abs(d)<.5?{label:state+' / STABLE',cls:'econ-trend-flat'}:d>0?{label:state+' / IMPROVING',cls:'econ-trend-up'}:{label:state+' / SLOWING',cls:'econ-trend-down'};
 }
