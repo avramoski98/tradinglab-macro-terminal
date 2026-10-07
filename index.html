@@ -762,20 +762,35 @@ function mergeEconHistory(staticPts,dynamicPts){
  for(const p of [...(staticPts||[]),...(dynamicPts||[])]) if(p&&p[0]!=null&&Number.isFinite(Number(p[1]))) seen.set(String(p[0]),Number(p[1]));
  return [...seen.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
 }
+function observationMonthKey(v){let s=String(v||'');return /^\d{4}-\d{2}/.test(s)?s.slice(0,7):s}
+function coverageInfo(points,id){
+ let p=points||[],months=[...new Set(p.map(x=>observationMonthKey(x[0])).filter(Boolean))],latest=p.length?String(p[p.length-1][0]):'';
+ let quarterly=/gdp/i.test(id)||months.length<=3&&p.length<=3;
+ let required=quarterly?2:6;
+ let complete=months.length>=required;
+ return {count:months.length,required,complete,latest,quarterly};
+}
+function freshnessInfo(latest){
+ if(!latest)return {label:'NO DATA',tone:'red',days:null};
+ let s=String(latest),date=/^\d{4}-\d{2}$/.test(s)?new Date(s+'-28T12:00:00Z'):new Date(s.length===10?s+'T12:00:00Z':s);
+ if(!Number.isFinite(date.getTime()))return {label:'UNKNOWN',tone:'amber',days:null};
+ let days=Math.max(0,Math.floor((Date.now()-date.getTime())/86400000)),label=days<=45?'FRESH':days<=75?'WATCH':'STALE';
+ return {label,tone:label==='FRESH'?'green':label==='WATCH'?'amber':'red',days};
+}
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
   let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=dynamicIndicatorSeries(ccy,d),p=d.primary?mergeEconHistory(base?.p||[],dyn):mergeEconHistory(st?.p||[],dyn);
-  if(d.primary||p.length){
-   out.push({
-    id:d.id,
-    label:d.primary?(base?.metric||d.label):(st?.label||d.label),
-    p,
-    unit:d.primary?(cfg.unit||''):(st?.unit??d.unit??''),
-    decimals:d.primary?cfg.decimals:(st?.decimals??d.decimals??1),
-    source:d.primary?cfg.source:(st?.source||'Structured verified releases stored in TradingLab terminal calendar/history.')
-   });
-  }
+  let coverage=coverageInfo(p,d.id),freshness=freshnessInfo(coverage.latest);
+  out.push({
+   id:d.id,
+   label:d.primary?(base?.metric||d.label):(st?.label||d.label),
+   p,
+   unit:d.primary?(cfg.unit||''):(st?.unit??d.unit??''),
+   decimals:d.primary?cfg.decimals:(st?.decimals??d.decimals??1),
+   source:d.primary?cfg.source:(st?.source||'Structured verified releases stored in TradingLab terminal calendar/history.'),
+   coverage,freshness
+  });
  }
  return out;
 }
@@ -823,13 +838,16 @@ function economicTrends(){
  let countries=G10_ORDER.map(c=>'<button class="econ-ccy '+(c===ccy?'on':'')+'" data-ccy="'+c+'">'+c+'</button>').join('');
  let cats=[['inflation','Inflation'],['labor','Labor'],['growth','Growth']].map(x=>'<button class="econ-cat '+(cat===x[0]?'on':'')+'" data-cat="'+x[0]+'">'+x[1]+'</button>').join('');
  let focuses=['latest','1m','3m','6m'].map(v=>'<button class="econ-focus '+(focus===v?'on':'')+'" data-focus="'+v+'">'+v.toUpperCase()+'</button>').join('');
- let inds=econIndicatorList(ccy,cat).map(x=>'<button class="econ-indicator '+(ind&&x.id===ind.id?'on':'')+'" data-ind="'+x.id+'">'+esc(x.label)+'</button>').join('');
+ let allIndicators=econIndicatorList(ccy,cat);
+ let inds=allIndicators.map(x=>'<button class="econ-indicator '+(ind&&x.id===ind.id?'on':'')+'" data-ind="'+x.id+'">'+esc(x.label)+' · '+(x.coverage.complete?'6M ✓':x.coverage.count+'/'+x.coverage.required)+'</button>').join('');
+ let completeCount=allIndicators.filter(x=>x.coverage.complete).length;
+ let coverageText=completeCount+'/'+allIndicators.length+' indicators 6M complete';
  let deltaFmt=d=>{if(!d)return'—';let suf=ind.unit==='%'?'pp':ind.unit==='K'?'K':ind.unit==='M'?'M':' pts';return(d.v>0?'+':'')+d.v.toFixed(ind.decimals)+suf};
- el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">Country-first macro history · choose an indicator · Bloomberg-style yellow bars · no line overlay.</div></div>'
+ el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">Country-first macro history · minimum 6M coverage rule · every indicator shows coverage + last update.</div><div class="mini" style="margin-top:5px"><b>'+esc(coverageText)+'</b></div></div>'
  +'<div class="econ-countrybar">'+countries+'</div><div class="trend-toolbar"><div class="trend-actions">'+cats+'</div><div class="trend-actions">'+focuses+'</div></div>'
  +'<div class="econ-countrybar">'+inds+'</div>'
  +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(ind?.label||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtIndVal(ind,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtIndVal(ind,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+deltaFmt(d1)+'</div></div><div><div class="k">3M Δ</div><div class="v">'+deltaFmt(d3)+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
- +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">'+(last?econMonth(last[0]):'—')+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Where six months of history are not yet stored, the available verified releases are shown rather than fabricated values.</div></div>';
+ +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">LAST UPDATE: '+(last?econMonth(last[0]):'—')+' · '+(ind?.freshness?.label||'NO DATA')+' · COVERAGE '+(ind?.coverage?.count||0)+'/'+(ind?.coverage?.required||6)+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+(ind?.coverage?.complete?'6M COMPLETE':'INCOMPLETE')+' · '+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Minimum rule: six monthly observations are required for monthly indicators; quarterly indicators must cover at least two quarters. Missing history is marked INCOMPLETE and is never fabricated.</div></div>';
  el.querySelectorAll('.econ-ccy').forEach(b=>b.addEventListener('click',()=>{ECON_UI.ccy=b.dataset.ccy;economicTrends()}));
  el.querySelectorAll('.econ-cat').forEach(b=>b.addEventListener('click',()=>{ECON_UI.cat=b.dataset.cat;economicTrends()}));
  el.querySelectorAll('.econ-focus').forEach(b=>b.addEventListener('click',()=>{ECON_UI.focus=b.dataset.focus;economicTrends()}));
