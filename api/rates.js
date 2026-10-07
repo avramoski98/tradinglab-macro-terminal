@@ -60,12 +60,12 @@ async function fetchOnce(url,accept='text/html,application/xhtml+xml'){
 }
 
 async function fetchText(url){
-  let firstError=null;
-  try{return cleanText(await fetchOnce(url))}
-  catch(e){firstError=e}
   const reader='https://r.jina.ai/'+url;
+  let readerError=null;
   try{return cleanText(await fetchOnce(reader,'text/plain,text/markdown,*/*'))}
-  catch(e){throw new Error('Direct source failed: '+String(firstError?.message||firstError)+'; reader failed: '+String(e?.message||e))}
+  catch(e){readerError=e}
+  try{return cleanText(await fetchOnce(url))}
+  catch(e){throw new Error('Reader failed: '+String(readerError?.message||readerError)+'; direct source failed: '+String(e?.message||e))}
 }
 
 function bankSection(rootText,bank,index){
