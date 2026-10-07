@@ -840,7 +840,52 @@ function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='
 function captureUiScroll(){let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');return{x:window.scrollX,y:window.scrollY,news:n?n.scrollTop:0,cat:c?c.scrollTop:0,drawer:d?d.scrollTop:0}}
 function restoreUiScroll(st){requestAnimationFrame(()=>{window.scrollTo(st.x,st.y);let n=$('#news .newslist'),c=$('#news .catalyst-panel'),d=$('#drawer');if(n)n.scrollTop=st.news;if(c)c.scrollTop=st.cat;if(d)d.scrollTop=st.drawer})}
 function updateDataFreshness(){let el=$('#dataFreshness');if(el)el.textContent='Live checked '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep, Macedonia';let w=$('#weekLabel');if(w){let [start,end]=activeCalendarRange(),a=new Date(start+'T12:00:00Z'),b=new Date(end+'T12:00:00Z');b.setUTCDate(b.getUTCDate()-1);let f=d=>d.toLocaleDateString('en-GB',{timeZone:'UTC',day:'2-digit',month:'short'});w.textContent='Week of '+f(a)+'–'+f(b)}}
-function render(){let st=captureUiScroll();renderMarketTape();overview();$('#g10').innerHTML=table();economicTrends();inflationTrends();laborTrends();growthTrends();weekly();calendarFull();live();newsDesk();divergence();commodityDesk();sectorDesk();ratesDesk();method();updateAlertUI();updateNextEvent();updateDataFreshness();restoreUiScroll(st)}
+const TL_RUNTIME={errors:[],lastRender:null,lastHealth:null};
+function moduleFailure(name,err,target){
+ console.error('[TradingLab]',name,err);
+ TL_RUNTIME.errors.push({name,message:String(err&&err.message||err),at:new Date().toISOString()});
+ if(TL_RUNTIME.errors.length>30)TL_RUNTIME.errors.shift();
+ if(target){let el=document.getElementById(target);if(el&&!el.innerHTML.trim())el.innerHTML='<div class="card"><h3>'+esc(name)+' temporarily unavailable</h3><div class="mini">One module failed, but the rest of TradingLab Terminal is still running. It will retry automatically.</div></div>'}
+}
+function safeModule(name,fn,target){try{return fn()}catch(e){moduleFailure(name,e,target);return null}}
+function render(){
+ let st=safeModule('UI scroll capture',captureUiScroll)||{x:0,y:0,news:0,cat:0,drawer:0};
+ safeModule('Market Tape',renderMarketTape);
+ safeModule('Macro Overview',overview,'overview');
+ safeModule('G10 Macro',()=>{$('#g10').innerHTML=table()},'g10');
+ safeModule('Economic Trends',economicTrends,'economic');
+ safeModule('Inflation Trends',inflationTrends,'inflation');
+ safeModule('Labor Trends',laborTrends,'labortrends');
+ safeModule('Growth Trends',growthTrends,'growthtrends');
+ safeModule('Weekly Focus',weekly,'weekly');
+ safeModule('Calendar',calendarFull,'calendar');
+ safeModule('Live Macro',live,'live');
+ safeModule('News Desk',newsDesk,'news');
+ safeModule('Divergence',divergence,'divergence');
+ safeModule('Commodity Cycles',commodityDesk,'commodity');
+ safeModule('Sector Rotation',sectorDesk,'sector');
+ safeModule('Rates',ratesDesk,'rates');
+ safeModule('Framework',method,'method');
+ safeModule('Alert UI',updateAlertUI);
+ safeModule('Next Event',updateNextEvent);
+ safeModule('Freshness',updateDataFreshness);
+ safeModule('UI scroll restore',()=>restoreUiScroll(st));
+ TL_RUNTIME.lastRender=new Date().toISOString();
+}
+async function terminalHealthPulse(){
+ try{
+  let r=await fetch('/api/health',{cache:'no-store'});
+  if(!r.ok)throw new Error('Health HTTP '+r.status);
+  let d=await r.json();
+  TL_RUNTIME.lastHealth=d.checkedAt||new Date().toISOString();
+  document.documentElement.dataset.terminalHealth='ok';
+ }catch(e){
+  moduleFailure('Health Pulse',e);
+  document.documentElement.dataset.terminalHealth='degraded';
+ }
+}
+window.addEventListener('error',e=>moduleFailure('Unhandled browser error',e.error||new Error(e.message)));
+window.addEventListener('unhandledrejection',e=>moduleFailure('Unhandled promise rejection',e.reason||new Error('Promise rejected')));
 async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);saveCalendarMacro(rawLiveReleaseObjects());sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Seed mode · provider not connected';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · seed mode';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
 function normalizeEvent(x){return {date:x.date||x.Date||'',time:x.time||x.Time||'',currency:x.currency||x.Currency||countryToCcy(x.country||x.Country),event:x.event||x.Event||x.Category||'',previous:x.previous??x.Previous??'—',forecast:x.forecast??x.Forecast??'—',actual:x.actual??x.Actual??'—',importance:x.importance??x.Importance??'',impact:x.impact||inferImpact(x),label:x.label||x.surprise||inferSurprise(x)}}
 function countryToCcy(c){c=String(c||'').toLowerCase();let m={"united states":"USD","euro area":"EUR","european union":"EUR","united kingdom":"GBP","japan":"JPY","switzerland":"CHF","australia":"AUD","new zealand":"NZD","canada":"CAD","sweden":"SEK","norway":"NOK"};return m[c]||''}
@@ -849,5 +894,21 @@ function inferSurprise(x){let a=num(x.actual??x.Actual),f=num(x.forecast??x.Fore
 function inferImpact(x){let ev=String(x.event||x.Event||x.Category||'').toLowerCase(),a=num(x.actual??x.Actual),f=num(x.forecast??x.Forecast);if(!isFinite(a)||!isFinite(f))return'Neutral';let goodHigher=!/unemployment|jobless|claims|deficit/.test(ev);let pos=goodHigher?a>f:a<f;return pos?'Strengthens':'Weakens'}
 const titles={overview:'Macro Overview',g10:'G10 Macro Monitor',economic:'Economic Trends',inflation:'G10 Inflation Trends',labortrends:'G10 Labor Trends',growthtrends:'G10 Growth Trends',weekly:'Weekly Focus',calendar:'Next Week Calendar',live:'Live Macro',news:'Live News Desk',divergence:'Macro Divergence',commodity:'Commodity Cycles',sector:'Sector Rotation',rates:'Rates Probabilities',method:'Framework'};
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{['inflation','labortrends','growthtrends'].forEach(id=>{if(id!==b.dataset.tab)stopTrendPlayback(id)});document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.tab).classList.add('active');$('#title').textContent=titles[b.dataset.tab]});
-setInterval(()=>{$('#clock').textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'},1000);render();loadMarkets();loadLive();loadNews();loadSectors();loadRates();checkEventReminders();setInterval(loadMarkets,15000);setInterval(loadLive,30000);setInterval(loadNews,15000);setInterval(loadSectors,60000);setInterval(loadRates,900000);setInterval(checkEventReminders,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadMarkets()});
+setInterval(()=>{safeModule('Clock',()=>{let el=$('#clock');if(el)el.textContent=new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',dateStyle:'medium',timeStyle:'medium'})+' · Prilep, Macedonia'})},1000);
+safeModule('Initial Render',render);
+Promise.resolve().then(()=>loadMarkets()).catch(e=>moduleFailure('Markets Loader',e));
+Promise.resolve().then(()=>loadLive()).catch(e=>moduleFailure('Calendar Loader',e));
+Promise.resolve().then(()=>loadNews()).catch(e=>moduleFailure('News Loader',e));
+Promise.resolve().then(()=>loadSectors()).catch(e=>moduleFailure('Sector Loader',e));
+Promise.resolve().then(()=>loadRates()).catch(e=>moduleFailure('Rates Loader',e));
+safeModule('Event Reminders',checkEventReminders);
+terminalHealthPulse();
+setInterval(()=>Promise.resolve(loadMarkets()).catch(e=>moduleFailure('Markets Loader',e)),15000);
+setInterval(()=>Promise.resolve(loadLive()).catch(e=>moduleFailure('Calendar Loader',e)),15000);
+setInterval(()=>Promise.resolve(loadNews()).catch(e=>moduleFailure('News Loader',e)),15000);
+setInterval(()=>Promise.resolve(loadSectors()).catch(e=>moduleFailure('Sector Loader',e)),60000);
+setInterval(()=>Promise.resolve(loadRates()).catch(e=>moduleFailure('Rates Loader',e)),300000);
+setInterval(()=>safeModule('Event Reminders',checkEventReminders),15000);
+setInterval(terminalHealthPulse,15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){terminalHealthPulse();Promise.resolve(loadMarkets()).catch(e=>moduleFailure('Markets Loader',e));Promise.resolve(loadLive()).catch(e=>moduleFailure('Calendar Loader',e));Promise.resolve(loadNews()).catch(e=>moduleFailure('News Loader',e));}});
 </script></body></html>
