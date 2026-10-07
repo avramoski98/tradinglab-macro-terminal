@@ -673,16 +673,19 @@ function econTrendSection(id){
  let rows=G10_ORDER.map(c=>{
   let o=cfg.data[c],p=o?.p||[],last=p[p.length-1],d1=deltaFrom(p,1),d3=deltaFrom(p,3),d6=deltaFrom(p,6),state=semanticState(cfg,p),focus=view==='latest'?last?.[1]:view==='1m'?d1?.v:view==='3m'?d3?.v:d6?.v;
   let focusText=view==='latest'?fmtTrendVal(cfg,focus):focus==null?'—':((focus>0?'+':'')+focus.toFixed(1)+(cfg.mode==='growth'?' pts':'pp'));
+  let cov=coverageInfo(p,o.metric||''),fresh=freshnessInfo(cov.latest);
   return '<tr><td><div class="trend-ccy">'+c+'</div><div class="trend-metric">'+esc(o.metric)+'</div></td>'
    +'<td><div class="trend-num">'+fmtTrendVal(cfg,last?.[1])+'</div><div class="mini">'+(last?econMonth(last[0]):'—')+'</div></td>'
    +'<td>'+deltaText(cfg,d1)+'</td><td>'+deltaText(cfg,d3)+'</td><td>'+deltaText(cfg,d6)+'</td>'
    +'<td><span class="trend-state '+state.cls+'">'+state.label+'</span></td>'
+   +'<td><span class="tag '+(cov.complete?'green':'red')+'">'+(cov.complete?'6M COMPLETE':'INCOMPLETE '+cov.count+'/'+cov.required)+'</span></td>'
+   +'<td><div class="trend-num">'+(last?econMonth(last[0]):'—')+'</div><div class="mini"><span class="tag '+fresh.tone+'">'+fresh.label+'</span></div></td>'
    +'<td>'+sparkSvg(p)+'</td><td><div class="trend-num" style="color:#ffb000">'+focusText+'</div><div class="mini">'+view.toUpperCase()+' focus</div></td></tr>';
  }).join('');
  el.innerHTML='<div class="trend-hero"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+cfg.title+'</h2><div class="mini" style="font-size:12px">'+cfg.subtitle+'</div></div>'
   +'<div class="trend-tabs">'+tabs+'</div>'+topSummary(cfg)
-  +'<div class="trend-table"><table><thead><tr><th>CCY / Metric</th><th>Latest</th><th>Latest Δ</th><th>3M Δ</th><th>6M Δ</th><th>Trend</th><th>History</th><th>Selected</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
-  +'<div class="trend-note"><span class="trend-source">DATA:</span> '+cfg.source+' · No interpolation is used: calculations use the nearest verified prior release available inside the requested window.</div>';
+  +'<div class="trend-table"><table><thead><tr><th>CCY / Metric</th><th>Latest</th><th>Latest Δ</th><th>3M Δ</th><th>6M Δ</th><th>Trend</th><th>Coverage</th><th>Last Update</th><th>History</th><th>Selected</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+  +'<div class="trend-note"><span class="trend-source">DATA:</span> '+cfg.source+' · Minimum coverage rule is enforced: monthly series require at least 6 verified observations; quarterly series require at least 2 quarters covering the same window. LAST UPDATE and freshness are shown explicitly. No interpolation or fabricated values are used.</div>';
  el.querySelectorAll('.trend-tab').forEach(b=>b.addEventListener('click',()=>{TREND_VIEW[id]=b.dataset.view;econTrendSection(id)}));
 }
 function inflationTrends(){econTrendSection('inflation')}
