@@ -69,16 +69,20 @@ async function fetchText(url){
 }
 
 function bankSection(rootText,bank,index){
-  const start=rootText.toLowerCase().indexOf(bank.name.toLowerCase());
-  if(start<0)return '';
-  let end=rootText.length;
-  for(let i=index+1;i<BANKS.length;i++){
-    const n=rootText.toLowerCase().indexOf(BANKS[i].name.toLowerCase(),start+bank.name.length);
-    if(n>=0){end=Math.min(end,n);break}
+  const lower=rootText.toLowerCase(),needle=bank.name.toLowerCase();
+  let pos=0,candidates=[];
+  while((pos=lower.indexOf(needle,pos))>=0){
+    const slice=rootText.slice(pos,Math.min(rootText.length,pos+1800));
+    const meetingPos=slice.search(/Next Meeting Date:?/i);
+    const probPos=slice.search(/Rate Change Probabilities/i);
+    if(meetingPos>=0&&meetingPos<500&&probPos>meetingPos)candidates.push({pos,slice,meetingPos,probPos});
+    pos+=needle.length;
   }
-  const toolsPos=rootText.toLowerCase().indexOf('financial tools',start+bank.name.length);
-  if(toolsPos>=0)end=Math.min(end,toolsPos);
-  return rootText.slice(start,end);
+  for(const x of candidates){
+    const probs=parseProbabilities(x.slice);
+    if(probs)return x.slice;
+  }
+  return '';
 }
 
 function parseMeeting(section,fallback){
