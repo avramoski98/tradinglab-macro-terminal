@@ -68,20 +68,46 @@ async function fetchText(url){
   catch(e){throw new Error('Direct source failed: '+String(firstError?.message||firstError)+'; reader failed: '+String(e?.message||e))}
 }
 
-async function fetchBank(bank){
+function bankSection(rootText,bank,index){
+  const start=rootText.toLowerCase().indexOf(bank.name.toLowerCase());
+  if(start<0)return '';
+  let end=rootText.length;
+  for(let i=index+1;i<BANKS.length;i++){
+    const n=rootText.toLowerCase().indexOf(BANKS[i].name.toLowerCase(),start+bank.name.length);
+    if(n>=0){end=Math.min(end,n);break}
+  }
+  const toolsPos=rootText.toLowerCase().indexOf('financial tools',start+bank.name.length);
+  if(toolsPos>=0)end=Math.min(end,toolsPos);
+  return rootText.slice(start,end);
+}
+
+function parseMeeting(section,fallback){
+  const m=section.match(/Next Meeting Date:?\s*([A-Za-z]+\s+\d{1,2},\s+\d{4})/i);
+  return m?m[1]:fallback;
+}
+
+function parseCurrent(section,fallback){
+  const m=section.match(/Current Rate:?\s*([0-9]+(?:\.[0-9]+)?%)/i);
+  return m?m[1]:fallback;
+}
+
+async function fetchBankFromRoot(bank,index,rootText,rootError){
   const checkedAt=new Date().toISOString();
   try{
-    const text=await fetchText(bank.url);
-    const probabilities=parseProbabilities(text);
-    if(!probabilities)throw new Error('Probability block not published');
+    if(!rootText)throw rootError||new Error('Central dashboard unavailable');
+    const section=bankSection(rootText,bank,index);
+    const probabilities=parseProbabilities(section);
+    if(!probabilities)throw new Error('Probability block not published for this bank');
     return {
       ...bank,
+      nextMeeting:parseMeeting(section,bank.nextMeeting),
+      current:bank.id==='FED'?bank.current:parseCurrent(section,bank.current),
       probabilities,
       live:true,
       stale:false,
       checkedAt,
       sourceUpdatedAt:checkedAt,
-      source:'CentralBank.Watch · market-implied live page'
+      source:'CentralBank.Watch · consolidated live dashboard'
     };
   }catch(e){
     return {
@@ -100,7 +126,10 @@ async function fetchBank(bank){
 export default async function handler(req,res){
   res.setHeader('Cache-Control','no-store, max-age=0');
   const checkedAt=new Date().toISOString();
-  const banks=await Promise.all(BANKS.map(fetchBank));
+  let rootText='',rootError=null;
+  try{rootText=await fetchText('https://centralbank.watch/')}
+  catch(e){rootError=e}
+  const banks=await Promise.all(BANKS.map((bank,index)=>fetchBankFromRoot(bank,index,rootText,rootError)));
   const cards=banks.map(bank=>({
     id:bank.id,ccy:bank.ccy,name:bank.name,nextMeeting:bank.nextMeeting,current:bank.current,
     source:bank.source,live:bank.live,stale:bank.stale,checkedAt:bank.checkedAt,
