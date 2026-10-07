@@ -280,6 +280,30 @@ async function fetchCalendarAny(urls){
   throw lastError;
 }
 
+function eventState(event,now=Date.now()){
+  const ts=Date.parse(event.date||event.sourceDate||'');
+  const hasActual=event.actual!=null&&!['','—','-','null','undefined'].includes(String(event.actual).trim());
+  if(hasActual)return 'released';
+  if(!Number.isFinite(ts))return 'scheduled';
+  const diff=now-ts;
+  if(diff<0)return 'scheduled';
+  if(diff<=5*60*1000)return 'checking';
+  return 'overdue';
+}
+
+function mergeProviderEvents(...groups){
+  const map=new Map();
+  for(const group of groups){
+    for(const e of group||[]){
+      const key=[String(e.date||'').slice(0,16),e.currency,String(e.event||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()].join('|');
+      const prev=map.get(key);
+      if(!prev||eventState(e)==='released'||eventState(prev)!=='released')map.set(key,e);
+    }
+  }
+  return [...map.values()].map(e=>({...e,releaseState:eventState(e),checkedAt:new Date().toISOString()}))
+    .sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+}
+
 async function fetchCalendar(url){
   const raw=await fetchJsonWithRetry(url);
   const events=(Array.isArray(raw)?raw:[]).map(x=>{
@@ -300,17 +324,43 @@ async function fetchCalendar(url){
 }
 
 export default async function handler(req,res){
-  res.setHeader('Cache-Control','s-maxage=20, stale-while-revalidate=60');
-  const sunday=skopjeWeekday()==='Sun';
-  const primary=sunday?FF_NEXT_WEEK:FF_THIS_WEEK;
-  const secondary=sunday?FF_THIS_WEEK:FF_NEXT_WEEK;
+  res.setHeader('Cache-Control','no-store, max-age=0');
+  const checkedAt=new Date().toISOString();
   try{
-    let events=[];let provider='ForexFactory weekly export + verified source overrides';
-    try{events=await fetchCalendarAny(primary);provider+=sunday?' · next week':' · this week';}
-    catch(e){events=await fetchCalendarAny(secondary);provider+=' · fallback';}
-    return res.status(200).json({mode:'live',provider,timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:'All G10 provider events are retained. Verified actuals override stale/pending provider values when available. Times are Europe/Skopje.'});
+    const [thisWeek,nextWeek]=await Promise.allSettled([
+      fetchCalendarAny(FF_THIS_WEEK),
+      fetchCalendarAny(FF_NEXT_WEEK)
+    ]);
+    const groups=[];
+    if(thisWeek.status==='fulfilled')groups.push(thisWeek.value);
+    if(nextWeek.status==='fulfilled')groups.push(nextWeek.value);
+    if(!groups.length)throw new Error('All calendar providers unavailable');
+    const events=mergeProviderEvents(...groups);
+    const overdue=events.filter(e=>e.releaseState==='overdue').length;
+    const checking=events.filter(e=>e.releaseState==='checking').length;
+    return res.status(200).json({
+      mode:'live',
+      provider:'ForexFactory this-week + next-week exports + verified source overrides',
+      timeZone:TARGET_TZ,
+      events,
+      checkedAt,
+      updatedAt:checkedAt,
+      overdue,
+      checking,
+      refreshHintMs:15000,
+      notice:'TradingLab checks both weekly feeds on every request. After scheduled time, missing Actual changes from SCHEDULED to CHECKING LIVE and then OVERDUE until the provider publishes or a verified override resolves it.'
+    });
   }catch(e){
-    const events=reconcileScheduledFallback(applyVerifiedOverrides(TODAY_FALLBACK_EVENTS));
-    return res.status(200).json({mode:'schedule-fallback',provider:'TradingLab schedule fallback + verified overrides',timeZone:TARGET_TZ,events,updatedAt:new Date().toISOString(),notice:`Live provider unavailable: ${String(e?.message||e)}`});
+    const events=mergeProviderEvents(reconcileScheduledFallback(applyVerifiedOverrides(TODAY_FALLBACK_EVENTS)));
+    return res.status(200).json({
+      mode:'schedule-fallback',
+      provider:'TradingLab schedule fallback + verified overrides',
+      timeZone:TARGET_TZ,
+      events,
+      checkedAt,
+      updatedAt:checkedAt,
+      refreshHintMs:15000,
+      notice:`Live provider unavailable: ${String(e?.message||e)}`
+    });
   }
 }
