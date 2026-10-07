@@ -1,0 +1,50 @@
+name: Production Smoke Test
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check terminal and all production APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://tradinglab-macro-terminal.vercel.app"
+          endpoints=(
+            "/"
+            "/api/health"
+            "/api/calendar"
+            "/api/markets"
+            "/api/news"
+            "/api/sectors"
+            "/api/rates"
+            "/api/commodity-calendar"
+          )
+
+          for path in "${endpoints[@]}"; do
+            echo "Checking ${base}${path}"
+            code="$(curl --silent --show-error --location               --connect-timeout 8 --max-time 20               --output /tmp/response.txt               --write-out "%{http_code}"               "${base}${path}")"
+
+            if [[ "$code" -lt 200 || "$code" -ge 400 ]]; then
+              echo "::error::${path} returned HTTP ${code}"
+              cat /tmp/response.txt || true
+              exit 1
+            fi
+
+            if [[ "$path" == "/" ]]; then
+              grep -q "TradingLab Macro Terminal" /tmp/response.txt || {
+                echo "::error::Terminal HTML did not contain expected application title"
+                exit 1
+              }
+            fi
+          done
+
+          echo "All TradingLab production smoke checks passed."
