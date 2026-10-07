@@ -1,66 +1,14 @@
-const SOURCE_UPDATED_AT = '2026-09-27T15:40:00Z';
-
 const BANKS = [
-  {
-    id:'FED', ccy:'USD', name:'Federal Reserve', nextMeeting:'28 Oct 2026',
-    current:'3.75–4.00%', holdRate:'3.75–4.00%', hikeRate:'4.00–4.25%', cutRate:'3.50–3.75%',
-    source:'CME FedWatch / Reuters · 25 Sep close', liveUrl:'https://centralbank.watch/federal-reserve/',
-    latest:{hike:66.0,hold:34.0,cut:0.0}, previous:{hike:53.0,hold:47.0,cut:0.0}
-  },
-  {
-    id:'ECB', ccy:'EUR', name:'European Central Bank', nextMeeting:'29 Oct 2026',
-    current:'2.50%', holdRate:'2.50%', hikeRate:'2.75%', cutRate:'2.25%',
-    source:'CentralBank.Watch / €STR · 27 Sep', liveUrl:'https://centralbank.watch/european-central-bank/',
-    latest:{hike:38.6,hold:61.4,cut:0.0}, previous:{hike:60.0,hold:40.0,cut:0.0}
-  },
-  {
-    id:'BOJ', ccy:'JPY', name:'Bank of Japan', nextMeeting:'28 Oct 2026',
-    current:'1.25%', holdRate:'1.25%', hikeRate:'1.50%', cutRate:'1.00%',
-    source:'Post-hike pricing feed conflict · probability withheld',
-    latest:{hike:NaN,hold:NaN,cut:NaN}, previous:{hike:NaN,hold:NaN,cut:NaN}, allowLive:false
-  },
-  {
-    id:'BOE', ccy:'GBP', name:'Bank of England', nextMeeting:'5 Nov 2026',
-    current:'3.75%', holdRate:'3.75%', hikeRate:'4.00%', cutRate:'3.50%',
-    source:'CentralBank.Watch / SONIA · 27 Sep', liveUrl:'https://centralbank.watch/bank-of-england/',
-    latest:{hike:85.7,hold:14.3,cut:0.0}, previous:{hike:65.0,hold:35.0,cut:0.0}
-  },
-  {
-    id:'BOC', ccy:'CAD', name:'Bank of Canada', nextMeeting:'28 Oct 2026',
-    current:'2.25%', holdRate:'2.25%', hikeRate:'2.50%', cutRate:'2.00%',
-    source:'BoC next-meeting market odds pending · stale Sep-14 quote withheld',
-    latest:{hike:NaN,hold:NaN,cut:NaN}, previous:{hike:NaN,hold:NaN,cut:NaN}, allowLive:false
-  },
-  {
-    id:'RBA', ccy:'AUD', name:'Reserve Bank of Australia', nextMeeting:'29 Sep 2026',
-    current:'4.35%', holdRate:'4.35%', hikeRate:'4.60%', cutRate:'4.10%',
-    source:'CentralBank.Watch / OIS · 27 Sep', liveUrl:'https://centralbank.watch/reserve-bank-of-australia/',
-    latest:{hike:90.0,hold:10.0,cut:0.0}, previous:{hike:76.0,hold:24.0,cut:0.0}
-  },
-  {
-    id:'RBNZ', ccy:'NZD', name:'Reserve Bank of New Zealand', nextMeeting:'28 Oct 2026',
-    current:'2.75%', holdRate:'2.75%', hikeRate:'3.00%', cutRate:'2.50%',
-    source:'Reuters market pricing · 22 Sep', latest:{hike:75.0,hold:25.0,cut:0.0},
-    previous:{hike:11.0,hold:89.0,cut:0.0}, allowLive:false
-  },
-  {
-    id:'SNB', ccy:'CHF', name:'Swiss National Bank', nextMeeting:'10 Dec 2026',
-    current:'0.00%', holdRate:'0.00%', hikeRate:'0.25%', cutRate:'-0.25%',
-    source:'CentralBank.Watch / SARON · 27 Sep', liveUrl:'https://centralbank.watch/swiss-national-bank/',
-    latest:{hike:39.9,hold:60.1,cut:0.0}, previous:{hike:5.7,hold:94.3,cut:0.0}
-  },
-  {
-    id:'RIKSBANK', ccy:'SEK', name:'Riksbank', nextMeeting:'4 Nov 2026',
-    current:'1.75%', holdRate:'1.75%', hikeRate:'2.00%', cutRate:'1.50%',
-    source:'Riksbank / Reuters · likely tightening before year-end; exact next-meeting odds unavailable',
-    latest:{hike:NaN,hold:NaN,cut:NaN}, previous:{hike:NaN,hold:NaN,cut:NaN}, allowLive:false
-  },
-  {
-    id:'NORGES', ccy:'NOK', name:'Norges Bank', nextMeeting:'5 Nov 2026',
-    current:'4.50%', holdRate:'4.50%', hikeRate:'4.75%', cutRate:'4.25%',
-    source:'Norges Bank / Reuters · Sep-24 hike; path implies ~40% another hike within 6m',
-    latest:{hike:NaN,hold:NaN,cut:NaN}, previous:{hike:NaN,hold:NaN,cut:NaN}, allowLive:false
-  }
+  {id:'FED',ccy:'USD',name:'Federal Reserve',nextMeeting:'28 Oct 2026',current:'3.75–4.00%',holdRate:'3.75–4.00%',hikeRate:'4.00–4.25%',cutRate:'3.50–3.75%',url:'https://centralbank.watch/federal-reserve/',previous:{hike:66.0,hold:34.0,cut:0.0}},
+  {id:'ECB',ccy:'EUR',name:'European Central Bank',nextMeeting:'29 Oct 2026',current:'2.50%',holdRate:'2.50%',hikeRate:'2.75%',cutRate:'2.25%',url:'https://centralbank.watch/european-central-bank/',previous:{hike:38.6,hold:61.4,cut:0.0}},
+  {id:'BOJ',ccy:'JPY',name:'Bank of Japan',nextMeeting:'28 Oct 2026',current:'1.25%',holdRate:'1.25%',hikeRate:'1.50%',cutRate:'1.00%',url:'https://centralbank.watch/bank-of-japan/',previous:{hike:0.0,hold:98.8,cut:1.2}},
+  {id:'BOE',ccy:'GBP',name:'Bank of England',nextMeeting:'5 Nov 2026',current:'3.75%',holdRate:'3.75%',hikeRate:'4.00%',cutRate:'3.50%',url:'https://centralbank.watch/bank-of-england/',previous:{hike:85.7,hold:14.3,cut:0.0}},
+  {id:'BOC',ccy:'CAD',name:'Bank of Canada',nextMeeting:'28 Oct 2026',current:'2.25%',holdRate:'2.25%',hikeRate:'2.50%',cutRate:'2.00%',url:'https://centralbank.watch/bank-of-canada/',previous:{hike:NaN,hold:NaN,cut:NaN}},
+  {id:'RBA',ccy:'AUD',name:'Reserve Bank of Australia',nextMeeting:'3 Nov 2026',current:'4.60%',holdRate:'4.60%',hikeRate:'4.85%',cutRate:'4.35%',url:'https://centralbank.watch/reserve-bank-of-australia/',previous:{hike:90.0,hold:10.0,cut:0.0}},
+  {id:'RBNZ',ccy:'NZD',name:'Reserve Bank of New Zealand',nextMeeting:'28 Oct 2026',current:'2.75%',holdRate:'2.75%',hikeRate:'3.00%',cutRate:'2.50%',url:'https://centralbank.watch/reserve-bank-of-new-zealand/',previous:{hike:NaN,hold:NaN,cut:NaN}},
+  {id:'SNB',ccy:'CHF',name:'Swiss National Bank',nextMeeting:'10 Dec 2026',current:'0.00%',holdRate:'0.00%',hikeRate:'0.25%',cutRate:'-0.25%',url:'https://centralbank.watch/swiss-national-bank/',previous:{hike:39.9,hold:60.1,cut:0.0}},
+  {id:'RIKSBANK',ccy:'SEK',name:'Riksbank',nextMeeting:'4 Nov 2026',current:'1.75%',holdRate:'1.75%',hikeRate:'2.00%',cutRate:'1.50%',url:'https://centralbank.watch/riksbank/',previous:{hike:NaN,hold:NaN,cut:NaN}},
+  {id:'NORGES',ccy:'NOK',name:'Norges Bank',nextMeeting:'5 Nov 2026',current:'4.50%',holdRate:'4.50%',hikeRate:'4.75%',cutRate:'4.25%',url:'https://centralbank.watch/norges-bank/',previous:{hike:NaN,hold:NaN,cut:NaN}}
 ];
 
 function cleanText(html=''){
@@ -79,56 +27,88 @@ function numberAfter(text,pattern){
   return m?Number(m[1]):NaN;
 }
 
-function parseProbabilities(text,fallback){
+function parseProbabilities(text){
   const hike=numberAfter(text,/Rate Hike\s*([0-9]+(?:\.[0-9]+)?)%/i);
   const hold=numberAfter(text,/(?:No Change|Hold)\s*([0-9]+(?:\.[0-9]+)?)%/i);
   const cut=numberAfter(text,/Rate Cut\s*([0-9]+(?:\.[0-9]+)?)%/i);
-  if([hike,hold,cut].every(Number.isFinite)) return {hike,hold,cut};
-  return fallback;
+  if([hike,hold,cut].every(Number.isFinite))return {hike,hold,cut};
+  return null;
 }
 
 function rowsFor(bank,probs,previous){
+  const p=probs||{hike:NaN,hold:NaN,cut:NaN};
+  const prev=previous||{hike:NaN,hold:NaN,cut:NaN};
   return [
-    {rate:bank.cutRate,direction:'cut',latest:probs.cut,previous:previous.cut},
-    {rate:bank.holdRate,direction:'hold',latest:probs.hold,previous:previous.hold,current:true},
-    {rate:bank.hikeRate,direction:'hike',latest:probs.hike,previous:previous.hike}
+    {rate:bank.cutRate,direction:'cut',latest:p.cut,previous:prev.cut},
+    {rate:bank.holdRate,direction:'hold',latest:p.hold,previous:prev.hold,current:true},
+    {rate:bank.hikeRate,direction:'hike',latest:p.hike,previous:prev.hike}
   ];
 }
 
-async function fetchBank(bank){
-  if(bank.allowLive===false||!bank.liveUrl) return {...bank,live:false};
+async function fetchText(url){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),4500);
+  const timer=setTimeout(()=>ctrl.abort(),5500);
   try{
-    const r=await fetch(bank.liveUrl,{
-      headers:{'User-Agent':'TradingLabMacroTerminal/3.0','Accept':'text/html,application/xhtml+xml'},
+    const r=await fetch(url,{
+      headers:{'User-Agent':'TradingLabMacroTerminal/6.0','Accept':'text/html,application/xhtml+xml','Cache-Control':'no-cache'},
       signal:ctrl.signal,
       cache:'no-store'
     });
-    if(!r.ok) throw new Error(`HTTP ${r.status}`);
-    const parsed=parseProbabilities(cleanText(await r.text()),bank.latest);
-    return {...bank,latest:parsed,live:true};
-  }catch(_){
-    return {...bank,live:false};
-  }finally{
-    clearTimeout(timer);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return cleanText(await r.text());
+  }finally{clearTimeout(timer)}
+}
+
+async function fetchBank(bank){
+  const checkedAt=new Date().toISOString();
+  try{
+    const text=await fetchText(bank.url);
+    const probabilities=parseProbabilities(text);
+    if(!probabilities)throw new Error('Probability block not published');
+    return {
+      ...bank,
+      probabilities,
+      live:true,
+      stale:false,
+      checkedAt,
+      sourceUpdatedAt:checkedAt,
+      source:'CentralBank.Watch · market-implied live page'
+    };
+  }catch(e){
+    return {
+      ...bank,
+      probabilities:null,
+      live:false,
+      stale:true,
+      checkedAt,
+      sourceUpdatedAt:null,
+      source:'Live market probability unavailable · no stale probability displayed',
+      error:String(e?.message||e)
+    };
   }
 }
 
 export default async function handler(req,res){
-  res.setHeader('Cache-Control','s-maxage=120, stale-while-revalidate=300');
+  res.setHeader('Cache-Control','no-store, max-age=0');
+  const checkedAt=new Date().toISOString();
   const banks=await Promise.all(BANKS.map(fetchBank));
   const cards=banks.map(bank=>({
     id:bank.id,ccy:bank.ccy,name:bank.name,nextMeeting:bank.nextMeeting,current:bank.current,
-    source:bank.source,live:bank.live,sourceUpdatedAt:SOURCE_UPDATED_AT,
-    probabilities:bank.latest,previousProbabilities:bank.previous,
-    rows:rowsFor(bank,bank.latest,bank.previous)
+    source:bank.source,live:bank.live,stale:bank.stale,checkedAt:bank.checkedAt,
+    sourceUpdatedAt:bank.sourceUpdatedAt,error:bank.error||null,
+    probabilities:bank.probabilities||{hike:NaN,hold:NaN,cut:NaN},
+    previousProbabilities:bank.previous,
+    rows:rowsFor(bank,bank.probabilities,bank.previous)
   }));
+  const liveCount=cards.filter(x=>x.live).length;
   return res.status(200).json({
-    mode:'live',
-    snapshot:'2026-09-27',
-    updatedAt:SOURCE_UPDATED_AT,
-    sourceUpdatedAt:SOURCE_UPDATED_AT,
+    mode:liveCount===cards.length?'live':'partial-live',
+    snapshot:checkedAt.slice(0,10),
+    updatedAt:checkedAt,
+    sourceUpdatedAt:checkedAt,
+    freshnessSeconds:0,
+    liveCount,
+    totalCount:cards.length,
     previousReference:'Previous verified/reference market snapshot',
     cards
   });
