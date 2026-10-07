@@ -209,7 +209,7 @@ function localDate(iso){
   return new Intl.DateTimeFormat('en-CA',{timeZone:TARGET_TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
 }
 
-function cleanEventName(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\b(final|prelim|preliminary|flash|estimate|index|change|rate|price)\b/g,' ').replace(/\s+/g,' ').trim()}
+function cleanEventName(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/\blabor cash earnings\b/g,'average cash earnings').replace(/[^a-z0-9]+/g,' ').trim().replace(/\b(final|prelim|preliminary|flash|estimate|index|change|rate|price)\b/g,' ').replace(/\s+/g,' ').trim()}
 function eventTokens(v){const stop=new Set(['m','y','q','the','of','and','index','change','rate','price','final','prelim','preliminary','flash','estimate']);return cleanEventName(v).split(' ').filter(x=>x.length>1&&!stop.has(x))}
 function fuzzyEventMatch(a,b){const A=eventTokens(a),B=eventTokens(b);if(!A.length||!B.length)return false;const bs=new Set(B),hits=A.filter(x=>bs.has(x)).length,score=hits/Math.min(A.length,B.length);return score>=0.6||cleanEventName(a).includes(cleanEventName(b))||cleanEventName(b).includes(cleanEventName(a))}
 function usableActual(v){const s=String(v??'').trim().toUpperCase();return !!s&&!['—','-','PENDING','N/A','NA','NULL','UNDEFINED'].includes(s)}
@@ -260,7 +260,7 @@ function applyPrimaryActuals(events){
  return out.map(e=>{
   const o=PRIMARY_ACTUALS.find(x=>x.currency===e.currency&&x.date===localDate(e.date)&&cleanEventName(x.event)===cleanEventName(e.event));
   if(!o)return e;
-  return {...e,actual:o.actual,source:o.source,sourceUrl:o.sourceUrl,verificationStatus:'verified-primary',actualVerifiedAt:o.verifiedAt,forecastVerificationStatus:'provider-unverified',label:'Verified actual',impact:'Neutral',stage:o.stage};
+  return {...e,event:o.event,actual:o.actual,source:o.source,sourceUrl:o.sourceUrl,verificationStatus:'verified-primary',actualVerifiedAt:o.verifiedAt,forecastVerificationStatus:'provider-unverified',label:'Verified actual',impact:'Neutral',stage:o.stage};
  });
 }
 function skopjeWeekday(){
