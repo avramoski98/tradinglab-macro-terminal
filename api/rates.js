@@ -69,19 +69,23 @@ async function fetchText(url){
 }
 
 function bankSection(rootText,bank,index){
+  const heading='### '+bank.name;
+  const h=rootText.indexOf(heading);
+  if(h>=0){
+    const next=rootText.indexOf('### ',h+heading.length);
+    const section=rootText.slice(h,next>=0?next:Math.min(rootText.length,h+2200));
+    if(parseProbabilities(section))return section;
+  }
   const lower=rootText.toLowerCase(),needle=bank.name.toLowerCase();
   let pos=0,candidates=[];
   while((pos=lower.indexOf(needle,pos))>=0){
-    const slice=rootText.slice(pos,Math.min(rootText.length,pos+1800));
+    const slice=rootText.slice(pos,Math.min(rootText.length,pos+1200));
     const meetingPos=slice.search(/Next Meeting Date:?/i);
     const probPos=slice.search(/Rate Change Probabilities/i);
-    if(meetingPos>=0&&meetingPos<500&&probPos>meetingPos)candidates.push({pos,slice,meetingPos,probPos});
+    if(meetingPos>=0&&meetingPos<250&&probPos>meetingPos)candidates.push(slice);
     pos+=needle.length;
   }
-  for(const x of candidates){
-    const probs=parseProbabilities(x.slice);
-    if(probs)return x.slice;
-  }
+  for(const slice of candidates)if(parseProbabilities(slice))return slice;
   return '';
 }
 
