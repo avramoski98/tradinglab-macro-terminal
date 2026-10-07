@@ -636,7 +636,7 @@ const ECON_TRENDS={
  }
 };
 
-function econMonth(v){if(!v)return'—';let [y,m,d]=String(v).split('-'),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d?String(Number(d))+' '+(n[+m-1]||m):(n[+m-1]||m)+' '+String(y).slice(-2)}
+function econMonth(v){if(!v)return'—';let [y,m,d]=String(v).split('-'),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d?String(Number(d))+' '+(n[+m-1]||m)+' '+y:(n[+m-1]||m)+' '+y}
 function monthNum(s){let [y,m]=String(s).split('-').map(Number);return y*12+m}
 function fmtTrendVal(cfg,v){if(v==null||!Number.isFinite(v))return'—';return v.toFixed(cfg.decimals)+(cfg.unit||'')}
 function pointAgo(points,months){if(!points.length)return null;let last=points[points.length-1],target=monthNum(last[0])-months,best=null;for(const p of points){if(monthNum(p[0])<=target)best=p}return best}
@@ -679,7 +679,7 @@ function econTrendSection(id){
    +'<td>'+deltaText(cfg,d1)+'</td><td>'+deltaText(cfg,d3)+'</td><td>'+deltaText(cfg,d6)+'</td>'
    +'<td><span class="trend-state '+state.cls+'">'+state.label+'</span></td>'
    +'<td><span class="tag '+(cov.complete?'green':'red')+'">'+(cov.complete?'6M COMPLETE':'INCOMPLETE '+cov.count+'/'+cov.required)+'</span></td>'
-   +'<td><div class="trend-num">'+(last?econMonth(last[0]):'—')+'</div><div class="mini"><span class="tag '+fresh.tone+'">'+fresh.label+'</span></div></td>'
+   +'<td><div class="trend-num">'+(last?econMonth(last[0]):'—')+'</div><div class="mini">DATA PERIOD · <span class="tag '+fresh.tone+'">'+fresh.label+'</span></div></td>'
    +'<td>'+sparkSvg(p)+'</td><td><div class="trend-num" style="color:#ffb000">'+focusText+'</div><div class="mini">'+view.toUpperCase()+' focus</div></td></tr>';
  }).join('');
  el.innerHTML='<div class="trend-hero"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+cfg.title+'</h2><div class="mini" style="font-size:12px">'+cfg.subtitle+'</div></div>'
@@ -851,7 +851,7 @@ function economicTrends(){
  +'<div class="econ-countrybar">'+countries+'</div><div class="trend-toolbar"><div class="trend-actions">'+cats+'</div><div class="trend-actions">'+focuses+'</div></div>'
  +'<div class="econ-countrybar">'+inds+'</div>'
  +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(ind?.label||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtIndVal(ind,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtIndVal(ind,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+deltaFmt(d1)+'</div></div><div><div class="k">3M Δ</div><div class="v">'+deltaFmt(d3)+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
- +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">LAST UPDATE: '+(last?econMonth(last[0]):'—')+' · '+(ind?.freshness?.label||'NO DATA')+' · COVERAGE '+(ind?.coverage?.count||0)+'/'+(ind?.coverage?.required||6)+' · selected '+focus.toUpperCase()+'</div></div><div><span class="econ-badge">'+(ind?.coverage?.complete?'6M COMPLETE':'INCOMPLETE')+' · '+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Minimum rule: six monthly observations are required for monthly indicators; quarterly indicators must cover at least two quarters. Missing history is marked INCOMPLETE and is never fabricated.</div></div>';
+ +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">LATEST DATA PERIOD: '+(last?econMonth(last[0]):'—')+' · '+(ind?.freshness?.label||'NO DATA')+' · COVERAGE '+(ind?.coverage?.count||0)+'/'+(ind?.coverage?.required||6)+' · selected '+focus.toUpperCase()+'</div><div class="mini" style="margin-top:3px">TERMINAL CHECKED: '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep</div></div><div><span class="econ-badge">'+(ind?.coverage?.complete?'6M COMPLETE':'INCOMPLETE')+' · '+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Minimum rule: six monthly observations are required for monthly indicators; quarterly indicators must cover at least two quarters. Missing history is marked INCOMPLETE and is never fabricated.</div></div>';
  el.querySelectorAll('.econ-ccy').forEach(b=>b.addEventListener('click',()=>{ECON_UI.ccy=b.dataset.ccy;economicTrends()}));
  el.querySelectorAll('.econ-cat').forEach(b=>b.addEventListener('click',()=>{ECON_UI.cat=b.dataset.cat;economicTrends()}));
  el.querySelectorAll('.econ-focus').forEach(b=>b.addEventListener('click',()=>{ECON_UI.focus=b.dataset.focus;economicTrends()}));
