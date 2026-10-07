@@ -963,6 +963,18 @@ async function loadVerifiedSnapshot(){
   const latest=(rows,re)=>rows.filter(x=>x.verificationStatus==='verified-primary'&&re.test(x.event)).sort((a,b)=>String(a.referenceDate).localeCompare(String(b.referenceDate))).at(-1);
   const fmt=x=>x?`${Number(x.actual).toLocaleString('en-US',{maximumFractionDigits:2})}${x.unit||''} · ${x.reference}`:'—';
   const cell=x=>{if(!x)return'—';let u;try{u=new URL(x.sourceUrl);if(u.protocol!=='https:')return'—'}catch{return'—'}return `<a href="${esc(u.href)}" target="_blank" rel="noopener noreferrer">${esc(fmt(x))}</a><div class="mini">${esc(x.event)} · ${esc(x.source)} · ${esc(x.stage||'published')}</div>`};
+  for(const [c,rr] of Object.entries(d.currencies)){
+   const inflation=latest(rr,/^(Headline CPI|Monthly CPI|Quarterly CPI|CPI y\/y|HICP y\/y)/),labor=latest(rr,/^Unemployment rate/),gdp=latest(rr,/^(Real GDP q\/q(?! annualized)|Mainland real GDP)/)||latest(rr,/GDP/);
+   const core=rr.filter(x=>x.verificationStatus==='verified-primary'&&/^Core /.test(x.event)&&x.reference===inflation?.reference);
+   if(inflation)RES[c].inflation=inflation.event+' '+fmt(inflation)+' · official';
+   if(core.length)RES[c].core=core.map(x=>x.event+' '+fmt(x)).join(' · ');
+   if(labor)RES[c].labor=labor.event+' '+fmt(labor);
+   if(gdp)RES[c].growth=gdp.event+' '+fmt(gdp);
+   const note=[inflation,labor,gdp].filter(Boolean).map(x=>x.event+': '+fmt(x)).join('; ');
+   RES[c].trendDetail='Verified official releases as of '+d.audit.cutoff+': '+note+'. Policy narratives and ranking retain an archived baseline.';
+   RES[c].weekly='Latest verified releases: '+note+'. Follow the current calendar and news feed for subsequent developments; archived policy pricing is not a current forecast.';
+  }
+  render();
   const rows=Object.entries(d.currencies).map(([c,rr])=>{const inflation=latest(rr,/^(Headline CPI|Monthly CPI|Quarterly CPI|CPI y\/y|HICP y\/y)/),labor=latest(rr,/^Unemployment rate/),gdp=latest(rr,/^(Real GDP q\/q(?! annualized)|Mainland real GDP)/)||latest(rr,/GDP/);return `<tr><td><b>${esc(c)}</b></td><td>${cell(inflation)}</td><td>${cell(labor)}</td><td>${cell(gdp)}</td></tr>`}).join('');
   document.getElementById('verifiedSnapshot').innerHTML=`<h3>Официјален G10 пресек · ${esc(d.audit.cutoff)}</h3><div class="mini">${d.audit.verified}/${d.audit.total} историски набљудувања потврдени. Проверката на вредноста не го потврдува пазарниот консензус. GDP е q/q; USD е годишно пресметан, CHF е приспособен за спортски настани, NOK е копнената економија. Кликни бројка за официјалниот извор.</div><div class="tablewrap"><table><thead><tr><th>Валута</th><th>Инфлација y/y</th><th>Невработеност</th><th>Реален GDP</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   document.getElementById('auditBanner').textContent=`Проверка: ${new Date(d.audit.checkedAt).toLocaleString('en-GB',{timeZone:'Europe/Skopje'})} Prilep · ${d.audit.verified}/${d.audit.total} потврдени записи. Рангирањето, старите наративи и останатата историја се архивска основа. Economic Data е во истиот терминал.`;
