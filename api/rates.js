@@ -45,18 +45,27 @@ function rowsFor(bank,probs,previous){
   ];
 }
 
-async function fetchText(url){
+async function fetchOnce(url,accept='text/html,application/xhtml+xml'){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),5500);
+  const timer=setTimeout(()=>ctrl.abort(),6500);
   try{
     const r=await fetch(url,{
-      headers:{'User-Agent':'TradingLabMacroTerminal/6.0','Accept':'text/html,application/xhtml+xml','Cache-Control':'no-cache'},
+      headers:{'User-Agent':'TradingLabMacroTerminal/6.1','Accept':accept,'Cache-Control':'no-cache'},
       signal:ctrl.signal,
       cache:'no-store'
     });
     if(!r.ok)throw new Error('HTTP '+r.status);
-    return cleanText(await r.text());
+    return await r.text();
   }finally{clearTimeout(timer)}
+}
+
+async function fetchText(url){
+  let firstError=null;
+  try{return cleanText(await fetchOnce(url))}
+  catch(e){firstError=e}
+  const reader='https://r.jina.ai/'+url;
+  try{return cleanText(await fetchOnce(reader,'text/plain,text/markdown,*/*'))}
+  catch(e){throw new Error('Direct source failed: '+String(firstError?.message||firstError)+'; reader failed: '+String(e?.message||e))}
 }
 
 async function fetchBank(bank){
