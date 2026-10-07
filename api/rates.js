@@ -13,11 +13,13 @@ const BANKS = [
 
 function cleanText(html=''){
   return String(html)
+    .replace(/<h[1-3][^>]*>/gi,' ### ')
     .replace(/<script[\s\S]*?<\/script>/gi,' ')
     .replace(/<style[\s\S]*?<\/style>/gi,' ')
     .replace(/<[^>]+>/g,' ')
     .replace(/&nbsp;|&#160;/gi,' ')
     .replace(/&amp;/gi,'&')
+    .replace(/\*\*/g,'')
     .replace(/\s+/g,' ')
     .trim();
 }
@@ -31,7 +33,7 @@ function parseProbabilities(text){
   const hike=numberAfter(text,/Rate Hike\s*([0-9]+(?:\.[0-9]+)?)%/i);
   const hold=numberAfter(text,/(?:No Change|Hold)\s*([0-9]+(?:\.[0-9]+)?)%/i);
   const cut=numberAfter(text,/Rate Cut\s*([0-9]+(?:\.[0-9]+)?)%/i);
-  if([hike,hold,cut].every(Number.isFinite))return {hike,hold,cut};
+  if([hike,hold,cut].every(v=>Number.isFinite(v)&&v>=0&&v<=100)&&Math.abs(hike+hold+cut-100)<=0.3)return {hike,hold,cut};
   return null;
 }
 
@@ -47,7 +49,7 @@ function rowsFor(bank,probs,previous){
 
 async function fetchOnce(url,accept='text/html,application/xhtml+xml'){
   const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),6500);
+  const timer=setTimeout(()=>ctrl.abort(),12000);
   try{
     const r=await fetch(url,{
       headers:{'User-Agent':'TradingLabMacroTerminal/6.1','Accept':accept,'Cache-Control':'no-cache'},
@@ -68,25 +70,16 @@ async function fetchText(url){
   catch(e){throw new Error('Reader failed: '+String(readerError?.message||readerError)+'; direct source failed: '+String(e?.message||e))}
 }
 
-function bankSection(rootText,bank,index){
-  const heading='### '+bank.name;
-  const h=rootText.indexOf(heading);
-  if(h>=0){
-    const next=rootText.indexOf('### ',h+heading.length);
-    const section=rootText.slice(h,next>=0?next:Math.min(rootText.length,h+2200));
-    if(parseProbabilities(section))return section;
-  }
-  const lower=rootText.toLowerCase(),needle=bank.name.toLowerCase();
-  let pos=0,candidates=[];
-  while((pos=lower.indexOf(needle,pos))>=0){
-    const slice=rootText.slice(pos,Math.min(rootText.length,pos+1200));
-    const meetingPos=slice.search(/Next Meeting Date:?/i);
-    const probPos=slice.search(/Rate Change Probabilities/i);
-    if(meetingPos>=0&&meetingPos<250&&probPos>meetingPos)candidates.push(slice);
-    pos+=needle.length;
-  }
-  for(const slice of candidates)if(parseProbabilities(slice))return slice;
-  return '';
+function bankSection(rootText,bank){
+  // Match an exact bank heading and stop before the next bank heading.
+  // Subheadings (######) must not terminate or extend the bank's block.
+  const name=bank.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const heading=new RegExp('(?:^|\\s)### '+name+'(?=\\s|$)','i');
+  const match=heading.exec(rootText);
+  if(!match)return '';
+  const rest=rootText.slice(match.index+match[0].length);
+  const next=rest.search(/(?:^|\s)### (?!#)/);
+  return rest.slice(0,next<0?rest.length:next);
 }
 
 function parseMeeting(section,fallback){
@@ -104,6 +97,8 @@ async function fetchBankFromRoot(bank,index,rootText,rootError){
   try{
     if(!rootText)throw rootError||new Error('Central dashboard unavailable');
     const section=bankSection(rootText,bank,index);
+    const sourceDate=parseSourceDate(rootText);
+    if(!sourceDate||Date.now()-Date.parse(sourceDate)>3*86400000)throw new Error('Source timestamp missing or older than three days');
     const probabilities=parseProbabilities(section);
     if(!probabilities)throw new Error('Probability block not published for this bank');
     return {
@@ -114,8 +109,8 @@ async function fetchBankFromRoot(bank,index,rootText,rootError){
       live:true,
       stale:false,
       checkedAt,
-      sourceUpdatedAt:checkedAt,
-      source:'CentralBank.Watch · consolidated live dashboard'
+      sourceUpdatedAt:parseSourceDate(rootText),
+      source:'CentralBank.Watch · source-derived probabilities'
     };
   }catch(e){
     return {
@@ -143,19 +138,22 @@ export default async function handler(req,res){
     source:bank.source,live:bank.live,stale:bank.stale,checkedAt:bank.checkedAt,
     sourceUpdatedAt:bank.sourceUpdatedAt,error:bank.error||null,
     probabilities:bank.probabilities||{hike:NaN,hold:NaN,cut:NaN},
-    previousProbabilities:bank.previous,
-    rows:rowsFor(bank,bank.probabilities,bank.previous)
+    previousProbabilities:null,
+    rows:rowsFor(bank,bank.probabilities,null)
   }));
   const liveCount=cards.filter(x=>x.live).length;
+  const sourceUpdatedAt=parseSourceDate(rootText);
   return res.status(200).json({
-    mode:liveCount===cards.length?'live':'partial-live',
+    mode:liveCount===cards.length?'live':liveCount?'partial-live':'unavailable',
     snapshot:checkedAt.slice(0,10),
     updatedAt:checkedAt,
-    sourceUpdatedAt:checkedAt,
-    freshnessSeconds:0,
+    sourceUpdatedAt:parseSourceDate(rootText),
+    freshnessSeconds:sourceUpdatedAt?Math.max(0,Math.floor((Date.now()-Date.parse(sourceUpdatedAt))/1000)):null,
     liveCount,
     totalCount:cards.length,
     previousReference:'Previous verified/reference market snapshot',
     cards
   });
 }
+
+function parseSourceDate(text){const m=text.match(/Data as of\s+([A-Za-z]+\s+\d{1,2},\s+\d{4})/i);if(!m)return null;const d=new Date(m[1]+" 00:00:00 UTC");return Number.isFinite(+d)?d.toISOString():null;}

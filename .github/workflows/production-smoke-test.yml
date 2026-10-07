@@ -48,3 +48,16 @@ jobs:
           done
 
           echo "All TradingLab production smoke checks passed."
+
+      - name: Check data readiness, not just HTTP status
+        run: |
+          curl --fail --silent --show-error --max-time 30 "https://tradinglab-macro-terminal.vercel.app/api/health?deep=1" > /tmp/quality.json
+          python - <<'PY'
+          import json
+          report=json.load(open('/tmp/quality.json'))
+          failures=[x for x in report.get('checks',[]) if not x.get('ready')]
+          for item in failures:
+              print('::error::'+item['service']+': '+item['reason'])
+          if not report.get('dataReady'):
+              raise SystemExit('Data readiness checks failed; HTTP 200 is not sufficient.')
+          PY

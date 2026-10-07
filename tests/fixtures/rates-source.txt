@@ -1,0 +1,24 @@
+Data as of October 6, 2026
+### Federal Reserve
+Next Meeting Date: October 28, 2026
+Current Rate: 3.88%
+Rate Change Probabilities
+Rate Hike **19.5%**
+No Change **80.5%**
+Rate Cut **0.0%**
+### European Central Bank
+Next Meeting Date: October 29, 2026
+Rate Hike **10.0%**
+No Change **90.0%**
+Rate Cut **0.0%**
+### Bank of Japan
+Next Meeting Date: October 28, 2026
+###### Rate Change Probabilities
+Rate Hike **0.0%**
+No Change **95.1%**
+Rate Cut **4.9%**
+### Reserve Bank of New Zealand
+Next Meeting Date: October 28, 2026
+Rate Hike **--%**
+No Change **--%**
+Rate Cut **--%**

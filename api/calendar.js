@@ -1,3 +1,4 @@
+import {COUNTRIES,fetchEconomicCalendar} from '../lib/economic-provider.mjs';
 const FF_THIS_WEEK=[
   'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
   'https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.json'
@@ -214,7 +215,7 @@ function eventTokens(v){const stop=new Set(['m','y','q','the','of','and','index'
 function fuzzyEventMatch(a,b){const A=eventTokens(a),B=eventTokens(b);if(!A.length||!B.length)return false;const bs=new Set(B),hits=A.filter(x=>bs.has(x)).length,score=hits/Math.min(A.length,B.length);return score>=0.6||cleanEventName(a).includes(cleanEventName(b))||cleanEventName(b).includes(cleanEventName(a))}
 function usableActual(v){const s=String(v??'').trim().toUpperCase();return !!s&&!['—','-','PENDING','N/A','NA','NULL','UNDEFINED'].includes(s)}
 function minutesAfterScheduled(e,now=Date.now()){const t=new Date(e.date).getTime();return Number.isFinite(t)?(now-t)/60000:-Infinity}
-function reconcileScheduledFallback(events){const out=[...events],now=Date.now();for(const s of TODAY_FALLBACK_EVENTS){const elapsed=minutesAfterScheduled(s,now);if(elapsed<0)continue;let best=-1;for(let i=0;i<out.length;i++){const e=out[i];if(e.currency!==s.currency||localDate(e.date)!==localDate(s.date))continue;if(fuzzyEventMatch(e.event,s.event)){best=i;break}const dt=Math.abs(new Date(e.date).getTime()-new Date(s.date).getTime())/60000;if(dt<=20&&eventTokens(e.event).some(t=>eventTokens(s.event).includes(t))){best=i;break}}if(best>=0){const e=out[best];if(!usableActual(e.actual)&&usableActual(s.actual))out[best]={...e,actual:s.actual,previous:usableActual(e.previous)?e.previous:s.previous,forecast:usableActual(e.forecast)?e.forecast:s.forecast,lastUpdate:new Date().toISOString(),source:(e.source||'provider')+' + TradingLab timed fallback'}}else out.push({...s,lastUpdate:new Date().toISOString(),source:'TradingLab timed schedule fallback'})}return out}
+function reconcileScheduledFallback(events){const out=[...events],now=Date.now();for(const s of TODAY_FALLBACK_EVENTS){const elapsed=minutesAfterScheduled(s,now);if(elapsed<0)continue;let best=-1;for(let i=0;i<out.length;i++){const e=out[i];if(e.currency!==s.currency||localDate(e.date)!==localDate(s.date))continue;if(fuzzyEventMatch(e.event,s.event)){best=i;break}const dt=Math.abs(new Date(e.date).getTime()-new Date(s.date).getTime())/60000;if(dt<=20&&eventTokens(e.event).some(t=>eventTokens(s.event).includes(t))){best=i;break}}if(best>=0){const e=out[best];if(!usableActual(e.actual)&&usableActual(s.actual))out[best]={...e,actual:s.actual,previous:usableActual(e.previous)?e.previous:s.previous,forecast:usableActual(e.forecast)?e.forecast:s.forecast,lastUpdate:null,verificationStatus:'manual-archive',source:(e.source||'provider')+' + TradingLab timed fallback'}}else out.push({...s,lastUpdate:null,verificationStatus:'manual-archive',source:'TradingLab timed schedule fallback'})}return out}
 
 function applyVerifiedOverrides(events){
   const out=[...events];
@@ -233,7 +234,7 @@ function applyVerifiedOverrides(events){
       if(/y\/y/i.test(o.event)&&!/y\/y|YoY|year/i.test(String(e.event||'')))continue;
       const resolvedForecast=usableActual(o.forecast)?o.forecast:(usableActual(e.forecast)?e.forecast:'—');
       const z=o.label?{label:o.label,impact:o.impact||'Neutral'}:infer(o.event,o.actual,resolvedForecast);
-      out[i]={...e,event:o.event||e.event,actual:o.actual,previous:usableActual(o.previous)?o.previous:e.previous,forecast:resolvedForecast,importance:betterImportance(e.importance,o.importance),label:z.label,impact:z.impact,lastUpdate:new Date().toISOString(),source:o.source};
+      out[i]={...e,event:o.event||e.event,actual:o.actual,previous:usableActual(o.previous)?o.previous:e.previous,forecast:resolvedForecast,importance:betterImportance(e.importance,o.importance),label:z.label,impact:z.impact,lastUpdate:null,verificationStatus:'manual-archive',source:o.source};
       matched=true;
       break;
     }
@@ -241,7 +242,7 @@ function applyVerifiedOverrides(events){
       out.push({
         date:o.date+'T'+o.time+':00+02:00',sourceDate:o.date+'T'+o.time+':00+02:00',timeZone:TARGET_TZ,
         country:o.currency,currency:o.currency,event:o.event,previous:o.previous,forecast:o.forecast,actual:o.actual,
-        importance:o.importance,label:o.label||'Released',impact:o.impact||'Neutral',lastUpdate:new Date().toISOString(),source:o.source
+        importance:o.importance,label:o.label||'Released',impact:o.impact||'Neutral',lastUpdate:null,verificationStatus:'manual-archive',source:o.source
       });
     }
   }
@@ -260,7 +261,7 @@ async function fetchJsonWithRetry(url){
     try{
       const r=await fetch(url,{
         headers:{Accept:'application/json','Cache-Control':'no-cache','User-Agent':'TradingLabMacroTerminal/5.2'},
-        cache:'no-store'
+        cache:'no-store',signal:AbortSignal.timeout(5000)
       });
       if(!r.ok)throw new Error(`ForexFactory ${r.status}`);
       const raw=await r.json();
@@ -316,7 +317,7 @@ async function fetchCalendar(url){
     return{
       date:toPrilepIso(x.date||''),sourceDate:x.date||'',timeZone:TARGET_TZ,
       country:currency,currency,event:x.title||x.event||'',previous:x.previous||'—',
-      forecast:forecast||'—',actual:actual||'—',importance:imp,label:z.label,impact:z.impact,
+      forecast:forecast??'—',actual:actual??'—',importance:imp,label:z.label,impact:z.impact,
       lastUpdate:null,source:'ForexFactory'
     };
   }).filter(Boolean);
@@ -327,6 +328,15 @@ export default async function handler(req,res){
   res.setHeader('Cache-Control','no-store, max-age=0');
   const checkedAt=new Date().toISOString();
   try{
+    if(process.env.TRADING_ECONOMICS_KEY){
+      const from=new Date(Date.now()-7*86400000).toISOString().slice(0,10),to=new Date(Date.now()+14*86400000).toISOString().slice(0,10);
+      try{
+        const records=await fetchEconomicCalendar(Object.values(COUNTRIES),from,to,process.env.TRADING_ECONOMICS_KEY);
+        const reverse=Object.fromEntries(Object.entries(COUNTRIES).map(([a,b])=>[b,a]));
+        const events=records.map(x=>{const z=infer(x.event,x.rawActual,x.rawForecast);return {...x,date:x.releaseDate,currency:reverse[x.country],actual:x.rawActual??'—',forecast:x.rawForecast??'—',previous:x.rawPrevious??'—',lastUpdate:x.sourceUpdatedAt,importance:x.importance===3?'HIGH':x.importance===2?'MED':'LOW',...z,verificationStatus:'provider'};}).filter(x=>x.currency);
+        return res.status(200).json({mode:'live',provider:'Trading Economics',events:mergeProviderEvents(events),checkedAt,updatedAt:checkedAt});
+      }catch{}
+    }
     const [thisWeek,nextWeek]=await Promise.allSettled([
       fetchCalendarAny(FF_THIS_WEEK),
       fetchCalendarAny(FF_NEXT_WEEK)
@@ -344,7 +354,7 @@ export default async function handler(req,res){
       timeZone:TARGET_TZ,
       events,
       checkedAt,
-      updatedAt:checkedAt,
+      updatedAt:null,
       overdue,
       checking,
       refreshHintMs:15000,
@@ -358,8 +368,9 @@ export default async function handler(req,res){
       timeZone:TARGET_TZ,
       events,
       checkedAt,
-      updatedAt:checkedAt,
-      refreshHintMs:15000,
+      updatedAt:null,
+      overdue:events.filter(e=>e.releaseState==='overdue').length,
+      refreshHintMs:60000,
       notice:`Live provider unavailable: ${String(e?.message||e)}`
     });
   }

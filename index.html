@@ -150,7 +150,8 @@
   <div class="nav">
     <button class="active" data-tab="overview">Overview</button>
     <button data-tab="g10">G10 Macro Monitor</button>
-    <button data-tab="economic">Economic Trends</button>
+    <button type="button" onclick="location.href='/economic-data.html'">Economic Data ↗</button>
+    <button data-tab="economic">Economic Trends · legacy</button>
     <button data-tab="rates">Rates Probabilities</button>
     <button data-tab="weekly">Weekly Focus</button>
     <button data-tab="calendar">Next Week Calendar</button>
@@ -379,14 +380,14 @@ function renderRelease(x){let cls=impactClass(x);return `<div class="release"><d
 
 
 let RATE_STATE=null;
-const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v2';
-function rateProbFmt(n){n=Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
-function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
-function rateValues(rows,field){let out={};for(let r of rows||[]){let v=Number(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
+const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v3';
+function rateProbFmt(n){n=n==null?NaN:Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
+function rateDeltaFmt(n){n=n==null?NaN:Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
+function rateValues(rows,field){let out={};for(let r of rows||[]){let v=r[field]==null?NaN:Number(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
 function rateSnapshot(stamp,values,kind='market'){return {stamp:String(stamp||''),values,kind}}
 function rateHistory(payload){
   let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
-  let next={},stamp=String(payload.updatedAt||new Date().toISOString());
+  let next={},stamp=String(payload.sourceUpdatedAt||payload.updatedAt||new Date().toISOString());
   let cards=(payload.cards||[]).map(card=>{
     let seed=card.rows||[],old=(saved[card.id]&&Array.isArray(saved[card.id].history))?saved[card.id].history:[];
     let currentValues=rateValues(seed,'latest'),referenceValues=rateValues(seed,'previous'),history=[...old],hasLive=card.live&&Object.keys(currentValues).length>0;
@@ -405,7 +406,7 @@ function rateHistory(payload){
     history=history.slice(0,3);
     let cur=history[0]||null,prev=history[1]||null,prior=history[2]||null;
     let rows=seed.map(r=>({...r,
-      currentPricing:cur&&Object.prototype.hasOwnProperty.call(cur.values,r.rate)?Number(cur.values[r.rate]):Number(r.latest),
+      currentPricing:!hasLive?NaN:cur&&Object.prototype.hasOwnProperty.call(cur.values,r.rate)?Number(cur.values[r.rate]):(r.latest==null?NaN:Number(r.latest)),
       previousPricing:prev&&Object.prototype.hasOwnProperty.call(prev.values,r.rate)?Number(prev.values[r.rate]):NaN,
       priorPricing:prior&&Object.prototype.hasOwnProperty.call(prior.values,r.rate)?Number(prior.values[r.rate]):NaN
     }));
@@ -425,6 +426,7 @@ function ratePolicyDelta(card,baseField){
 }
 function rateRepricing(card){
   let short=ratePolicyDelta(card,'previousPricing'),broad=ratePolicyDelta(card,'priorPricing'),signal=Number.isFinite(short)?short:0;
+  if(!card.live||!Number.isFinite(short))return {label:'INSUFFICIENT VERIFIED SNAPSHOTS',tone:'warn',short,broad};
   if(signal>.05)return {label:'HAWKISH REPRICING',tone:'good',short,broad};
   if(signal<-.05)return {label:'DOVISH REPRICING',tone:'bad',short,broad};
   return {label:'PRICING STABLE',tone:'warn',short,broad};
@@ -433,7 +435,7 @@ function ratesDesk(){
   let el=$('#rates');if(!el)return;
   if(!RATE_STATE){el.innerHTML='<div class="card"><h3>Interest Rate Probabilities</h3><div class="mini">Loading market-implied probabilities…</div></div>';return}
   let stamp=new Date(RATE_STATE.updatedAt||Date.now()).toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false});
-  el.innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB · RATES PROBABILITIES</div><h2>Prior Pricing → Previous Pricing → Current Market Expectation</h2><div class="mini" style="font-size:12px"><b>Current Market Expectation</b> = what the market prices now. <b>Previous Pricing</b> = the immediately preceding snapshot. <b>Prior Pricing</b> = the snapshot before that. The two Δ columns show exactly how much today's expectation moved versus each of the last two observations.</div></div><div class="rates-status"><div><b>${RATE_STATE.mode==='live'?'LIVE / MARKET-IMPLIED':RATE_STATE.mode==='partial-live'?'PARTIAL LIVE · STALE VALUES WITHHELD':'REFERENCE SNAPSHOT'}</b><div class="mini">This is market pricing, not the central bank's official forecast or decision.</div></div><div class="mini" style="text-align:right">Current snapshot ${esc(stamp)} · Prilep, Macedonia<br>Snapshots are stored locally in this browser.</div></div><div class="rates-grid">${(RATE_STATE.cards||[]).map(card=>{let read=rateRepricing(card),short=Number.isFinite(read.short)?rateDeltaFmt(read.short):'—',broad=Number.isFinite(read.broad)?rateDeltaFmt(read.broad):'—';return `<div class="rate-card"><div class="rate-head"><div><div class="rate-bank">${esc(card.id)} · ${esc(card.ccy)}</div><b>${esc(card.name)} Interest Rate Probabilities</b><div class="mini" style="margin-top:4px">Policy rate now ${esc(card.current)} · Source ${esc(card.source)} ${card.live?'<span class="tag green">LIVE</span>':'<span class="tag red">LIVE DATA UNAVAILABLE</span>'}</div></div><div class="rate-meta">NEXT DECISION<br><b style="color:#ddd">${esc(card.nextMeeting)}</b></div></div><div style="overflow:auto"><div class="rate-table"><div class="rate-cell rate-colhead">Policy Outcome</div><div class="rate-cell rate-colhead">Prior Pricing</div><div class="rate-cell rate-colhead">Previous Pricing</div><div class="rate-cell rate-colhead">Current Pricing</div><div class="rate-cell rate-colhead">Δ vs Previous</div><div class="rate-cell rate-colhead">Δ vs Prior</div>${(card.rows||[]).map(r=>{let dp=Number(r.currentPricing)-Number(r.previousPricing),d2=Number(r.currentPricing)-Number(r.priorPricing),cp=dp>.0001?'pos':dp<-.0001?'neg':'flat',c2=d2>.0001?'pos':d2<-.0001?'neg':'flat';return `<div class="rate-cell">${rateOutcome(r)}</div><div class="rate-cell rate-prior">${rateProbFmt(r.priorPricing)}</div><div class="rate-cell">${rateProbFmt(r.previousPricing)}</div><div class="rate-cell rate-current-pricing">${rateProbFmt(r.currentPricing)}</div><div class="rate-cell rate-change ${Number.isFinite(dp)?cp:'flat'}">${rateDeltaFmt(dp)}</div><div class="rate-cell rate-change ${Number.isFinite(d2)?c2:'flat'}">${rateDeltaFmt(d2)}</div>`}).join('')}</div></div><div class="rate-read"><b class="${read.tone}">${read.label}</b> · latest policy repricing <b>${short}</b>${Number.isFinite(read.broad)?` · vs prior <b>${broad}</b>`:''}. <span class="muted">If both deltas point the same way, the repricing has continuity; if they conflict, the latest move may be a short-term reversal/spike.</span></div></div>`}).join('')}</div><div class="call" style="margin-top:8px"><b>Example:</b> HIKE 48.2% prior → 55.6% previous → 57.4% current means the hike probability strengthened across both snapshots. Δ vs Previous = +1.8pp; Δ vs Prior = +9.2pp. That is much stronger confirmation than seeing 57.4% in isolation.</div>`;
+  el.innerHTML=`<div class="weekhero"><div class="kicker">TRADINGLAB · RATES PROBABILITIES</div><h2>Prior Pricing → Previous Pricing → Current Market Expectation</h2><div class="mini" style="font-size:12px"><b>Current Market Expectation</b> = what the market prices now. <b>Previous Pricing</b> = the immediately preceding snapshot. <b>Prior Pricing</b> = the snapshot before that. The two Δ columns show exactly how much today's expectation moved versus each of the last two observations.</div></div><div class="rates-status"><div><b>${RATE_STATE.mode==='live'?'LIVE / MARKET-IMPLIED':RATE_STATE.mode==='partial-live'?'PARTIAL LIVE · STALE VALUES WITHHELD':'LIVE DATA UNAVAILABLE'}</b><div class="mini">This is market pricing, not the central bank's official forecast or decision.</div></div><div class="mini" style="text-align:right">Current snapshot ${esc(stamp)} · Prilep, Macedonia<br>Snapshots are stored locally in this browser.</div></div><div class="rates-grid">${(RATE_STATE.cards||[]).map(card=>{let read=rateRepricing(card),short=Number.isFinite(read.short)?rateDeltaFmt(read.short):'—',broad=Number.isFinite(read.broad)?rateDeltaFmt(read.broad):'—';return `<div class="rate-card"><div class="rate-head"><div><div class="rate-bank">${esc(card.id)} · ${esc(card.ccy)}</div><b>${esc(card.name)} Interest Rate Probabilities</b><div class="mini" style="margin-top:4px">Policy rate now ${esc(card.current)} · Source ${esc(card.source)} ${card.live?'<span class="tag green">LIVE</span>':'<span class="tag red">LIVE DATA UNAVAILABLE</span>'}</div></div><div class="rate-meta">NEXT DECISION<br><b style="color:#ddd">${esc(card.nextMeeting)}</b></div></div><div style="overflow:auto"><div class="rate-table"><div class="rate-cell rate-colhead">Policy Outcome</div><div class="rate-cell rate-colhead">Prior Pricing</div><div class="rate-cell rate-colhead">Previous Pricing</div><div class="rate-cell rate-colhead">Current Pricing</div><div class="rate-cell rate-colhead">Δ vs Previous</div><div class="rate-cell rate-colhead">Δ vs Prior</div>${(card.rows||[]).map(r=>{let dp=Number(r.currentPricing)-Number(r.previousPricing),d2=Number(r.currentPricing)-Number(r.priorPricing),cp=dp>.0001?'pos':dp<-.0001?'neg':'flat',c2=d2>.0001?'pos':d2<-.0001?'neg':'flat';return `<div class="rate-cell">${rateOutcome(r)}</div><div class="rate-cell rate-prior">${rateProbFmt(r.priorPricing)}</div><div class="rate-cell">${rateProbFmt(r.previousPricing)}</div><div class="rate-cell rate-current-pricing">${rateProbFmt(r.currentPricing)}</div><div class="rate-cell rate-change ${Number.isFinite(dp)?cp:'flat'}">${rateDeltaFmt(dp)}</div><div class="rate-cell rate-change ${Number.isFinite(d2)?c2:'flat'}">${rateDeltaFmt(d2)}</div>`}).join('')}</div></div><div class="rate-read"><b class="${read.tone}">${read.label}</b> · latest policy repricing <b>${short}</b>${Number.isFinite(read.broad)?` · vs prior <b>${broad}</b>`:''}. <span class="muted">If both deltas point the same way, the repricing has continuity; if they conflict, the latest move may be a short-term reversal/spike.</span></div></div>`}).join('')}</div><div class="call" style="margin-top:8px"><b>Example:</b> HIKE 48.2% prior → 55.6% previous → 57.4% current means the hike probability strengthened across both snapshots. Δ vs Previous = +1.8pp; Δ vs Prior = +9.2pp. That is much stronger confirmation than seeing 57.4% in isolation.</div>`;
 }
 
 function applyVerifiedRateUpdates(payload){return payload}
@@ -792,7 +794,7 @@ function mergeEconHistory(staticPts,dynamicPts){
 function observationMonthKey(v){let s=String(v||'');return /^\d{4}-\d{2}/.test(s)?s.slice(0,7):s}
 function coverageInfo(points,id){
  let p=points||[],months=[...new Set(p.map(x=>observationMonthKey(x[0])).filter(Boolean))],latest=p.length?String(p[p.length-1][0]):'';
- let quarterly=/gdp/i.test(id)||months.length<=3&&p.length<=3;
+ let quarterly=/gdp/i.test(id);
  let required=quarterly?2:6;
  let complete=months.length>=required;
  return {count:months.length,required,complete,latest,quarterly};
@@ -937,7 +939,7 @@ async function terminalHealthPulse(){
 }
 window.addEventListener('error',e=>moduleFailure('Unhandled browser error',e.error||new Error(e.message)));
 window.addEventListener('unhandledrejection',e=>moduleFailure('Unhandled promise rejection',e.reason||new Error('Promise rejected')));
-async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);saveCalendarMacro(rawLiveReleaseObjects());sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Seed mode · provider not connected';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · seed mode';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
+async function loadLive(manual=false){let dot=$('#dot');try{let r=await fetch('/api/calendar',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);let d=await r.json();liveEvents=(d.events||[]).map(normalizeEvent);detectReleaseChanges(liveEvents);saveCalendarMacro(rawLiveReleaseObjects());sourceMode=d.mode||'live';$('#feedMode').textContent=sourceMode==='live'?'Live provider connected':'Archived schedule · live provider unavailable';dot.className='live-dot '+(sourceMode==='live'?'on':'');$('#lastSync').textContent='Last sync: '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Skopje',hour12:false})+' Prilep, Macedonia';render()}catch(e){sourceMode='seed';$('#feedMode').textContent='Feed unavailable · archived data';dot.className='live-dot err';$('#lastSync').textContent='Last check failed';if(manual)console.error(e);render()}}
 function normalizeEvent(x){return {date:x.date||x.Date||'',time:x.time||x.Time||'',currency:x.currency||x.Currency||countryToCcy(x.country||x.Country),event:x.event||x.Event||x.Category||'',previous:x.previous??x.Previous??'—',forecast:x.forecast??x.Forecast??'—',actual:x.actual??x.Actual??'—',importance:x.importance??x.Importance??'',impact:x.impact||inferImpact(x),label:x.label||x.surprise||inferSurprise(x),releaseState:x.releaseState||'scheduled',checkedAt:x.checkedAt||null}}
 function countryToCcy(c){c=String(c||'').toLowerCase();let m={"united states":"USD","euro area":"EUR","european union":"EUR","united kingdom":"GBP","japan":"JPY","switzerland":"CHF","australia":"AUD","new zealand":"NZD","canada":"CAD","sweden":"SEK","norway":"NOK"};return m[c]||''}
 function num(v){if(v==null)return NaN;let s=String(v).replace(/[^0-9+-.]/g,'');return Number(s)}
