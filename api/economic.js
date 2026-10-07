@@ -1,6 +1,6 @@
-import {COUNTRIES,fetchEconomicCalendar} from '../lib/economic-provider.mjs';
 const memory=new Map();
 export default async function handler(req,res){
+ const {COUNTRIES,fetchEconomicCalendar}=await import('../lib/economic-provider.mjs');
  const ccy=String(req.query?.currency||'USD').toUpperCase(),months=Number(req.query?.months||6);
  res.setHeader('Cache-Control','no-store');
  if(!COUNTRIES[ccy]||![3,6,12].includes(months))return res.status(400).json({mode:'invalid-query',events:[],error:'Supported currency and 3, 6 or 12 months required.'});

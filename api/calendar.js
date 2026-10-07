@@ -1,4 +1,3 @@
-import {COUNTRIES,fetchEconomicCalendar} from '../lib/economic-provider.mjs';
 const FF_THIS_WEEK=[
   'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
   'https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.json'
@@ -325,6 +324,7 @@ async function fetchCalendar(url){
 }
 
 export default async function handler(req,res){
+ const {COUNTRIES,fetchEconomicCalendar}=await import('../lib/economic-provider.mjs');
   res.setHeader('Cache-Control','no-store, max-age=0');
   const checkedAt=new Date().toISOString();
   try{
