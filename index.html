@@ -709,6 +709,7 @@ function parseActualNumber(v,mode){
 function monthKeyFromDate(d){let x=String(d||'').slice(0,7);return /^\d{4}-\d{2}$/.test(x)?x:''}
 function prevMonthKey(m){let [y,mo]=String(m).split('-').map(Number);mo--;if(mo<1){mo=12;y--}return y+'-'+String(mo).padStart(2,'0')}
 function dynamicIndicatorSeries(ccy,def){
+ if(!def||!(def.re instanceof RegExp))return [];
  let out=[],sources=[...(MANUAL_CATALYSTS||[]),...(typeof VERIFIED_OVERRIDES!=='undefined'?(VERIFIED_OVERRIDES||[]):[])];
  for(const u of sources){
   if((u.ccy||u.currency)!==ccy||!def.re.test(String(u.event||'')))continue;
