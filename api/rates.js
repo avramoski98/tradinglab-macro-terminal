@@ -98,7 +98,7 @@ async function fetchBankFromRoot(bank,index,rootText,rootError){
     if(!rootText)throw rootError||new Error('Central dashboard unavailable');
     const section=bankSection(rootText,bank,index);
     const sourceDate=parseSourceDate(rootText);
-    if(!sourceDate||Date.now()-Date.parse(sourceDate)>3*86400000)throw new Error('Source timestamp missing or older than three days');
+    if(!sourceDate||Date.now()-Date.parse(sourceDate)>36*60*60*1000)throw new Error('Source timestamp missing or older than 36 hours');
     const probabilities=parseProbabilities(section);
     if(!probabilities)throw new Error('Probability block not published for this bank');
     return {
