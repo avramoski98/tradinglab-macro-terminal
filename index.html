@@ -657,7 +657,7 @@ function econMonth(v){if(!v)return'—';let [y,m,d]=String(v).split('-'),n=['Jan
 function econPeriodShort(v){if(!v)return'—';let [y,m]=String(v).split('-'),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return (n[+m-1]||m)}
 function econReleaseParts(pt){
  if(!pt)return{period:'—',release:'—'};
- return {period:'Released '+econPeriodShort(pt[0]),release:pt[2]?econMonth(pt[2]):'date unavailable'};
+ return {period:'Period '+econPeriodShort(pt[0]),release:pt[2]?'Published '+econMonth(pt[2]):'release date unavailable'};
 }
 function econReleaseLabel(pt){
  let x=econReleaseParts(pt);return x.period+' · '+x.release;
@@ -703,14 +703,14 @@ function econTrendSection(id){
    +'<td><div class="trend-num">'+fmtTrendVal(cfg,last?.[1])+'</div><div class="mini">'+(last?econMonth(last[0]):'—')+'</div></td>'
    +'<td>'+deltaText(cfg,d1)+'</td><td>'+deltaText(cfg,d3)+'</td><td>'+deltaText(cfg,d6)+'</td>'
    +'<td><span class="trend-state '+state.cls+'">'+state.label+'</span></td>'
-   +'<td><span class="tag '+(cov.complete?'green':'red')+'">'+(cov.complete?'6M COMPLETE':'INCOMPLETE '+cov.count+'/'+cov.required)+'</span></td>'
+   +'<td><span class="tag '+(cov.complete?'green':'red')+'">'+(cov.complete?(cov.quarterly?'2Q VERIFIED':'6M VERIFIED'):'UNVERIFIED '+cov.count+'/'+cov.required)+'</span></td>'
    +'<td><div class="trend-num">'+(last?econReleaseLabel(last):'—')+'</div><div class="mini"><span class="tag '+fresh.tone+'">'+fresh.label+'</span></div></td>'
    +'<td>'+sparkSvg(p)+'</td><td><div class="trend-num" style="color:#ffb000">'+focusText+'</div><div class="mini">'+view.toUpperCase()+' focus</div></td></tr>';
  }).join('');
  el.innerHTML='<div class="trend-hero"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+cfg.title+'</h2><div class="mini" style="font-size:12px">'+cfg.subtitle+'</div></div>'
   +'<div class="trend-tabs">'+tabs+'</div>'+topSummary(cfg)
   +'<div class="trend-table"><table><thead><tr><th>CCY / Metric</th><th>Latest</th><th>Latest Δ</th><th>3M Δ</th><th>6M Δ</th><th>Trend</th><th>Coverage</th><th>Last Update</th><th>History</th><th>Selected</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
-  +'<div class="trend-note"><span class="trend-source">DATA:</span> '+cfg.source+' · Minimum coverage rule is enforced: monthly series require at least 6 verified observations; quarterly series require at least 2 quarters covering the same window. LAST UPDATE and freshness are shown explicitly. No interpolation or fabricated values are used.</div>';
+  +'<div class="trend-note"><span class="trend-source">DATA:</span> '+cfg.source+' · Coverage requires 6 monthly or 2 quarterly source-verified observations with release dates. Archived values are shown for research but never count as verified. LAST UPDATE is unknown when a source release date is missing.</div>';
  el.querySelectorAll('.trend-tab').forEach(b=>b.addEventListener('click',()=>{TREND_VIEW[id]=b.dataset.view;econTrendSection(id)}));
 }
 function inflationTrends(){econTrendSection('inflation')}
@@ -751,12 +751,12 @@ function dynamicIndicatorSeries(ccy,def){
   if((u.ccy||u.currency)!==ccy||!def.re.test(String(u.event||'')))continue;
   let v=parseActualNumber(u.actual,def.mode||'first'),period=dataPeriodFromRelease(u,def),releaseDate=String(u.date||'').slice(0,10);
   if(!period||!Number.isFinite(v))continue;
-  out.push([period,v,releaseDate]);
+  out.push([period,v,releaseDate,u.verificationStatus==='verified-primary'&&u.sourceUrl?'verified-primary':null]);
   let pv=parseActualNumber(u.previous,def.mode||'first'),pm=prevMonthKey(period);
-  if(Number.isFinite(pv))out.push([pm,pv,null]);
+  if(Number.isFinite(pv))out.push([pm,pv,null,null]);
  }
  out.sort((a,b)=>a[0].localeCompare(b[0]));
- let seen=new Map();for(const p of out){let old=seen.get(p[0]);if(!old||p[2])seen.set(p[0],p)}
+ let seen=new Map();for(const p of out){let old=seen.get(p[0]);if(!old||(p[3]&&!old[3])||(!old[2]&&p[2]))seen.set(p[0],p)}
  return [...seen.values()];
 }
 const ECON_STATIC_HISTORY={
@@ -801,31 +801,38 @@ function mergeEconHistory(staticPts,dynamicPts){
  let seen=new Map();
  for(const p of [...(staticPts||[]),...(dynamicPts||[])]){
   if(!p||p[0]==null||!Number.isFinite(Number(p[1])))continue;
-  let row=[String(p[0]),Number(p[1]),p[2]||null],old=seen.get(String(p[0]));
-  if(!old||row[2])seen.set(String(p[0]),row);
+  let row=[String(p[0]),Number(p[1]),p[2]||null,p[3]||null],old=seen.get(String(p[0]));
+  if(!old||(row[3]&&!old[3])||(!old[2]&&row[2]))seen.set(String(p[0]),row);
  }
  return [...seen.values()].sort((a,b)=>a[0].localeCompare(b[0]));
 }
 function observationMonthKey(v){let s=String(v||'');return /^\d{4}-\d{2}/.test(s)?s.slice(0,7):s}
 function coverageInfo(points,id){
- let p=points||[],months=[...new Set(p.map(x=>observationMonthKey(x[0])).filter(Boolean))],latest=p.length?String(p[p.length-1][0]):'';
- let quarterly=/gdp/i.test(id);
- let required=quarterly?2:6;
- let complete=months.length>=required;
- return {count:months.length,required,complete,latest,quarterly};
+ const p=points||[],quarterly=/gdp|quarterly|q\/q/i.test(id),required=quarterly?2:6;
+ const verified=p.filter(x=>x&&x[3]==='verified-primary'&&Number.isFinite(Number(x[1]))&&Number.isFinite(Date.parse(x[2]))&&Date.parse(x[2])<=Date.now());
+ const periods=[...new Set(verified.map(x=>observationMonthKey(x[0])).filter(Boolean))].sort();
+ const available=[...new Set(p.map(x=>observationMonthKey(x[0])).filter(Boolean))].length;
+ const now=new Date(),nowMonth=now.getUTCFullYear()*12+now.getUTCMonth()+1;
+ const lastMonth=periods.length?monthNum(periods[periods.length-1]):null;
+ const recent=lastMonth!==null&&nowMonth-lastMonth<=(quarterly?6:3);
+ const span=periods.length?lastMonth-monthNum(periods[0]):0;
+ const complete=periods.length>=required&&recent&&span>=(quarterly?3:5);
+ const dates=verified.map(x=>x[2]).sort();
+ return {count:periods.length,available,required,complete,latest:dates.at(-1)||null,quarterly};
 }
 function freshnessInfo(latest){
- if(!latest)return {label:'NO DATA',tone:'red',days:null};
- let s=String(latest),date=/^\d{4}-\d{2}$/.test(s)?new Date(s+'-28T12:00:00Z'):new Date(s.length===10?s+'T12:00:00Z':s);
- if(!Number.isFinite(date.getTime()))return {label:'UNKNOWN',tone:'amber',days:null};
- let days=Math.max(0,Math.floor((Date.now()-date.getTime())/86400000)),label=days<=45?'FRESH':days<=75?'WATCH':'STALE';
+ if(!latest)return {label:'UNVERIFIED',tone:'amber',days:null};
+ const d=new Date(latest);
+ if(!Number.isFinite(d.getTime()))return {label:'UNKNOWN',tone:'amber',days:null};
+ const days=Math.max(0,Math.floor((Date.now()-d.getTime())/86400000));
+ const label=days<=45?'FRESH':days<=75?'WATCH':'STALE';
  return {label,tone:label==='FRESH'?'green':label==='WATCH'?'amber':'red',days};
 }
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
   let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=dynamicIndicatorSeries(ccy,d),p=d.primary?mergeEconHistory(base?.p||[],dyn):mergeEconHistory(st?.p||[],dyn);
-  let coverage=coverageInfo(p,d.id),freshness=freshnessInfo(coverage.latest);
+  let coverage=coverageInfo(p,d.primary?(base?.metric||d.id):(st?.label||d.id)),freshness=freshnessInfo(coverage.latest);
   out.push({
    id:d.id,
    label:d.primary?(base?.metric||d.label):(st?.label||d.label),
@@ -883,15 +890,15 @@ function economicTrends(){
  let cats=[['inflation','Inflation'],['labor','Labor'],['growth','Growth']].map(x=>'<button class="econ-cat '+(cat===x[0]?'on':'')+'" data-cat="'+x[0]+'">'+x[1]+'</button>').join('');
  let focuses=['latest','1m','3m','6m'].map(v=>'<button class="econ-focus '+(focus===v?'on':'')+'" data-focus="'+v+'">'+v.toUpperCase()+'</button>').join('');
  let allIndicators=econIndicatorList(ccy,cat);
- let inds=allIndicators.map(x=>'<button class="econ-indicator '+(ind&&x.id===ind.id?'on':'')+'" data-ind="'+x.id+'">'+esc(x.label)+' · '+(x.coverage.complete?'6M ✓':x.coverage.count+'/'+x.coverage.required)+'</button>').join('');
+ let inds=allIndicators.map(x=>'<button class="econ-indicator '+(ind&&x.id===ind.id?'on':'')+'" data-ind="'+x.id+'">'+esc(x.label)+' · '+(x.coverage.complete?(x.coverage.quarterly?'2Q ✓':'6M ✓'):x.coverage.count+'/'+x.coverage.required)+'</button>').join('');
  let completeCount=allIndicators.filter(x=>x.coverage.complete).length;
- let coverageText=completeCount+'/'+allIndicators.length+' indicators 6M complete';
+ let coverageText=completeCount+'/'+allIndicators.length+' indicators verified coverage complete';
  let deltaFmt=d=>{if(!d)return'—';let suf=ind.unit==='%'?'pp':ind.unit==='K'?'K':ind.unit==='M'?'M':' pts';return(d.v>0?'+':'')+d.v.toFixed(ind.decimals)+suf};
  el.innerHTML='<div class="econ-header"><div class="kicker">TRADINGLAB · ECONOMIC TRENDS</div><h2 style="margin:3px 0 7px;font-size:17px">'+ccy+' · '+(cat==='inflation'?'Inflation':cat==='labor'?'Labor':'Growth')+'</h2><div class="mini" style="font-size:12px">Country-first macro history · minimum 6M coverage rule · every indicator shows coverage + last update.</div><div class="mini" style="margin-top:5px"><b>'+esc(coverageText)+'</b></div></div>'
  +'<div class="econ-countrybar">'+countries+'</div><div class="trend-toolbar"><div class="trend-actions">'+cats+'</div><div class="trend-actions">'+focuses+'</div></div>'
  +'<div class="econ-countrybar">'+inds+'</div>'
  +'<div class="econ-summary"><div><div class="k">Indicator</div><div class="v">'+esc(ind?.label||'—')+'</div></div><div><div class="k">Latest</div><div class="v">'+(last?fmtIndVal(ind,last[1]):'—')+'</div></div><div><div class="k">Previous</div><div class="v">'+(prev?fmtIndVal(ind,prev[1]):'—')+'</div></div><div><div class="k">1M Δ</div><div class="v">'+deltaFmt(d1)+'</div></div><div><div class="k">3M Δ</div><div class="v">'+deltaFmt(d3)+'</div></div><div><div class="k">6M / Trend</div><div class="v '+tr.cls+'">'+tr.label+'</div></div></div>'
- +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">'+(last?econReleaseLabel(last):'NO RELEASE DATA')+' · '+(ind?.freshness?.label||'NO DATA')+' · COVERAGE '+(ind?.coverage?.count||0)+'/'+(ind?.coverage?.required||6)+' · selected '+focus.toUpperCase()+'</div><div class="mini" style="margin-top:3px">TERMINAL CHECKED: '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep</div></div><div><span class="econ-badge">'+(ind?.coverage?.complete?'6M COMPLETE':'INCOMPLETE')+' · '+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart only plots dated verified observations. Minimum rule: six monthly observations are required for monthly indicators; quarterly indicators must cover at least two quarters. Missing history is marked INCOMPLETE and is never fabricated.</div></div>';
+ +'<div class="econ-chart-card"><div class="econ-chart-title"><div><h3>'+esc(ind?.label||'Economic indicator')+'</h3><div class="mini">'+(last?econReleaseLabel(last):'NO RELEASE DATA')+' · '+(ind?.freshness?.label||'NO DATA')+' · COVERAGE '+(ind?.coverage?.count||0)+'/'+(ind?.coverage?.required||6)+' · selected '+focus.toUpperCase()+'</div><div class="mini" style="margin-top:3px">TERMINAL CHECKED: '+new Date().toLocaleString('en-GB',{timeZone:'Europe/Skopje',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' Prilep</div></div><div><span class="econ-badge">'+(ind?.coverage?.complete?(ind.coverage.quarterly?'2Q VERIFIED':'6M VERIFIED'):'UNVERIFIED')+' · '+econFocusValue(cat,p,focus,ind)+'</span></div></div><div class="barwrap">'+econBarSvg(cat,p,ind)+'</div><div class="econ-note"><span class="trend-source">DATA:</span> '+esc(ind?.source||'Verified terminal releases')+' · The chart can show archival observations for context; only source-verified dated observations count toward coverages. Minimum rule: six monthly observations are required for monthly indicators; quarterly indicators must cover at least two quarters. Missing history is marked INCOMPLETE and is never fabricated.</div></div>';
  el.querySelectorAll('.econ-ccy').forEach(b=>b.addEventListener('click',()=>{ECON_UI.ccy=b.dataset.ccy;economicTrends()}));
  el.querySelectorAll('.econ-cat').forEach(b=>b.addEventListener('click',()=>{ECON_UI.cat=b.dataset.cat;economicTrends()}));
  el.querySelectorAll('.econ-focus').forEach(b=>b.addEventListener('click',()=>{ECON_UI.focus=b.dataset.focus;economicTrends()}));
