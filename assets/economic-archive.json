@@ -2742,13 +2742,18 @@
         "actual": 6.9,
         "reference": "2026-04",
         "referenceDate": "2026-04-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-05-08",
         "unit": "%",
-        "source": "BLS, Eurostat, ONS, Statistics Bureau Japan, SECO, Statistics Canada, ABS, Stats NZ, Statistics Sweden and Statistics Norway; cross-checked with secondary release histories.",
+        "source": "Statistics Canada",
         "forecast": null,
         "previous": null,
-        "sourceUpdatedAt": null,
-        "verificationStatus": "legacy-unverified"
+        "sourceUpdatedAt": "2026-05-08T00:00:00Z",
+        "verificationStatus": "verified-primary",
+        "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260508/dq260508a-eng.htm",
+        "verifiedAt": "2026-10-09T14:53:50Z",
+        "releaseTimeKnown": false,
+        "rawActual": "6.9%",
+        "stage": "published"
       },
       {
         "category": "labor",
@@ -2756,13 +2761,18 @@
         "actual": 6.6,
         "reference": "2026-05",
         "referenceDate": "2026-05-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-06-05",
         "unit": "%",
-        "source": "BLS, Eurostat, ONS, Statistics Bureau Japan, SECO, Statistics Canada, ABS, Stats NZ, Statistics Sweden and Statistics Norway; cross-checked with secondary release histories.",
+        "source": "Statistics Canada",
         "forecast": null,
         "previous": null,
-        "sourceUpdatedAt": null,
-        "verificationStatus": "legacy-unverified"
+        "sourceUpdatedAt": "2026-06-05T00:00:00Z",
+        "verificationStatus": "verified-primary",
+        "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260605/dq260605a-eng.htm",
+        "verifiedAt": "2026-10-09T14:53:50Z",
+        "releaseTimeKnown": false,
+        "rawActual": "6.6%",
+        "stage": "published"
       },
       {
         "category": "labor",
@@ -2770,13 +2780,18 @@
         "actual": 6.5,
         "reference": "2026-06",
         "referenceDate": "2026-06-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-07-10",
         "unit": "%",
-        "source": "BLS, Eurostat, ONS, Statistics Bureau Japan, SECO, Statistics Canada, ABS, Stats NZ, Statistics Sweden and Statistics Norway; cross-checked with secondary release histories.",
+        "source": "Statistics Canada",
         "forecast": null,
         "previous": null,
-        "sourceUpdatedAt": null,
-        "verificationStatus": "legacy-unverified"
+        "sourceUpdatedAt": "2026-07-10T00:00:00Z",
+        "verificationStatus": "verified-primary",
+        "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260710/dq260710a-eng.htm",
+        "verifiedAt": "2026-10-09T14:53:50Z",
+        "releaseTimeKnown": false,
+        "rawActual": "6.5%",
+        "stage": "published"
       },
       {
         "category": "labor",
@@ -2784,13 +2799,18 @@
         "actual": 6.4,
         "reference": "2026-07",
         "referenceDate": "2026-07-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-08-07",
         "unit": "%",
-        "source": "BLS, Eurostat, ONS, Statistics Bureau Japan, SECO, Statistics Canada, ABS, Stats NZ, Statistics Sweden and Statistics Norway; cross-checked with secondary release histories.",
+        "source": "Statistics Canada",
         "forecast": null,
         "previous": null,
-        "sourceUpdatedAt": null,
-        "verificationStatus": "legacy-unverified"
+        "sourceUpdatedAt": "2026-08-07T00:00:00Z",
+        "verificationStatus": "verified-primary",
+        "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260807/dq260807a-eng.htm",
+        "verifiedAt": "2026-10-09T14:53:50Z",
+        "releaseTimeKnown": false,
+        "rawActual": "6.4%",
+        "stage": "published"
       },
       {
         "category": "labor",
@@ -2807,9 +2827,9 @@
         "verificationStatus": "verified-primary",
         "rawActual": "6.4%",
         "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260904/dq260904a-eng.htm",
-        "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
+        "verifiedAt": "2026-10-09T14:53:50Z",
         "releaseTimeKnown": false,
-        "stage": "final",
+        "stage": "published",
         "surprise": null
       },
       {
@@ -2900,6 +2920,23 @@
         "sourceUpdatedAt": "2026-08-28T00:00:00Z",
         "verifiedAt": "2026-10-07T19:17:40.319736+00:00",
         "verificationStatus": "verified-primary",
+        "stage": "published"
+      },
+      {
+        "category": "labor",
+        "event": "Unemployment rate · SA",
+        "actual": 6.5,
+        "reference": "2026-09",
+        "referenceDate": "2026-09-01T00:00:00Z",
+        "unit": "%",
+        "releaseDate": "2026-10-09",
+        "source": "Statistics Canada",
+        "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/261009/dq261009a-eng.htm",
+        "sourceUpdatedAt": "2026-10-09T00:00:00Z",
+        "verificationStatus": "verified-primary",
+        "verifiedAt": "2026-10-09T14:53:50Z",
+        "releaseTimeKnown": false,
+        "rawActual": "6.5%",
         "stage": "published"
       }
     ],
@@ -4226,10 +4263,10 @@
     ]
   },
   "audit": {
-    "checkedAt": "2026-10-09T10:00:00Z",
+    "checkedAt": "2026-10-09T14:53:50Z",
     "cutoff": "2026-10-09",
-    "scope": "Official NOK September CPI/CPI-ATE and JPY August real household expenditure verified and appended; other legacy observations still unverified.",
-    "verified": 91,
-    "total": 261
+    "scope": "Statistics Canada unemployment Apr-Sep verified from six official monthly releases; remaining legacy observations not verified.",
+    "verified": 96,
+    "total": 262
   }
 }
