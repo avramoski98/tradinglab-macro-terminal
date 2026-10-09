@@ -145,7 +145,7 @@ export default async function handler(req,res){
   const sourceUpdatedAt=parseSourceDate(rootText);
   return res.status(200).json({
     mode:liveCount===cards.length?'live':liveCount?'partial-live':'unavailable',
-    snapshot:checkedAt.slice(0,10),
+    snapshot:sourceUpdatedAt?sourceUpdatedAt.slice(0,10):null,
     updatedAt:checkedAt,
     sourceUpdatedAt:parseSourceDate(rootText),
     freshnessSeconds:sourceUpdatedAt?Math.max(0,Math.floor((Date.now()-Date.parse(sourceUpdatedAt))/1000)):null,
