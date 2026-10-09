@@ -1,4 +1,3 @@
-import legacyHandler from '../lib/calendar-legacy.mjs';
 
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-09T15:45:00Z';
@@ -46,6 +45,7 @@ export function applyVerifiedReleaseOverlay(payload){
   releaseOverlayVerifiedAt:VERIFIED_AT};
 }
 export default async function handler(req,res){
+ const {default:legacyHandler}=await import('../lib/calendar-legacy.mjs');
  const proxy={
   setHeader:(...args)=>res.setHeader(...args),
   status(code){res.status(code);return this;},
