@@ -11,7 +11,7 @@ test('rates accept markdown fixture, reject invalid probability totals',()=>{con
 const html=fs.readFileSync('index.html','utf8'),inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
 test('main terminal inline scripts all parse',()=>{for(const x of inline)new vm.Script(x[1]);});
 test('monthly coverage cannot be mislabeled quarterly',()=>{const a=html.slice(html.indexOf('function observationMonthKey'),html.indexOf('function freshnessInfo'));vm.runInContext(a,ctx);const c=ctx.coverageInfo([['2026-08',1],['2026-09',2]],'claims');assert.equal(c.required,6);assert.equal(c.complete,false);});
-test('null rates do not display 0%',()=>{const a=html.slice(html.indexOf('function rateProbFmt'),html.indexOf('function rateSnapshot'));vm.runInContext(a,ctx);assert.equal(ctx.rateProbFmt(null),'—');assert.equal(ctx.rateProbFmt(0),'0.00%');assert.deepEqual(JSON.parse(JSON.stringify(ctx.rateValues([{rate:'2%',latest:null}],'latest'))),{});});
+test('null rates do not display 0%',()=>{const a=html.slice(html.indexOf('function finiteRate'),html.indexOf('function rateSnapshot'));vm.runInContext(a,ctx);assert.equal(ctx.rateProbFmt(null),'—');assert.equal(ctx.rateProbFmt(0),'0.00%');assert.deepEqual(JSON.parse(JSON.stringify(ctx.rateValues([{rate:'2%',latest:null}],'latest'))),{});});
 test('bank sections never borrow another bank probabilities',()=>{const source=ctx.cleanText(fs.readFileSync('tests/fixtures/rates-source.txt','utf8'));const boj=ctx.parseProbabilities(ctx.bankSection(source,{name:'Bank of Japan'}));assert.equal(boj.hike,0);assert.equal(boj.hold,95.1);assert.equal(ctx.parseProbabilities(ctx.bankSection(source,{name:'Reserve Bank of New Zealand'})),null);assert.equal(ctx.bankSection(source,{name:'Bank of Canada'}),'');});
 test('verified snapshot has traceable, non-future observations and honest coverage totals',()=>{const d=JSON.parse(fs.readFileSync('assets/economic-archive.json')),rows=Object.values(d.currencies).flat(),verified=rows.filter(x=>x.verificationStatus==='verified-primary');assert.equal(d.audit.verified,verified.length);assert.equal(d.audit.total,rows.length);const keys=new Set();for(const x of verified){assert.ok(Number.isFinite(x.actual));assert.equal(new URL(x.sourceUrl).protocol,'https:');assert.ok(Date.parse(x.verifiedAt)<=Date.now());if(x.releaseDate)assert.ok(Date.parse(x.releaseDate)<=Date.now());assert.equal(x.forecast,null,'primary statistics do not supply verified market consensus');const key=[x.event,x.reference,x.source].join('|');assert.ok(!keys.has(key),key);keys.add(key)}for(const [c,rr] of Object.entries(d.currencies))assert.ok(rr.some(x=>x.verificationStatus==='verified-primary'&&/GDP/.test(x.event)),c+' GDP coverage');});
 test('reviewed calendar actuals preserve forecasts without claiming consensus verification',()=>{const context={Date,Intl,console,AbortSignal,process,setTimeout,clearTimeout};vm.createContext(context);vm.runInContext(fs.readFileSync('api/calendar.js','utf8').replace('export default async function','async function'),context);const result=context.applyPrimaryActuals([{date:'2026-10-07T01:30:00+02:00',currency:'JPY',event:'Labor Cash Earnings y/y',actual:'—',forecast:'3.3%',previous:'2.4%'}])[0];assert.equal(result.actual,'3.8%');assert.equal(result.forecast,'3.3%');assert.equal(result.verificationStatus,'verified-primary');assert.equal(result.forecastVerificationStatus,'provider-unverified');});
@@ -19,3 +19,21 @@ test('reviewed calendar actuals preserve forecasts without claiming consensus ve
 test('blank and future releases cannot create trading catalysts',()=>{const h=fs.readFileSync('index.html','utf8'),c={Date,liveEvents:[{date:'2099-01-01',actual:'100K',forecast:'50K'},{date:'2026-10-07T01:00:00Z',actual:'—',forecast:'90K'}],catalystKind:()=> 'NFP',catalystWeight:()=>3};vm.createContext(c);vm.runInContext(h.slice(h.indexOf('function num(v)'),h.indexOf('function inferSurprise')),c);vm.runInContext(h.slice(h.indexOf('function scoredLiveEvents()'),h.indexOf('function canonicalCatalystEvent')),c);assert.ok(Number.isNaN(c.num('—')));assert.ok(Number.isNaN(c.num('')));assert.equal(c.num('1.2M'),1200000);assert.equal(c.num('0.0%'),0);assert.equal(c.scoredLiveEvents().length,0);});
 
 test('history window includes midnight on its first day',()=>{const js=fs.readFileSync('assets/economic-data.js','utf8'),FakeDate=class extends Date{constructor(...args){super(...(args.length?args:['2026-10-07T19:00:00Z']))}},c={Date:FakeDate,state:{months:6,events:[{event:'CPI',actual:3,referenceDate:'2026-04-01T00:00:00Z'}]},matches:()=>true};vm.createContext(c);vm.runInContext(js.slice(js.indexOf('function visible()'),js.indexOf('function render()')),c);assert.equal(c.visible().length,1);});
+
+test('G10 coverage and freshness do not count undated archived values',()=>{
+ const c={Date,monthNum:(x)=>{const [y,m]=String(x).split('-').map(Number);return y*12+m;}};
+ vm.createContext(c);
+ vm.runInContext(html.slice(html.indexOf('function observationMonthKey'),html.indexOf('function econIndicatorList')),c);
+ const archive=Array.from({length:6},(_,i)=>['2026-'+String(i+4).padStart(2,'0'),2.5,null,null]);
+ assert.equal(c.coverageInfo(archive,'Headline CPI y/y').complete,false);
+ assert.equal(c.coverageInfo(archive,'Headline CPI y/y').count,0);
+ assert.equal(c.freshnessInfo(null).label,'UNVERIFIED');
+ assert.equal(c.coverageInfo([['2026-03',3,'2026-04-15T10:00:00Z','verified-primary'],['2026-06',4,'2026-07-15T10:00:00Z','verified-primary']],'Quarterly CPI y/y').required,2);
+});
+test('EIA published overrides remain secondary verified and USDA is not auto-released',()=>{
+ const c={Date,fetch:async()=>({ok:false}),console};vm.createContext(c);
+ vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
+ const rows=c.knownEiaRows();assert.equal(rows.length,2);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
+ assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&x.releaseState==='overdue'));
+});
