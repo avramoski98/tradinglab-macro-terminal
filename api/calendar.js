@@ -14,6 +14,11 @@ const VERIFIED=[
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/Prelim UoM (?:1-Yr )?Inflation Expectations/i,event:'Prelim UoM 1-Yr Inflation Expectations · Oct',actual:'4.7%',previous:'4.6%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'},
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/UoM 5-Yr Inflation Expectations/i,event:'Prelim UoM 5-Yr Inflation Expectations · Oct',actual:'3.5%',previous:'3.4%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'}
 ];
+const BLS_NEXT_WEEK=[
+ ['2026-10-14T14:30:00+02:00','Consumer Price Index · Sep','HIGH'],
+ ['2026-10-15T14:30:00+02:00','Producer Price Index · Sep','HIGH'],
+ ['2026-10-16T14:30:00+02:00','Import and Export Price Indexes · Sep','MED']
+];
 const rank={LOW:1,MED:2,HIGH:3,EXTREME:4};
 export function applyVerifiedReleaseOverlay(payload){
  if(!Array.isArray(payload?.events))return payload;
@@ -36,6 +41,11 @@ export function applyVerifiedReleaseOverlay(payload){
    forecastVerificationStatus:'provider-unverified'
   };
   if(i>=0)rows[i]=record;else rows.push(record);
+ }
+ for(const [date,event,importance] of BLS_NEXT_WEEK){
+   if(!rows.some(e=>e.currency==='USD'&&String(e.date||'').slice(0,10)===date.slice(0,10)&&
+     (event.startsWith('Consumer')?/CPI|Consumer Price Index/i.test(e.event):event.startsWith('Producer')?/PPI|Producer Price Index/i.test(e.event):/Import.*Export.*Price/i.test(e.event))))
+     rows.push({date,sourceDate:date,timeZone:'Europe/Skopje',country:'USD',currency:'USD',event,importance,previous:'—',forecast:'—',actual:'—',label:'Scheduled',impact:'Neutral',releaseState:Date.parse(date)>Date.now()?'scheduled':'overdue',source:'BLS official calendar',sourceUrl:'https://www.bls.gov/schedule/2026/home.htm',verificationStatus:'official-schedule'});
  }
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
  return {...payload,events:rows,
