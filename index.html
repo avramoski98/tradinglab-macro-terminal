@@ -706,9 +706,9 @@ function econTrendSection(id){
  let el=document.getElementById(id);if(!el)return;let cfg=ECON_TRENDS[id],view=TREND_VIEW[id]||'latest';
  let tabs=['latest','1m','3m','6m'].map(v=>'<button class="trend-tab '+(view===v?'on':'')+'" data-view="'+v+'">'+v.toUpperCase()+'</button>').join('');
  let rows=G10_ORDER.map(c=>{
-  let o=cfg.data[c],p=o?.p||[],last=p[p.length-1],d1=deltaFrom(p,1),d3=deltaFrom(p,3),d6=deltaFrom(p,6),state=semanticState(cfg,p),focus=view==='latest'?last?.[1]:view==='1m'?d1?.v:view==='3m'?d3?.v:d6?.v;
+  let o=cfg.data[c],category=id==='labortrends'?'labor':id==='growthtrends'?'growth':'inflation',verifiedSeries=econIndicatorList(c,category)[0],p=verifiedSeries?.p||o?.p||[],last=p[p.length-1],d1=deltaFrom(p,1),d3=deltaFrom(p,3),d6=deltaFrom(p,6),state=semanticState(cfg,p),focus=view==='latest'?last?.[1]:view==='1m'?d1?.v:view==='3m'?d3?.v:d6?.v;
   let focusText=view==='latest'?fmtTrendVal(cfg,focus):focus==null?'—':((focus>0?'+':'')+focus.toFixed(1)+(cfg.mode==='growth'?' pts':'pp'));
-  let cov=coverageInfo(p,o.metric||''),fresh=freshnessInfo(cov.latest);
+  let cov=coverageInfo(p,(c==='NZD'&&category==='labor'?'quarterly ':'')+(o.metric||'')),fresh=freshnessInfo(cov.latest);
   return '<tr><td><div class="trend-ccy">'+c+'</div><div class="trend-metric">'+esc(o.metric)+'</div></td>'
    +'<td><div class="trend-num">'+fmtTrendVal(cfg,last?.[1])+'</div><div class="mini">'+(last?econMonth(last[0]):'—')+'</div></td>'
    +'<td>'+deltaText(cfg,d1)+'</td><td>'+deltaText(cfg,d3)+'</td><td>'+deltaText(cfg,d6)+'</td>'
@@ -844,7 +844,7 @@ function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=ECON_INDICATOR_DEFS[cat],out=[];
  for(const d of defs){
   let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=mergeEconHistory(dynamicIndicatorSeries(ccy,d),verifiedArchiveSeries(ccy,cat,d)),p=d.primary?mergeEconHistory(base?.p||[],dyn):mergeEconHistory(st?.p||[],dyn);
-  let coverage=coverageInfo(p,d.primary?(base?.metric||d.id):(st?.label||d.id)),freshness=freshnessInfo(coverage.latest);
+  let coverage=coverageInfo(p,(ccy==='NZD'&&cat==='labor'&&d.id==='unemployment'?'quarterly ':'')+(d.primary?(base?.metric||d.id):(st?.label||d.id))),freshness=freshnessInfo(coverage.latest);
   out.push({
    id:d.id,
    label:d.primary?(base?.metric||d.label):(st?.label||d.label),
