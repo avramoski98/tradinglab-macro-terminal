@@ -7,16 +7,23 @@ const USDA_EVENTS=[
   ['2026-09-11','18:00','Crop Production','AGRI','HIGH','USDA NASS','Corn · Soybeans · Cotton · Wheat','Multi-metric report'],
   ['2026-09-11','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report'],
   ['2026-09-14','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
-  ['2026-09-17','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
+  ['2026-09-21','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
+  ['2026-09-28','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
   ['2026-09-18','21:00','Hop Stocks','SOFTS','LOW','USDA NASS','Hops','Stocks report'],
   ['2026-09-22','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report'],
   ['2026-09-24','21:00','Hogs and Pigs','LIVESTOCK','HIGH','USDA NASS','Lean Hogs','Inventory report'],
   ['2026-09-30','18:00','Grain Stocks','GRAINS','HIGH','USDA NASS','Corn · Wheat · Soybeans','Stocks by crop'],
   ['2026-09-30','18:00','Small Grains Summary','GRAINS','HIGH','USDA NASS','Wheat · Oats · Barley','Production report'],
+  ['2026-10-05','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
   ['2026-10-09','18:00','WASDE','AGRI','HIGH','USDA','Wheat · Corn · Soybeans · Cotton','Multi-metric report'],
   ['2026-10-09','18:00','Crop Production','AGRI','HIGH','USDA NASS','Corn · Soybeans · Cotton · Wheat','Multi-metric report'],
   ['2026-10-09','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report'],
+  ['2026-10-13','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
+  ['2026-10-19','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
   ['2026-10-22','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report'],
+  ['2026-10-26','21:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
+  ['2026-11-02','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
+  ['2026-11-09','22:00','Crop Progress','AGRI','MED','USDA NASS','Corn · Soybeans · Cotton · Wheat','Weekly progress/condition'],
   ['2026-11-10','18:00','WASDE','AGRI','HIGH','USDA','Wheat · Corn · Soybeans · Cotton','Multi-metric report'],
   ['2026-11-10','18:00','Crop Production','AGRI','HIGH','USDA NASS','Corn · Soybeans · Cotton · Wheat','Multi-metric report'],
   ['2026-11-10','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report'],
@@ -27,10 +34,42 @@ const USDA_EVENTS=[
   ['2026-12-22','18:00','Cotton Ginnings','COTTON','MED','USDA NASS','Cotton','Multi-metric report']
 ];
 
+
+/* Official USDA publication links. A report being published does not mean
+ * there is one numeric Actual for its multi-metric statistics. */
+const OFFICIAL_REPORTS={
+ '2026-09-11|WASDE':'https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report',
+ '2026-09-11|Crop Production':'https://www.nass.usda.gov/Newsroom/Executive_Briefings/index.php',
+ '2026-09-11|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings',
+ '2026-09-14|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress',
+ '2026-09-21|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress',
+ '2026-09-22|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings',
+ '2026-09-24|Hogs and Pigs':'https://www.nass.usda.gov/Newsroom/Executive_Briefings/index.php',
+ '2026-09-28|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress',
+ '2026-09-30|Grain Stocks':'https://esmis.nal.usda.gov/publication/grain-stocks/2026-09-30',
+ '2026-09-30|Small Grains Summary':'https://www.nass.usda.gov/Newsroom/Executive_Briefings/index.php',
+ '2026-10-05|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-05',
+ '2026-10-09|WASDE':'https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report',
+ '2026-10-09|Crop Production':'https://esmis.nal.usda.gov/publication/crop-production/2026-10-09',
+ '2026-10-09|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings/2026-10-09'
+};
+
 function num(v){if(v==null)return NaN;return Number(String(v).replace(/,/g,'').replace(/[^0-9+-.]/g,''));}
 function surprise(event,actual,forecast){const a=num(actual),f=num(forecast);if(!Number.isFinite(a)||!Number.isFinite(f))return'—';if(a===f)return'IN LINE';const lower=/crude oil inventories|natural gas storage|gasoline inventories/i.test(event);return lower?(a<f?'BULLISH':'BEARISH'):(a>f?'BEAT':'MISS');}
 function iso(date,time){const [y,m,day]=date.split('-').map(Number);const lastSunday=mo=>{const d=new Date(Date.UTC(y,mo+1,0));return d.getUTCDate()-d.getUTCDay()};const dst=(m>3&&m<10)||(m===3&&day>=lastSunday(2))||(m===10&&day<lastSunday(9));return `${date}T${time}:00${dst?'+02:00':'+01:00'}`;}
-function usdaRows(){const now=Date.now();return USDA_EVENTS.map(([date,time,event,category,importance,source,markets,format])=>{const released=now>=new Date(iso(date,time)).getTime();return {date:iso(date,time),timeZone:TARGET_TZ,country:'COM',currency:'COM',event,category,markets,importance,source,previous:'—',forecast:format,actual:'—',label:released?'UNVERIFIED':'PENDING',releaseState:released?'overdue':'scheduled',impact:'Report-driven',note:'USDA releases are multi-metric: production, yield, stocks, exports/imports and other crop-specific fields. There is no single CPI-style headline Actual.'};});}
+function usdaRows(){
+ const now=Date.now();
+ return USDA_EVENTS.map(([date,time,event,category,importance,source,markets,format])=>{
+  const releaseDate=iso(date,time),past=now>=new Date(releaseDate).getTime();
+  const sourceUrl=past?OFFICIAL_REPORTS[date+'|'+event]:null,published=Boolean(sourceUrl);
+  return {date:releaseDate,timeZone:TARGET_TZ,country:'COM',currency:'COM',event,category,markets,importance,source,
+   sourceUrl:sourceUrl||null,verificationStatus:published?'verified-primary':past?'unverified':'official-schedule',
+   lastUpdate:published?releaseDate:null,previous:'—',forecast:format,actual:'—',
+   label:published?'PUBLISHED':past?'UNVERIFIED':'PENDING',
+   releaseState:published?'released':past?'overdue':'scheduled',impact:'Report-driven',
+   note:published?'Official USDA publication verified. Multi-metric report; no single numeric Actual.':'USDA multi-metric report; a past scheduled time alone does not verify publication.'};
+ });
+}
 async function ff(url){try{const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'TradingLabMacroTerminal/5.1'},cache:'no-store'});if(!r.ok)return[];const j=await r.json();return Array.isArray(j)?j:[]}catch(e){return[]}}
 function energyRows(raw){return raw.filter(x=>/crude oil inventories|natural gas storage|gasoline inventories|distillate inventories/i.test(String(x.title||x.event||''))).map(x=>{const event=x.title||x.event||'';const actual=x.actual??'—',forecast=x.forecast??'—';return {date:x.date,country:'COM',currency:'COM',event:`EIA · ${event}`,category:/natural gas/i.test(event)?'ENERGY · GAS':'ENERGY · OIL',markets:/natural gas/i.test(event)?'Natural Gas':'WTI · Brent · Products',importance:/crude oil inventories|natural gas storage/i.test(event)?'HIGH':'MED',source:'ForexFactory / EIA',previous:x.previous??'—',forecast,actual,label:actual&&actual!=='—'?surprise(event,actual,forecast):(Date.parse(x.date)<Date.now()?'OVERDUE':'PENDING'),releaseState:actual&&actual!=='—'?'released':(Date.parse(x.date)<Date.now()?'overdue':'scheduled'),impact:'Inventory surprise',note:'Energy inventories support classic Previous / Forecast / Actual because the release has a single headline change.'};});}
 
