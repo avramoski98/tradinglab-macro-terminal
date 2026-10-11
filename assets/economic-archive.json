@@ -1319,7 +1319,7 @@
         "actual": 3,
         "reference": "2026-04",
         "referenceDate": "2026-04-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-05-20",
         "unit": "%",
         "source": "Eurostat",
         "forecast": null,
@@ -1331,7 +1331,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-20052026-ap"
       },
       {
         "category": "inflation",
@@ -1339,7 +1340,7 @@
         "actual": 3.2,
         "reference": "2026-05",
         "referenceDate": "2026-05-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-06-17",
         "unit": "%",
         "source": "Eurostat",
         "forecast": null,
@@ -1351,7 +1352,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17062026-ap"
       },
       {
         "category": "inflation",
@@ -1359,7 +1361,7 @@
         "actual": 2.8,
         "reference": "2026-06",
         "referenceDate": "2026-06-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-07-17",
         "unit": "%",
         "source": "Eurostat",
         "forecast": null,
@@ -1371,7 +1373,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17072026-ap"
       },
       {
         "category": "inflation",
@@ -1379,7 +1382,7 @@
         "actual": 2.9,
         "reference": "2026-07",
         "referenceDate": "2026-07-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-08-19",
         "unit": "%",
         "source": "Eurostat",
         "forecast": null,
@@ -1391,7 +1394,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-19082026-ap"
       },
       {
         "category": "inflation",
@@ -1399,7 +1403,7 @@
         "actual": 3.2,
         "reference": "2026-08",
         "referenceDate": "2026-08-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-09-17",
         "unit": "%",
         "source": "Eurostat",
         "forecast": null,
@@ -1411,7 +1415,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17092026-ap"
       },
       {
         "category": "inflation",
@@ -1580,10 +1585,11 @@
         "sourceUpdatedAt": "2026-10-02T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-05-20",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-20052026-ap"
       },
       {
         "event": "Core HICP y/y",
@@ -1600,10 +1606,11 @@
         "sourceUpdatedAt": "2026-10-02T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-06-17",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17062026-ap"
       },
       {
         "event": "Core HICP y/y",
@@ -1620,10 +1627,11 @@
         "sourceUpdatedAt": "2026-10-02T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-07-17",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17072026-ap"
       },
       {
         "event": "Core HICP y/y",
@@ -1640,10 +1648,11 @@
         "sourceUpdatedAt": "2026-10-02T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-08-19",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-19082026-ap"
       },
       {
         "event": "Core HICP y/y",
@@ -1660,10 +1669,11 @@
         "sourceUpdatedAt": "2026-10-02T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-09-17",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-17092026-ap"
       },
       {
         "event": "Core HICP y/y",
@@ -3021,7 +3031,7 @@
         "actual": 4.6,
         "reference": "2026-03",
         "referenceDate": "2026-03-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-04-29",
         "unit": "%",
         "source": "ABS",
         "forecast": null,
@@ -3033,7 +3043,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/mar-2026"
       },
       {
         "category": "inflation",
@@ -3041,7 +3052,7 @@
         "actual": 4.2,
         "reference": "2026-04",
         "referenceDate": "2026-04-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-05-27",
         "unit": "%",
         "source": "ABS",
         "forecast": null,
@@ -3053,7 +3064,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/apr-2026"
       },
       {
         "category": "inflation",
@@ -3061,7 +3073,7 @@
         "actual": 4,
         "reference": "2026-05",
         "referenceDate": "2026-05-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-06-24",
         "unit": "%",
         "source": "ABS",
         "forecast": null,
@@ -3073,7 +3085,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/may-2026"
       },
       {
         "category": "inflation",
@@ -3081,7 +3094,7 @@
         "actual": 3.8,
         "reference": "2026-06",
         "referenceDate": "2026-06-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-07-29",
         "unit": "%",
         "source": "ABS",
         "forecast": null,
@@ -3093,7 +3106,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jun-2026"
       },
       {
         "category": "inflation",
@@ -3101,7 +3115,7 @@
         "actual": 3.5,
         "reference": "2026-07",
         "referenceDate": "2026-07-01T00:00:00Z",
-        "releaseDate": null,
+        "releaseDate": "2026-08-26",
         "unit": "%",
         "source": "ABS",
         "forecast": null,
@@ -3113,7 +3127,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jul-2026"
       },
       {
         "category": "inflation",
@@ -3296,10 +3311,11 @@
         "sourceUpdatedAt": "2026-09-30T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-04-29",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/mar-2026"
       },
       {
         "event": "Core CPI trimmed mean y/y",
@@ -3316,10 +3332,11 @@
         "sourceUpdatedAt": "2026-09-30T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-05-27",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/apr-2026"
       },
       {
         "event": "Core CPI trimmed mean y/y",
@@ -3336,10 +3353,12 @@
         "sourceUpdatedAt": "2026-09-30T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-06-24",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/may-2026",
+        "dataVintageNote": "3.5% is the revised May 2026 figure in ABS August 2026 vintage; the original May release showed 3.6%."
       },
       {
         "event": "Core CPI trimmed mean y/y",
@@ -3356,10 +3375,11 @@
         "sourceUpdatedAt": "2026-09-30T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-07-29",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jun-2026"
       },
       {
         "event": "Core CPI trimmed mean y/y",
@@ -3376,10 +3396,11 @@
         "sourceUpdatedAt": "2026-09-30T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-08-26",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "releaseSourceUrl": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jul-2026"
       },
       {
         "event": "Core CPI trimmed mean y/y",
