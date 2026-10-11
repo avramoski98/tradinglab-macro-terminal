@@ -1710,10 +1710,11 @@
         "sourceUpdatedAt": "2026-10-06T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-05-07",
         "releaseTimeKnown": false,
         "stage": "revised",
-        "surprise": null
+        "surprise": null,
+        "initialReleaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-07052026-ap"
       },
       {
         "event": "Retail Sales m/m",
@@ -1730,10 +1731,11 @@
         "sourceUpdatedAt": "2026-10-06T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-06-04",
         "releaseTimeKnown": false,
         "stage": "revised",
-        "surprise": null
+        "surprise": null,
+        "initialReleaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-04062026-ap"
       },
       {
         "event": "Retail Sales m/m",
@@ -1750,10 +1752,11 @@
         "sourceUpdatedAt": "2026-10-06T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-07-06",
         "releaseTimeKnown": false,
         "stage": "revised",
-        "surprise": null
+        "surprise": null,
+        "initialReleaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-06072026-bp"
       },
       {
         "event": "Retail Sales m/m",
@@ -1770,10 +1773,11 @@
         "sourceUpdatedAt": "2026-10-06T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-08-06",
         "releaseTimeKnown": false,
         "stage": "revised",
-        "surprise": null
+        "surprise": null,
+        "initialReleaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-06082026-ap"
       },
       {
         "event": "Retail Sales m/m",
@@ -1790,10 +1794,11 @@
         "sourceUpdatedAt": "2026-10-06T00:00:00Z",
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "verificationStatus": "verified-primary",
-        "releaseDate": null,
+        "releaseDate": "2026-09-04",
         "releaseTimeKnown": false,
         "stage": "revised",
-        "surprise": null
+        "surprise": null,
+        "initialReleaseSourceUrl": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-04092026-ap"
       },
       {
         "event": "Retail Sales m/m",
@@ -4408,9 +4413,9 @@
     ]
   },
   "audit": {
-    "checkedAt": "2026-10-11T11:29:42.433Z",
+    "checkedAt": "2026-10-11T16:57:00Z",
     "cutoff": "2026-10-11",
-    "scope": "Statistics Canada unemployment Apr-Sep verified from six official monthly releases; remaining legacy observations not verified.; USD headline/core CPI Mar–Aug verified against six original BLS releases with official release timestamps.; NZD March CPI and revised March unemployment/GDP verified from Stats NZ; duplicate unverified quarterly unemployment rows replaced.; GBP CPI Mar–Jul 2026 checked against five original ONS bulletins, with release dates; Aug already verified.",
+    "scope": "Statistics Canada unemployment Apr-Sep verified from six official monthly releases; remaining legacy observations not verified.; USD headline/core CPI Mar–Aug verified against six original BLS releases with official release timestamps.; NZD March CPI and revised March unemployment/GDP verified from Stats NZ; duplicate unverified quarterly unemployment rows replaced.; GBP CPI Mar–Jul 2026 checked against five original ONS bulletins, with release dates; Aug already verified.; EUR retail sales original release dates Mar–Jul 2026 verified against Eurostat bulletins; actuals remain revised values from 6 Oct 2026.",
     "verified": 114,
     "total": 263
   }
