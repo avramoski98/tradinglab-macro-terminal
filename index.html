@@ -384,7 +384,7 @@ function canonicalCatalystEvent(v=''){return String(v).toLowerCase().replace(/m\
 function allCatalysts(){let [ws,we]=weekBounds(),all=[...MANUAL_CATALYSTS,...(newsData.macroUpdates||[]),...calendarMacroHistory(),...scoredLiveEvents()],seen=new Set(),out=[];for(const u of all){let d=new Date(u.date||0);if(!isFinite(d)||d<ws||d>=we||d>new Date())continue;let key=[u.ccy,skopjeDate(u.date),canonicalCatalystEvent(u.event),String(u.actual)].join('|');if(seen.has(key))continue;seen.add(key);out.push(u)}return out.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0))}
 function catalystScore(c){let sum=0;for(const u of allCatalysts())if(u.ccy===c)sum+=Number(u.score||0);return Math.max(-4,Math.min(4,Math.round(sum*10)/10))}
 function liveStrength(c){return (11-Number(RES[c].order||10)) + catalystScore(c)*.70}
-function currentOrder(){return [...ORDER].sort((a,b)=>Number(RES[a].order||99)-Number(RES[b].order||99))}
+function currentOrder(){return [...ORDER].sort((a,b)=>liveStrength(b)-liveStrength(a)||Number(RES[a].order||99)-Number(RES[b].order||99))}
 function scoreMarkup(c){let s=catalystScore(c),cls=s>0?'pos':s<0?'neg':'flat';return `<span class="live-score ${cls}">${s>0?'+':''}${s.toFixed(1)}</span>`}
 function newsMacroFor(c){return allCatalysts().filter(x=>x.ccy===c).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0))[0]||null}
 function adjustedBiasNote(c){let s=catalystScore(c);return s>=3?'UPGRADE WATCH':s<=-3?'DOWNGRADE WATCH':Math.abs(s)>=1.5?'CATALYST ACTIVE':'BASE INTACT'}
@@ -412,9 +412,10 @@ function renderRelease(x){let cls=impactClass(x);return `<div class="release"><d
 
 let RATE_STATE=null;
 const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v2';
-function rateProbFmt(n){n=Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
-function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
-function rateValues(rows,field){let out={};for(let r of rows||[]){let v=Number(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
+function finiteRate(n){if(n===null||n===undefined||n===''||n==='—')return null;const v=Number(n);return Number.isFinite(v)?v:null}
+function rateProbFmt(n){let v=finiteRate(n);return v===null?'—':v.toFixed(2)+'%'}
+function rateDeltaFmt(n){let v=finiteRate(n);return v===null?'—':`${v>0?'+':''}${v.toFixed(2)}pp`}
+function rateValues(rows,field){let out={};for(let r of rows||[]){let v=finiteRate(r[field]);if(v!==null)out[r.rate]=v}return out}
 function rateSnapshot(stamp,values,kind='market'){return {stamp:String(stamp||''),values,kind}}
 function rateHistory(payload){
   let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
