@@ -42,6 +42,7 @@ const OFFICIAL_REPORTS={
  '2026-09-11|Crop Production':'https://www.nass.usda.gov/Newsroom/Executive_Briefings/index.php',
  '2026-09-11|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings',
  '2026-09-14|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress',
+ '2026-09-18|Hop Stocks':'https://esmis.nal.usda.gov/publication/hop-stocks/2026-09-18',
  '2026-09-21|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress',
  '2026-09-22|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings',
  '2026-09-24|Hogs and Pigs':'https://www.nass.usda.gov/Newsroom/Executive_Briefings/index.php',
