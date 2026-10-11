@@ -3555,7 +3555,7 @@
         "actual": 0.9,
         "reference": "2026-03",
         "referenceDate": "2026-03-01T00:00:00Z",
-        "releaseDate": "2026-09-17",
+        "releaseDate": "2026-06-18",
         "releaseTimeKnown": false,
         "unit": "%",
         "source": "Stats NZ · June quarter revision of March GDP",
@@ -3568,7 +3568,11 @@
         "rawActual": "0.9%",
         "forecast": null,
         "previous": null,
-        "surprise": null
+        "surprise": null,
+        "frequency": "quarterly",
+        "originalReleaseDate": "2026-06-18",
+        "revisionDate": "2026-09-17",
+        "originalSourceUrl": "https://www.stats.govt.nz/news/gdp-increases-0-8-percent-in-the-march-2026-quarter/"
       },
       {
         "category": "growth",
@@ -3588,7 +3592,8 @@
         "sourceUpdatedAt": "2026-09-17T00:00:00Z",
         "verifiedAt": "2026-10-07T19:17:40.319736+00:00",
         "verificationStatus": "verified-primary",
-        "stage": "published"
+        "stage": "published",
+        "frequency": "quarterly"
       },
       {
         "category": "inflation",
@@ -3608,7 +3613,8 @@
         "verifiedAt": "2026-10-10T07:55:34Z",
         "stage": "official-publication",
         "rawActual": "3.1%",
-        "surprise": null
+        "surprise": null,
+        "frequency": "quarterly"
       },
       {
         "category": "inflation",
@@ -3628,7 +3634,8 @@
         "verifiedAt": "2026-10-07T19:07:11.879211+00:00",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "frequency": "quarterly"
       },
       {
         "category": "labor",
@@ -3636,7 +3643,7 @@
         "actual": 5.4,
         "reference": "2026-03",
         "referenceDate": "2026-03-01T00:00:00Z",
-        "releaseDate": "2026-08-05",
+        "releaseDate": "2026-05-06",
         "releaseTimeKnown": false,
         "unit": "%",
         "source": "Stats NZ · June quarter revision of March unemployment",
@@ -3649,7 +3656,11 @@
         "rawActual": "5.4%",
         "forecast": null,
         "previous": null,
-        "surprise": null
+        "surprise": null,
+        "frequency": "quarterly",
+        "originalReleaseDate": "2026-05-06",
+        "revisionDate": "2026-08-05",
+        "originalSourceUrl": "https://www.stats.govt.nz/news/unemployment-rate-at-5-3-percent-in-the-march-2026-quarter/"
       },
       {
         "event": "Unemployment rate · SA",
@@ -3669,7 +3680,8 @@
         "releaseDate": "2026-08-05",
         "releaseTimeKnown": false,
         "stage": "final",
-        "surprise": null
+        "surprise": null,
+        "frequency": "quarterly"
       }
     ],
     "SEK": [
