@@ -2,6 +2,8 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-09T15:45:00Z';
 const VERIFIED=[
+ {day:'2026-10-05',time:'10:00',ccy:'EUR',match:/PPI m\/m|Industrial Producer Prices m\/m/i,event:'Euro Area PPI m/m · Aug',actual:'1.9%',previous:'1.6%',importance:'HIGH',source:'Eurostat',url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-05102026-ap',status:'verified-primary',force:true},
+ {day:'2026-10-06',time:'08:00',ccy:'EUR',match:/German Factory Orders|New Orders in Manufacturing/i,event:'German Factory Orders m/m · Aug',actual:'-10.6%',previous:'3.2%',importance:'HIGH',source:'Destatis',url:'https://www.destatis.de/EN/Press/2026/10/PE26_354_421.html',status:'verified-primary',force:true},
  {day:'2026-10-08',time:'08:00',ccy:'EUR',match:/German Trade Balance/i,event:'German Trade Balance · Aug',actual:'19.5B',previous:'21.6B',importance:'MED',source:'Destatis / Reuters',url:'https://www.reuters.com/world/china/german-exports-unexpectedly-fall-august-2026-10-08/',status:'verified-secondary'},
  {day:'2026-10-08',time:'14:30',ccy:'USD',match:/Unemployment Claims|Initial Jobless Claims/i,event:'Initial Jobless Claims · week ending 3 Oct',actual:'197K',previous:'199K',importance:'HIGH',source:'U.S. Department of Labor / AP',url:'https://apnews.com/article/7d52b48a5f41e60630d96c7a1711774c',status:'verified-secondary'},
  {day:'2026-10-09',time:'01:30',ccy:'JPY',match:/Household Spending/i,event:'Household Spending y/y · Aug',actual:'-3.1%',previous:'-3.6%',importance:'MED',source:'Statistics Bureau of Japan',url:'https://www.stat.go.jp/data/kakei/sokuhou/tsuki/index.html',status:'verified-primary'},
@@ -27,7 +29,7 @@ export function applyVerifiedReleaseOverlay(payload){
  for(const o of VERIFIED){
   let i=rows.findIndex(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.day&&o.match.test(String(e.event||'')));
   const base=i>=0?rows[i]:null;
-  if(!base&&!activeDates.has(o.day))continue;
+  if(!base&&!activeDates.has(o.day)&&!o.force)continue;
   const record={
    ...(base||{}),date:base?.date||o.day+'T'+o.time+':00+02:00',
    sourceDate:base?.sourceDate||o.day+'T'+o.time+':00+02:00',
@@ -47,6 +49,8 @@ export function applyVerifiedReleaseOverlay(payload){
      (event.startsWith('Consumer')?/CPI|Consumer Price Index/i.test(e.event):event.startsWith('Producer')?/PPI|Producer Price Index/i.test(e.event):/Import.*Export.*Price/i.test(e.event))))
      rows.push({date,sourceDate:date,timeZone:'Europe/Skopje',country:'USD',currency:'USD',event,importance,previous:'—',forecast:'—',actual:'—',label:'Scheduled',impact:'Neutral',releaseState:Date.parse(date)>Date.now()?'scheduled':'overdue',source:'BLS official calendar',sourceUrl:'https://www.bls.gov/schedule/2026/home.htm',verificationStatus:'official-schedule'});
  }
+ const audDate='2026-10-15T02:30:00+02:00';
+ if(!rows.some(e=>e.currency==='AUD'&&String(e.date||'').slice(0,10)==='2026-10-15'&&/Employment Change|Unemployment Rate|Labour Force/i.test(String(e.event||''))))rows.push({date:audDate,sourceDate:audDate,timeZone:'Europe/Skopje',country:'AUD',currency:'AUD',event:'Labour Force · Sep',importance:'HIGH',previous:'—',forecast:'—',actual:'—',label:'Scheduled',impact:'Neutral',releaseState:Date.parse(audDate)>Date.now()?'scheduled':'overdue',source:'Australian Bureau of Statistics',sourceUrl:'https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release',verificationStatus:'official-schedule'});
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
  return {...payload,events:rows,
   overdue:rows.filter(e=>e.releaseState==='overdue').length,

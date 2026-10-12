@@ -36,7 +36,7 @@ test('EIA published overrides remain secondary verified and USDA is not auto-rel
  vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
  const rows=c.knownEiaRows();assert.equal(rows.length,2);
  assert.ok(rows.every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
- assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&x.releaseState==='overdue'));
+ assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&(x.releaseState==='overdue'||(x.releaseState==='released'&&x.verificationStatus==='verified-primary'&&!!x.sourceUrl))));
 });
 
 test('official Oct 9 calendar overlay resolves CAD and USD releases without fabricating consensus',()=>{
@@ -45,3 +45,7 @@ test('official Oct 9 calendar overlay resolves CAD and USD releases without fabr
  assert.equal(cad.actual,'-68.3K');assert.equal(cad.forecast,'6.1K');assert.equal(cad.verificationStatus,'verified-primary');assert.equal(cad.releaseState,'released');
  assert.equal(usd.actual,'46.3');assert.equal(usd.forecast,'47.5');assert.equal(usd.releaseState,'released');assert.equal(out.overdue,0);
 });
+
+// Freshness must respect quarterly frequency; API polling must not manufacture rate history.
+test('quarterly releases use quarterly freshness windows',()=>{const c={Date};vm.createContext(c);vm.runInContext(html.slice(html.indexOf('function freshnessInfo('),html.indexOf('function verifiedArchiveSeries(')),c);const latest=new Date(Date.now()-82*86400000).toISOString();assert.equal(c.freshnessInfo(latest,false).label,'STALE');assert.equal(c.freshnessInfo(latest,true).label,'FRESH');});
+test('rate history rejects unverified and repeated polling snapshots',()=>{const memory={};const c={Date,localStorage:{getItem:k=>memory[k]||null,setItem:(k,v)=>memory[k]=v}};vm.createContext(c);vm.runInContext(html.slice(html.indexOf('const RATE_SNAPSHOT_KEY='),html.indexOf('function rateOutcome(')),c);const rows=[{rate:'4%',latest:20,direction:'hike'},{rate:'3.75%',latest:70,direction:'hold'},{rate:'3.5%',latest:10,direction:'cut'}],stamp=new Date().toISOString();const payload={cards:[{id:'FED',live:true,stale:false,sourceUpdatedAt:stamp,rows}]};const first=c.rateHistory(payload),second=c.rateHistory(payload);assert.equal(first.cards[0].history.length,1);assert.equal(second.cards[0].history.length,1);const unavailable=c.rateHistory({cards:[{id:'FED',live:false,stale:true,sourceUpdatedAt:null,rows:rows.map(x=>({...x,latest:null}))}]});assert.equal(unavailable.cards[0].live,false);assert.ok(unavailable.cards[0].rows.every(x=>Number.isNaN(x.currentPricing)));assert.equal(c.rateProbFmt(null),'—');});

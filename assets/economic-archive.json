@@ -3056,7 +3056,8 @@
         "verifiedAt": "2026-10-09T14:53:50Z",
         "releaseTimeKnown": false,
         "rawActual": "6.5%",
-        "stage": "published"
+        "stage": "published",
+        "forecast": null
       }
     ],
     "AUD": [
