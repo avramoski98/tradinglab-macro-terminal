@@ -1,0 +1,50 @@
+{
+  "source": "Statistics Canada",
+  "series": "CAD CPI y/y",
+  "unit": "percent",
+  "verifiedAt": "2026-10-19T19:40:00Z",
+  "observations": [
+    {
+      "period": "2026-03",
+      "actual": 2.4,
+      "releaseDate": "2026-04-20",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260420/dq260420a-eng.htm"
+    },
+    {
+      "period": "2026-04",
+      "actual": 2.8,
+      "releaseDate": "2026-05-19",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260519/dq260519a-eng.htm"
+    },
+    {
+      "period": "2026-05",
+      "actual": 3.2,
+      "releaseDate": "2026-06-22",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260622/dq260622a-eng.htm"
+    },
+    {
+      "period": "2026-06",
+      "actual": 2.8,
+      "releaseDate": "2026-07-20",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260720/dq260720a-eng.htm"
+    },
+    {
+      "period": "2026-07",
+      "actual": 3,
+      "releaseDate": "2026-08-17",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260817/dq260817a-eng.htm"
+    },
+    {
+      "period": "2026-08",
+      "actual": 3,
+      "releaseDate": "2026-09-14",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260914/dq260914a-eng.htm"
+    },
+    {
+      "period": "2026-09",
+      "actual": 3.1,
+      "releaseDate": "2026-10-19",
+      "sourceUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/261019/dq261019a-eng.htm"
+    }
+  ]
+}
