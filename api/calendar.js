@@ -2,6 +2,11 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-09T15:45:00Z';
 const VERIFIED=[
+ {day:'2026-10-20',time:'08:00',ccy:'EUR',match:/German PPI m\/m/i,event:'German PPI m/m · Sep',actual:'+1.9%',importance:'HIGH',source:'Destatis',url:'https://www.destatis.de/EN/Press/2026/10/PE26_373_61241.html',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
+ {day:'2026-10-20',time:'08:00',ccy:'GBP',match:/Average Earnings Index 3m\/y/i,event:'Average Earnings Index 3m/y · Jun–Aug',actual:'3.7%',importance:'HIGH',source:'ONS · total earnings incl. bonuses',url:'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/october2026',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
+ {day:'2026-10-20',time:'08:00',ccy:'GBP',match:/^Unemployment Rate$/i,event:'Unemployment Rate · Jun–Aug',actual:'4.7%',importance:'HIGH',source:'ONS',url:'https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
+ {day:'2026-10-20',time:'11:00',ccy:'EUR',match:/German ZEW Economic Sentiment/i,event:'German ZEW Economic Sentiment · Oct',actual:'28.1',previous:'34.7',importance:'HIGH',source:'ZEW',url:'https://www.zew.de/en/press/latest-press-releases/declining-economic-expectations',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
+ {day:'2026-10-20',time:'11:00',ccy:'EUR',match:/^ZEW Economic Sentiment$/i,event:'Euro Area ZEW Economic Sentiment · Oct',actual:'18.5',previous:'25.8',importance:'MED',source:'ZEW',url:'https://www.zew.de/en/press/latest-press-releases/declining-economic-expectations',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
  {day:'2026-10-05',time:'10:00',ccy:'EUR',match:/PPI m\/m|Industrial Producer Prices m\/m/i,event:'Euro Area PPI m/m · Aug',actual:'1.9%',previous:'1.6%',importance:'HIGH',source:'Eurostat',url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/4-05102026-ap',status:'verified-primary',force:true},
  {day:'2026-10-06',time:'08:00',ccy:'EUR',match:/German Factory Orders|New Orders in Manufacturing/i,event:'German Factory Orders m/m · Aug',actual:'-10.6%',previous:'3.2%',importance:'HIGH',source:'Destatis',url:'https://www.destatis.de/EN/Press/2026/10/PE26_354_421.html',status:'verified-primary',force:true},
  {day:'2026-10-08',time:'08:00',ccy:'EUR',match:/German Trade Balance/i,event:'German Trade Balance · Aug',actual:'19.5B',previous:'21.6B',importance:'MED',source:'Destatis / Reuters',url:'https://www.reuters.com/world/china/german-exports-unexpectedly-fall-august-2026-10-08/',status:'verified-secondary'},
@@ -39,7 +44,7 @@ export function applyVerifiedReleaseOverlay(payload){
    importance:rank[base?.importance]>rank[o.importance]?base.importance:o.importance,
    label:'Verified actual',impact:'Neutral',releaseState:'released',
    source:o.source,sourceUrl:o.url,verificationStatus:o.status,
-   actualVerifiedAt:VERIFIED_AT,lastUpdate:VERIFIED_AT,
+   actualVerifiedAt:o.verifiedAt||VERIFIED_AT,lastUpdate:o.verifiedAt||VERIFIED_AT,
    forecastVerificationStatus:'provider-unverified'
   };
   if(i>=0)rows[i]=record;else rows.push(record);
