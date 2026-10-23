@@ -107,3 +107,19 @@ test('Japan official unemployment SA six-month revised history is complete and s
  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('stat.go.jp')&&x.sourceUpdatedAt==='2026-10-02T00:00:00Z'&&x.releaseTimeKnown===false&&x.stage==='official-revised-table'||x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('stat.go.jp')&&x.reference==='2026-08'));
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
+
+test('archived weekly rate odds and meeting expectations are never displayed as live',()=>{
+ const h=fs.readFileSync('index.html','utf8');
+ const start=h.indexOf('function safePolicyOdds('),end=h.indexOf('function weekly(){',start);
+ assert.ok(start>0&&end>start);
+ const c={RATE_STATE:{cards:[{ccy:'USD',live:false,stale:true}]}};
+ vm.createContext(c);vm.runInContext(h.slice(start,end),c);
+ assert.match(c.safePolicyOdds('USD'),/UNAVAILABLE/);
+ assert.doesNotMatch(c.safePolicyOdds('USD'),/66%|39%|75%/);
+ assert.match(c.safeNextPolicy('USD'),/Upcoming Calendar/);
+ c.RATE_STATE={cards:[{ccy:'USD',live:true,stale:false}]};
+ assert.match(c.safePolicyOdds('USD'),/Rates Probabilities tab/);
+ assert.ok(!h.includes('${esc(r.pricing)}'));
+ assert.ok(!h.includes('${esc(r.next)}'));
+ assert.ok(!h.includes("['Next Expectation',r.next]"));
+});
