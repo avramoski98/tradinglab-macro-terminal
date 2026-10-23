@@ -2,6 +2,16 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-09T15:45:00Z';
 const VERIFIED=[
+ {day:'2026-10-14',time:'14:30',ccy:'USD',match:/Consumer Price Index|^CPI/i,event:'Consumer Price Index · Sep (headline m/m)',actual:'+0.6%',importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/news.release/archives/cpi_10142026.htm',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-14',time:'14:30',ccy:'USD',match:/^Headline CPI y\/y/i,event:'Headline CPI y/y · Sep',actual:'3.7%',importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/news.release/archives/cpi_10142026.htm',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-15',time:'14:30',ccy:'USD',match:/Producer Price Index|^PPI/i,event:'Producer Price Index · Sep (final demand m/m)',actual:'+1.3%',importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/news.release/archives/ppi_10152026.htm',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-16',time:'14:30',ccy:'USD',match:/Import and Export Price Indexes|^Import Price/i,event:'Import Price Index m/m · Sep',actual:'+1.1%',importance:'MED',source:'U.S. BLS',url:'https://www.bls.gov/news.release/archives/ximpim_10162026.htm',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-16',time:'14:30',ccy:'USD',match:/^Export Price Index/i,event:'Export Price Index m/m · Sep',actual:'+2.2%',importance:'MED',source:'U.S. BLS',url:'https://www.bls.gov/news.release/archives/ximpim_10162026.htm',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-15',time:'02:30',ccy:'AUD',match:/Labour Force|Unemployment Rate/i,event:'Labour Force · Sep (unemployment rate)',actual:'4.7%',importance:'HIGH',source:'Australian Bureau of Statistics',url:'https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/sep-2026',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-21',time:'08:00',ccy:'GBP',match:/^CPI y\/y|Consumer Price Index/i,event:'CPI y/y · Sep',actual:'3.5%',importance:'HIGH',source:'UK ONS',url:'https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/consumerpriceinflation/september2026',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-21',time:'08:00',ccy:'GBP',match:/^Core CPI y\/y/i,event:'Core CPI y/y · Sep',actual:'2.8%',importance:'HIGH',source:'UK ONS',url:'https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/consumerpriceinflation/september2026',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-21',time:'23:45',ccy:'NZD',match:/^CPI q\/q|^Quarterly CPI q\/q/i,event:'Quarterly CPI q/q · Q3',actual:'0.7%',importance:'HIGH',source:'Stats NZ',url:'https://www.stats.govt.nz/information-releases/consumers-price-index-september-2026-quarter/',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
+ {day:'2026-10-21',time:'23:45',ccy:'NZD',match:/^CPI y\/y|^Quarterly CPI y\/y/i,event:'Quarterly CPI y/y · Q3',actual:'3.7%',importance:'HIGH',source:'Stats NZ',url:'https://www.stats.govt.nz/information-releases/consumers-price-index-september-2026-quarter/',status:'verified-primary',verifiedAt:'2026-10-23T07:46:00Z',force:true},
  {day:'2026-10-20',time:'08:00',ccy:'EUR',match:/German PPI m\/m/i,event:'German PPI m/m · Sep',actual:'+1.9%',importance:'HIGH',source:'Destatis',url:'https://www.destatis.de/EN/Press/2026/10/PE26_373_61241.html',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
  {day:'2026-10-20',time:'08:00',ccy:'GBP',match:/Average Earnings Index 3m\/y/i,event:'Average Earnings Index 3m/y · Jun–Aug',actual:'3.7%',importance:'HIGH',source:'ONS · total earnings incl. bonuses',url:'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/october2026',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
  {day:'2026-10-20',time:'08:00',ccy:'GBP',match:/^Unemployment Rate$/i,event:'Unemployment Rate · Jun–Aug',actual:'4.7%',importance:'HIGH',source:'ONS',url:'https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment',status:'verified-primary',verifiedAt:'2026-10-20T14:10:00Z'},
@@ -25,6 +35,15 @@ const BLS_NEXT_WEEK=[
  ['2026-10-14T14:30:00+02:00','Consumer Price Index · Sep','HIGH'],
  ['2026-10-15T14:30:00+02:00','Producer Price Index · Sep','HIGH'],
  ['2026-10-16T14:30:00+02:00','Import and Export Price Indexes · Sep','MED']
+];
+const OFFICIAL_UPCOMING=[
+ {date:'2026-10-28T02:00:00+01:00',ccy:'NZD',event:'RBNZ Official Cash Rate Decision',match:/RBNZ|Official Cash Rate|OCR Decision/i,importance:'EXTREME',source:'Reserve Bank of New Zealand',url:'https://www.rbnz.govt.nz/monetary-policy/about-monetary-policy/the-official-cash-rate'},
+ {date:'2026-10-28T14:45:00+01:00',ccy:'CAD',event:'Bank of Canada Rate Decision & Monetary Policy Report',match:/BoC|Bank of Canada.*Rate|Overnight Rate/i,importance:'EXTREME',source:'Bank of Canada',url:'https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/'},
+ {date:'2026-10-28T19:00:00+01:00',ccy:'USD',event:'FOMC Rate Decision',match:/FOMC.*Rate|Federal Funds Rate|Fed Rate Decision/i,importance:'EXTREME',source:'Federal Reserve',url:'https://www.federalreserve.gov/newsevents/2026-october.htm'},
+ {date:'2026-10-28T19:30:00+01:00',ccy:'USD',event:'FOMC Chair Press Conference',match:/Fed.*Press Conference|FOMC.*Press Conference/i,importance:'HIGH',source:'Federal Reserve',url:'https://www.federalreserve.gov/newsevents/2026-october.htm'},
+ {date:'2026-10-29T14:15:00+01:00',ccy:'EUR',event:'ECB Rate Decision',match:/ECB.*Rate|Main Refinancing Rate|Deposit Facility Rate/i,importance:'EXTREME',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
+ {date:'2026-10-29T14:45:00+01:00',ccy:'EUR',event:'ECB Press Conference',match:/ECB.*Press Conference|Lagarde.*Press Conference/i,importance:'HIGH',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
+ {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'}
 ];
 const rank={LOW:1,MED:2,HIGH:3,EXTREME:4};
 export function applyVerifiedReleaseOverlay(payload){
@@ -56,6 +75,14 @@ export function applyVerifiedReleaseOverlay(payload){
  }
  const audDate='2026-10-15T02:30:00+02:00';
  if(!rows.some(e=>e.currency==='AUD'&&String(e.date||'').slice(0,10)==='2026-10-15'&&/Employment Change|Unemployment Rate|Labour Force/i.test(String(e.event||''))))rows.push({date:audDate,sourceDate:audDate,timeZone:'Europe/Skopje',country:'AUD',currency:'AUD',event:'Labour Force · Sep',importance:'HIGH',previous:'—',forecast:'—',actual:'—',label:'Scheduled',impact:'Neutral',releaseState:Date.parse(audDate)>Date.now()?'scheduled':'overdue',source:'Australian Bureau of Statistics',sourceUrl:'https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release',verificationStatus:'official-schedule'});
+ for(const o of OFFICIAL_UPCOMING){
+  if(rows.some(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.date.slice(0,10)&&o.match.test(String(e.event||''))))continue;
+  const upcoming=Date.parse(o.date)>Date.now();
+  rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
+   importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?'Scheduled · official':'OVERDUE · unverified',
+   impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
+   verificationStatus:'official-schedule',lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+ }
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
  return {...payload,events:rows,
   overdue:rows.filter(e=>e.releaseState==='overdue').length,
