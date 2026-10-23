@@ -195,3 +195,14 @@ test('NOK September LFS and six-month trend are source-verified, with August rev
  assert.equal(sep?.releaseState,'released');
  assert.equal(sep?.verificationStatus,'verified-primary');
 });
+
+test('Sweden unemployment is six verified SCB smoothed SA months with explicit revision provenance',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.SEK.filter(x=>x.event==='Unemployment rate · SA smoothed');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[8.7,8.7,8.7,8.7,8.7,8.7]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-21','2026-06-15','2026-07-24','2026-08-21','2026-09-16','2026-10-16']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.stage==='official-revised-table'&&x.sourceUrl.includes('scb.se')&&x.sourceUpdatedAt==='2026-10-16T06:00:00Z'&&x.originalReleaseUrl));
+ assert.ok(rows[0].revisionNote.includes('8.6%'));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+});
