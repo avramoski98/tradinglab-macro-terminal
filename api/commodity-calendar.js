@@ -52,7 +52,10 @@ const OFFICIAL_REPORTS={
  '2026-10-05|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-05',
  '2026-10-09|WASDE':'https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report',
  '2026-10-09|Crop Production':'https://esmis.nal.usda.gov/publication/crop-production/2026-10-09',
- '2026-10-09|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings/2026-10-09'
+ '2026-10-09|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings/2026-10-09',
+ '2026-10-13|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-13',
+ '2026-10-19|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-19',
+ '2026-10-22|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings'
 };
 
 function num(v){if(v==null)return NaN;return Number(String(v).replace(/,/g,'').replace(/[^0-9+-.]/g,''));}
