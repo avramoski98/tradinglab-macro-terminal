@@ -181,6 +181,16 @@
 #rates .rate-prior{color:#777}
 @media(max-width:700px){#rates .rate-table{min-width:760px}}
 
+
+#rates .rate-table{grid-template-columns:minmax(138px,1.25fr) 92px 92px 92px 100px 92px}
+#rates .rate-cell:nth-child(4n+1){text-align:right}
+#rates .rate-cell:nth-child(6n+1){text-align:left}
+#rates .rate-outcome b{display:block;color:#fff;font-size:10px}
+#rates .rate-outcome .mini{margin-top:2px}
+#rates .rate-current-pricing{color:var(--accent2);font-weight:900}
+#rates .rate-prior{color:#777}
+@media(max-width:700px){#rates .rate-table{min-width:760px}}
+
 </style>
 </head><body>
 <div class="app">
@@ -452,37 +462,37 @@ function renderRelease(x){let cls=impactClass(x);return `<div class="release"><d
 
 
 let RATE_STATE=null;
-const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v3';
-function finiteRate(n){if(n===null||n===undefined||n===''||(typeof n==='string'&&/^(?:—|N\/A|NA|null|undefined)$/i.test(n.trim())))return NaN;const v=Number(n);return Number.isFinite(v)?v:NaN}
-function rateProbFmt(n){n=finiteRate(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
-function rateDeltaFmt(n){n=finiteRate(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
-function rateValues(rows,field){let out={};for(let r of rows||[]){let v=finiteRate(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
+const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v2';
+function rateProbFmt(n){n=Number(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
+function rateDeltaFmt(n){n=Number(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
+function rateValues(rows,field){let out={};for(let r of rows||[]){let v=Number(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
 function rateSnapshot(stamp,values,kind='market'){return {stamp:String(stamp||''),values,kind}}
 function rateHistory(payload){
- let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
- const next={};
- const cards=(payload.cards||[]).map(card=>{
-  const seed=card.rows||[],previousHistory=Array.isArray(saved[card.id]?.history)?saved[card.id].history:[],
-   sourceDay=String(card.sourceUpdatedAt||'').slice(0,10),utcDay=new Date().toISOString().slice(0,10),
-   fresh=card.live===true&&card.stale!==true&&/^\d{4}-\d{2}-\d{2}$/.test(sourceDay)&&sourceDay===utcDay,
-   values=rateValues(seed,'latest');
-  let history=previousHistory.filter(x=>x?.kind==='market'&&x.stamp&&Object.keys(x.values||{}).length);
-  if(fresh&&Object.keys(values).length){
-   if(history[0]?.stamp===card.sourceUpdatedAt)history[0]=rateSnapshot(card.sourceUpdatedAt,values);
-   else history.unshift(rateSnapshot(card.sourceUpdatedAt,values));
-  }
-  history=history.slice(0,3);
-  const cur=fresh?history[0]:null,prev=fresh?history[1]:null,prior=fresh?history[2]:null;
-  const rows=seed.map(r=>({...r,
-   currentPricing:cur&&Object.prototype.hasOwnProperty.call(cur.values,r.rate)?finiteRate(cur.values[r.rate]):NaN,
-   previousPricing:prev&&Object.prototype.hasOwnProperty.call(prev.values,r.rate)?finiteRate(prev.values[r.rate]):NaN,
-   priorPricing:prior&&Object.prototype.hasOwnProperty.call(prior.values,r.rate)?finiteRate(prior.values[r.rate]):NaN
-  }));
-  next[card.id]={history};
-  return {...card,live:fresh,rows,history};
- });
- try{localStorage.setItem(RATE_SNAPSHOT_KEY,JSON.stringify(next))}catch(e){}
- return {...payload,cards};
+  let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_SNAPSHOT_KEY)||'{}')}catch(e){}
+  let next={},stamp=String(payload.updatedAt||new Date().toISOString());
+  let cards=(payload.cards||[]).map(card=>{
+    let seed=card.rows||[],old=(saved[card.id]&&Array.isArray(saved[card.id].history))?saved[card.id].history:[];
+    let currentValues=rateValues(seed,'latest'),referenceValues=rateValues(seed,'previous'),history=[...old];
+    if(!history.length){
+      history.push(rateSnapshot(stamp,currentValues,'market'));
+      if(Object.keys(referenceValues).length)history.push(rateSnapshot('REFERENCE',referenceValues,'reference'));
+    }else if(history[0].stamp===stamp){
+      history[0]=rateSnapshot(stamp,currentValues,'market');
+    }else{
+      history.unshift(rateSnapshot(stamp,currentValues,'market'));
+    }
+    history=history.slice(0,3);
+    let cur=history[0]||null,prev=history[1]||null,prior=history[2]||null;
+    let rows=seed.map(r=>({...r,
+      currentPricing:cur&&Object.prototype.hasOwnProperty.call(cur.values,r.rate)?Number(cur.values[r.rate]):Number(r.latest),
+      previousPricing:prev&&Object.prototype.hasOwnProperty.call(prev.values,r.rate)?Number(prev.values[r.rate]):NaN,
+      priorPricing:prior&&Object.prototype.hasOwnProperty.call(prior.values,r.rate)?Number(prior.values[r.rate]):NaN
+    }));
+    next[card.id]={history};
+    return {...card,rows,history};
+  });
+  try{localStorage.setItem(RATE_SNAPSHOT_KEY,JSON.stringify(next))}catch(e){}
+  return {...payload,cards};
 }
 function rateOutcome(r){let label=r.direction==='hike'?'HIKE':r.direction==='cut'?'CUT':'HOLD';return `<div class="rate-outcome"><b>${label}${r.current?' · CURRENT RATE':''}</b><div class="mini">${esc(r.rate)}</div></div>`}
 function ratePolicyDelta(card,baseField){
@@ -494,7 +504,7 @@ function ratePolicyDelta(card,baseField){
 }
 function rateRepricing(card){
   let short=ratePolicyDelta(card,'previousPricing'),broad=ratePolicyDelta(card,'priorPricing'),signal=Number.isFinite(short)?short:0;
-  if(!Number.isFinite(short)&&!Number.isFinite(broad))return {label:'NO VERIFIED REPRICING',tone:'warn',short,broad};if(signal>.05)return {label:'HAWKISH REPRICING',tone:'good',short,broad};
+  if(signal>.05)return {label:'HAWKISH REPRICING',tone:'good',short,broad};
   if(signal<-.05)return {label:'DOVISH REPRICING',tone:'bad',short,broad};
   return {label:'PRICING STABLE',tone:'warn',short,broad};
 }
