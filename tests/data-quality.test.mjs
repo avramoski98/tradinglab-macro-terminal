@@ -65,3 +65,14 @@ test('Sweden final CPI CPIF and core CPIF each have six official monthly release
  const latest=d.currencies.SEK.filter(x=>x.reference==='2026-09'&&names.includes(x.event));
  assert.deepEqual(latest.map(x=>x.actual),[1.1,1.5,0.5]);
 });
+
+
+test('Swiss SECO unemployment has six verified monthly observations and publication dates',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json'));
+ const rows=d.currencies.CHF.filter(x=>x.event==='Unemployment rate · SA');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[3.0,3.1,3.1,3.1,3.1,3.1]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-07','2026-06-04','2026-07-06','2026-08-06','2026-09-07','2026-10-06']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('seco.admin.ch')&&x.sourceUpdatedAt&&x.releaseTimeKnown===false));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+});
