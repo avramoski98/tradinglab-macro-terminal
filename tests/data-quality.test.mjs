@@ -181,3 +181,17 @@ test('BLS April–September payroll and earnings history is source-verified with
  assert.equal(d.currencies.USD.find(x=>x.event==='Nonfarm Payrolls'&&x.reference==='2026-05').sourceUpdatedAt,'2026-08-07T12:30:00Z');
  assert.equal(d.currencies.USD.find(x=>x.event==='Nonfarm Payrolls'&&x.reference==='2026-06').sourceUpdatedAt,'2026-09-04T12:30:00Z');
 });
+
+test('NOK September LFS and six-month trend are source-verified, with August revision preserved',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.NOK.filter(x=>x.event==='Unemployment rate · trend').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[4.7,4.7,4.5,4.5,4.6,4.6]);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.releaseDate&&x.sourceUpdatedAt&&x.sourceUrl.includes('ssb.no')&&x.revisionNote));
+ assert.equal(rows[4].sourceUpdatedAt,'2026-10-22T06:00:00Z');
+ const calendar=applyVerifiedReleaseOverlay({mode:'live',events:[]});
+ const sep=calendar.events.find(x=>x.currency==='NOK'&&x.event==='LFS unemployment trend · Sep');
+ assert.equal(sep?.actual,'4.6%');
+ assert.equal(sep?.releaseState,'released');
+ assert.equal(sep?.verificationStatus,'verified-primary');
+});
