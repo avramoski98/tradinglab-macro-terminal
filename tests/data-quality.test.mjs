@@ -34,7 +34,7 @@ test('G10 coverage and freshness do not count undated archived values',()=>{
 test('EIA published overrides remain secondary verified and USDA is not auto-released',()=>{
  const c={Date,fetch:async()=>({ok:false}),console};vm.createContext(c);
  vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
- const rows=c.knownEiaRows();assert.equal(rows.length,2);
+ const rows=c.knownEiaRows();assert.equal(rows.length,4);assert.ok(rows.some(x=>x.event.includes('Natural Gas Storage')&&x.actual==='+77B'));assert.ok(rows.some(x=>x.event.includes('Crude Oil Inventories')&&x.actual==='-3.060M'));
  assert.ok(rows.every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
  assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&(x.releaseState==='overdue'||(x.releaseState==='released'&&x.verificationStatus==='verified-primary'&&!!x.sourceUrl))));
 });
