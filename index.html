@@ -472,7 +472,7 @@ function rateHistory(payload){
   let next={},utcDay=new Date().toISOString().slice(0,10);
   let cards=(payload.cards||[]).map(card=>{
     let seed=card.rows||[],sourceDay=String(card.sourceUpdatedAt||'').slice(0,10);
-    let fresh=card.live===true&&card.stale!==true&&/^\\d{4}-\\d{2}-\\d{2}$/.test(sourceDay)&&sourceDay===utcDay;
+    let fresh=card.live===true&&card.stale!==true&&/^\d{4}-\d{2}-\d{2}$/.test(sourceDay)&&sourceDay===utcDay;
     let currentValues=fresh?rateValues(seed,'latest'):{};
     let history=(saved[card.id]?.history||[]).filter(x=>x?.kind==='market'&&x.stamp&&x.values&&Object.keys(x.values).length);
     if(fresh&&Object.keys(currentValues).length===seed.length){
