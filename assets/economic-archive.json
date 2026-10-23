@@ -3699,7 +3699,8 @@
         "stage": "revised-historical-table",
         "dataVintageNote": "Seasonally adjusted unemployment rate from ABS September 2026 revised historical table; historical release times not independently verified.",
         "releaseTimeKnown": true,
-        "releaseDate": "2026-10-15T00:30:00Z"
+        "releaseDate": "2026-10-15T00:30:00Z",
+        "forecast": null
       }
     ],
     "NZD": [
