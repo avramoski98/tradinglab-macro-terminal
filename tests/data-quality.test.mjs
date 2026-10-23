@@ -146,3 +146,22 @@ test('weekly focus includes late October 23 verified-secondary catalysts and cav
  assert.ok(h.includes('not independently verified against the University of Michigan primary bulletin'));
  assert.ok(h.includes('primary bulletin not independently retrieved'));
 });
+
+test('G10 revised quarterly GDP Q1/Q2 history has two primary-source observations',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const expected={
+  EUR:[['Real GDP q/q · SA',0.0,0.6]],
+  CHF:[['Real GDP q/q · sport-event adjusted',0.5,1.5]],
+  CAD:[['Real GDP q/q',0.1,0.8]],
+  SEK:[['Real GDP q/q · SA',-0.1,1.6]],
+  NOK:[['Mainland real GDP q/q · SA',0.1,0.3],['Total real GDP q/q · SA',0.4,0.7]],
+  JPY:[['Real GDP q/q · SA',0.5,0.4],['Real GDP q/q annualized',1.9,1.4]],
+  AUD:[['Real GDP q/q · SA',0.3,0.4]]
+ };
+ for(const [ccy,series] of Object.entries(expected))for(const [event,q1,q2] of series){
+  const rows=d.currencies[ccy].filter(x=>x.event===event&&['2026-03','2026-06'].includes(x.reference)).sort((a,b)=>a.reference.localeCompare(b.reference));
+  assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-06'],ccy+' '+event+' quarters');
+  assert.deepEqual(rows.map(x=>x.actual),[q1,q2],ccy+' '+event+' values');
+  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl?.startsWith('https://')&&x.sourceUpdatedAt&&x.releaseDate&&x.releaseTimeKnown===false),ccy+' '+event+' provenance');
+ }
+});
