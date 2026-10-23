@@ -463,8 +463,8 @@ function rateHistory(payload){
  const next={};
  const cards=(payload.cards||[]).map(card=>{
   const seed=card.rows||[],previousHistory=Array.isArray(saved[card.id]?.history)?saved[card.id].history:[],
-   sourceTime=Date.parse(card.sourceUpdatedAt||''),now=Date.now(),
-   fresh=card.live===true&&card.stale!==true&&Number.isFinite(sourceTime)&&sourceTime<=now+60000&&now-sourceTime<=12*3600000,
+   sourceDay=String(card.sourceUpdatedAt||'').slice(0,10),utcDay=new Date().toISOString().slice(0,10),
+   fresh=card.live===true&&card.stale!==true&&/^\d{4}-\d{2}-\d{2}$/.test(sourceDay)&&sourceDay===utcDay,
    values=rateValues(seed,'latest');
   let history=previousHistory.filter(x=>x?.kind==='market'&&x.stamp&&Object.keys(x.values||{}).length);
   if(fresh&&Object.keys(values).length){
