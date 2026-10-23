@@ -206,3 +206,13 @@ test('Sweden unemployment is six verified SCB smoothed SA months with explicit r
  assert.ok(rows[0].revisionNote.includes('8.6%'));
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
+
+test('GBP unemployment ONS revised rolling-quarter history is six observations with provenance',()=>{
+ const archive=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const series=archive.currencies.GBP.filter(e=>e.event==='Unemployment rate · SA');
+ assert.equal(series.length,6);
+ assert.deepEqual(series.map(e=>e.reference),['2026-02','2026-03','2026-04','2026-05','2026-06','2026-07']);
+ assert.deepEqual(series.map(e=>e.actual),[5.0,4.9,4.9,4.9,4.9,4.7]);
+ assert.ok(series.every(e=>e.verificationStatus==='verified-primary'&&e.sourceUrl?.includes('ons.gov.uk')&&e.releaseDate&&e.sourceUpdatedAt&&e.referencePeriod&&e.revisionVintage==='2026-10-20'));
+ assert.equal(archive.currencies.GBP.filter(e=>e.event==='LFS unemployment · 3M SA').length,0);
+});
