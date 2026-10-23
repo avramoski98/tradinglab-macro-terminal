@@ -443,8 +443,8 @@ function renderRelease(x){let cls=impactClass(x);return `<div class="release"><d
 
 
 let RATE_STATE=null;
-function finiteRate(n){if(n===null||n===undefined||n===''||(typeof n==='string'&&/^(?:—|N\/A|NA|null|undefined)$/i.test(n.trim())))return NaN;const v=Number(n);return Number.isFinite(v)?v:NaN}
 const RATE_SNAPSHOT_KEY='tl_rates_snapshot_v3';
+function finiteRate(n){if(n===null||n===undefined||n===''||(typeof n==='string'&&/^(?:—|N\/A|NA|null|undefined)$/i.test(n.trim())))return NaN;const v=Number(n);return Number.isFinite(v)?v:NaN}
 function rateProbFmt(n){n=finiteRate(n);return Number.isFinite(n)?n.toFixed(2)+'%':'—'}
 function rateDeltaFmt(n){n=finiteRate(n);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}pp`:'—'}
 function rateValues(rows,field){let out={};for(let r of rows||[]){let v=finiteRate(r[field]);if(Number.isFinite(v))out[r.rate]=v}return out}
