@@ -76,3 +76,23 @@ test('Swiss SECO unemployment has six verified monthly observations and publicat
  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('seco.admin.ch')&&x.sourceUpdatedAt&&x.releaseTimeKnown===false));
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
+
+
+test('Canada core CPI median and trimmed series use six verified revised official months',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json'));
+ const specs={'Core CPI-median y/y':[2.1,2.1,1.9,2.0,2.0,1.9],'Core CPI-trim y/y':[2.0,2.0,1.9,1.9,1.9,1.8]};
+ for(const [name,values] of Object.entries(specs)){
+  const rows=d.currencies.CAD.filter(x=>x.event===name);
+  assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+  assert.deepEqual(rows.map(x=>x.actual),values);
+  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.stage==='official-revised-table'&&x.sourceUrl.includes('statcan.gc.ca')&&x.sourceUpdatedAt==='2026-10-19T12:30:00Z'));
+ }
+});
+
+test('Canada median and trimmed October 19 CPI releases are not left overdue',()=>{
+ const input={mode:'live',events:[{date:'2026-10-19T14:30:00+02:00',currency:'CAD',event:'Median CPI y/y',releaseState:'overdue',actual:'—',importance:'HIGH'},{date:'2026-10-19T14:30:00+02:00',currency:'CAD',event:'Trimmed CPI y/y',releaseState:'overdue',actual:'—',importance:'HIGH'}]};
+ const out=applyVerifiedReleaseOverlay(input);
+ assert.deepEqual(out.events.filter(x=>x.currency==='CAD').map(x=>x.actual),['1.9%','1.8%']);
+ assert.equal(out.events.filter(x=>x.currency==='CAD'&&x.releaseState==='overdue').length,0);
+ assert.ok(out.events.filter(x=>x.currency==='CAD').every(x=>x.verificationStatus==='verified-primary'));
+});
