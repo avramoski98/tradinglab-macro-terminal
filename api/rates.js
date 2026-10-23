@@ -98,7 +98,7 @@ async function fetchBankFromRoot(bank,index,rootText,rootError){
     if(!rootText)throw rootError||new Error('Central dashboard unavailable');
     const section=bankSection(rootText,bank,index);
     const sourceDate=parseSourceDate(rootText);
-    if(!sourceDate||Date.now()-Date.parse(sourceDate)>12*60*60*1000)throw new Error('Source timestamp missing or older than 12 hours');
+    if(!sourceDate||sourceDate.slice(0,10)!==checkedAt.slice(0,10))throw new Error('Source date is not current UTC day (source provides date only)');
     const probabilities=parseProbabilities(section);
     if(!probabilities)throw new Error('Probability block not published for this bank');
     return {
@@ -148,7 +148,9 @@ export default async function handler(req,res){
     snapshot:sourceUpdatedAt?sourceUpdatedAt.slice(0,10):null,
     updatedAt:checkedAt,
     sourceUpdatedAt:parseSourceDate(rootText),
-    freshnessSeconds:sourceUpdatedAt?Math.max(0,Math.floor((Date.now()-Date.parse(sourceUpdatedAt))/1000)):null,
+    sourceTimestampPrecision:'date',
+    freshnessSeconds:null,
+    freshnessDays:sourceUpdatedAt?Math.floor((Date.parse(checkedAt.slice(0,10)+'T00:00:00Z')-Date.parse(sourceUpdatedAt))/86400000):null,
     liveCount,
     totalCount:cards.length,
     previousReference:'Previous verified/reference market snapshot',
