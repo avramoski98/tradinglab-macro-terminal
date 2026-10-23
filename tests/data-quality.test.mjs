@@ -226,6 +226,29 @@ test('NZD BusinessNZ Manufacturing PMI has six primary-verified months and docum
  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.releaseTimeKnown===false&&x.sourceUrl.startsWith('https://businessnz.org.nz/')&&x.sourceUpdatedAt&&x.verifiedAt));
  assert.equal(rows[0].sourceUpdatedAt,'2026-09-11T00:00:00Z');
  assert.ok(rows.slice(1).every(x=>x.sourceUpdatedAt==='2026-10-16T00:00:00Z'));
- assert.equal(d.audit.lastBackfill.corrected,4);
- assert.equal(d.audit.lastBackfill.added,1);
+ assert.ok(rows.every(x=>x.sourceUrl&&x.revisionNote));
+});
+
+
+test('ONS September GBP retail sales resolves overdue calendar event as official release',()=>{
+ const base={date:'2026-10-23T08:00:00+02:00',currency:'GBP',event:'Retail Sales m/m',actual:'—',releaseState:'overdue',importance:'HIGH'};
+ const d=applyVerifiedReleaseOverlay({mode:'live',events:[base]});
+ const row=d.events.find(x=>x.currency==='GBP'&&x.event.startsWith('Retail Sales m/m'));
+ assert.equal(row?.releaseState,'released');
+ assert.equal(row?.actual,'-0.4%');
+ assert.equal(row?.previous,'+0.7%');
+ assert.equal(row?.verificationStatus,'verified-primary');
+ assert.ok(row?.sourceUrl.includes('ons.gov.uk'));
+ assert.equal(d.overdue,0);
+});
+
+test('ONS revised GBP retail volume index has six consistent verified April-September observations',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.GBP.filter(x=>x.event==='Retail Sales Volume Index · SA incl fuel');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[101.5,102.9,103.4,103.0,103.7,103.3]);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.unit.startsWith('index')&&x.sourceUrl.includes('ons.gov.uk')&&x.sourceUpdatedAt==='2026-10-23T06:00:00Z'&&x.releaseDate==='2026-10-23T06:00:00Z'&&x.revisionNote.includes('NOT monthly percent change')));
+ assert.equal(d.audit.lastBackfill.added,6);
+ assert.equal(d.audit.lastBackfill.corrected,0);
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
