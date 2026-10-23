@@ -92,7 +92,8 @@ test('Canada core CPI median and trimmed series use six verified revised officia
 test('Canada median and trimmed October 19 CPI releases are not left overdue',()=>{
  const input={mode:'live',events:[{date:'2026-10-19T14:30:00+02:00',currency:'CAD',event:'Median CPI y/y',releaseState:'overdue',actual:'—',importance:'HIGH'},{date:'2026-10-19T14:30:00+02:00',currency:'CAD',event:'Trimmed CPI y/y',releaseState:'overdue',actual:'—',importance:'HIGH'}]};
  const out=applyVerifiedReleaseOverlay(input);
- assert.deepEqual(out.events.filter(x=>x.currency==='CAD').map(x=>x.actual),['1.9%','1.8%']);
- assert.equal(out.events.filter(x=>x.currency==='CAD'&&x.releaseState==='overdue').length,0);
- assert.ok(out.events.filter(x=>x.currency==='CAD').every(x=>x.verificationStatus==='verified-primary'));
+ const core=out.events.filter(x=>x.currency==='CAD'&&/^(Median|Trimmed) CPI/.test(x.event));
+ assert.deepEqual(core.map(x=>x.actual),['1.9%','1.8%']);
+ assert.equal(core.filter(x=>x.releaseState==='overdue').length,0);
+ assert.ok(core.every(x=>x.verificationStatus==='verified-primary'));
 });
