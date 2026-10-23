@@ -126,14 +126,15 @@ test('archived weekly rate odds and meeting expectations are never displayed as 
 
 test('October 23 CAD retail and Michigan final releases resolve overdue without inventing consensus',()=>{
  const input={mode:'live',events:[
+  {date:'2026-10-23T14:30:00+02:00',currency:'CAD',event:'Core Retail Sales m/m',actual:'—',forecast:'1.1%',releaseState:'overdue'},
   {date:'2026-10-23T14:30:00+02:00',currency:'CAD',event:'Retail Sales m/m',actual:'—',forecast:'1.3%',releaseState:'overdue'},
   {date:'2026-10-23T16:00:00+02:00',currency:'USD',event:'Revised UoM Consumer Sentiment',actual:'—',forecast:'46.3',releaseState:'overdue'},
   {date:'2026-10-23T16:00:00+02:00',currency:'USD',event:'Revised UoM Inflation Expectations',actual:'—',forecast:'4.7%',releaseState:'overdue'}
  ]};
  const out=applyVerifiedReleaseOverlay(input);
  const targets=out.events.filter(x=>/Retail Sales m\/m|Revised UoM/.test(x.event));
- assert.deepEqual(targets.map(x=>x.actual),['1.2%','48.0','4.7%']);
+ assert.deepEqual(targets.map(x=>x.actual),['1.1%','1.2%','48.0','4.7%']);
  assert.ok(targets.every(x=>x.releaseState==='released'&&x.verificationStatus==='verified-secondary'&&x.sourceUrl));
- assert.deepEqual(targets.map(x=>x.forecast),['1.3%','46.3','4.7%']);
+ assert.deepEqual(targets.map(x=>x.forecast),['1.1%','1.3%','46.3','4.7%']);
  assert.equal(out.overdue,0);
 });
