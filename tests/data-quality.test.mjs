@@ -97,3 +97,13 @@ test('Canada median and trimmed October 19 CPI releases are not left overdue',()
  assert.equal(core.filter(x=>x.releaseState==='overdue').length,0);
  assert.ok(core.every(x=>x.verificationStatus==='verified-primary'));
 });
+
+test('Japan official unemployment SA six-month revised history is complete and sourced',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.JPY.filter(x=>x.event==='Unemployment rate · SA');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[2.7,2.5,2.5,2.5,2.4,2.5]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-04-28','2026-05-29','2026-06-30','2026-07-31','2026-08-28','2026-10-02']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('stat.go.jp')&&x.sourceUpdatedAt==='2026-10-02T00:00:00Z'&&x.releaseTimeKnown===false&&x.stage==='official-revised-table'||x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('stat.go.jp')&&x.reference==='2026-08'));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+});
