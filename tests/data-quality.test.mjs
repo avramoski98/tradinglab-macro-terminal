@@ -138,3 +138,11 @@ test('October 23 CAD retail and Michigan final releases resolve overdue without 
  assert.deepEqual(targets.map(x=>x.forecast),['1.1%','1.3%','46.3','4.7%']);
  assert.equal(out.overdue,0);
 });
+
+test('weekly focus includes late October 23 verified-secondary catalysts and caveats',()=>{
+ const h=fs.readFileSync('index.html','utf8');
+ assert.ok(h.includes('US Michigan final (23 Oct, 16:00 CEST)'));
+ assert.ok(h.includes('Canada August Retail Sales (23 Oct, 14:30 CEST)'));
+ assert.ok(h.includes('not independently verified against the University of Michigan primary bulletin'));
+ assert.ok(h.includes('primary bulletin not independently retrieved'));
+});
