@@ -165,3 +165,19 @@ test('G10 revised quarterly GDP Q1/Q2 history has two primary-source observation
   assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl?.startsWith('https://')&&x.sourceUpdatedAt&&x.releaseDate&&x.releaseTimeKnown===false),ccy+' '+event+' provenance');
  }
 });
+
+test('BLS April–September payroll and earnings history is source-verified with revisions dated',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const specs=[
+  ['Nonfarm Payrolls',[148,63,31,-10,133,29]],
+  ['Average Hourly Earnings y/y',[3.6,3.4,3.5,3.2,3.1,3.0]]
+ ];
+ for(const [event,expected] of specs){
+  const rows=d.currencies.USD.filter(x=>x.event===event).sort((a,b)=>a.reference.localeCompare(b.reference));
+  assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+  assert.deepEqual(rows.map(x=>x.actual),expected);
+  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('bls.gov')&&x.sourceUpdatedAt&&x.releaseDate));
+ }
+ assert.equal(d.currencies.USD.find(x=>x.event==='Nonfarm Payrolls'&&x.reference==='2026-05').sourceUpdatedAt,'2026-08-07T12:30:00Z');
+ assert.equal(d.currencies.USD.find(x=>x.event==='Nonfarm Payrolls'&&x.reference==='2026-06').sourceUpdatedAt,'2026-09-04T12:30:00Z');
+});
