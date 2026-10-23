@@ -1,7 +1,8 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-09T15:45:00Z';
+const VERIFIED_AT='2026-10-23T23:34:00Z';
 const VERIFIED=[
+ {day:'2026-10-23',time:'08:00',ccy:'GBP',match:/^Retail Sales m\/m(?: ·.*)?$/i,event:'Retail Sales m/m · Sep (volume SA incl fuel)',actual:'-0.4%',previous:'+0.7%',importance:'HIGH',source:'UK Office for National Statistics · Retail sales September 2026, 23 Oct',url:'https://www.ons.gov.uk/businessindustryandtrade/retailindustry/bulletins/retailsales/september2026',status:'verified-primary',verifiedAt:'2026-10-23T23:34:00Z',force:true},
  {day:'2026-10-22',time:'10:00',ccy:'NOK',match:/^Unemployment Rate.*Sep|^LFS Unemployment.*Sep/i,event:'LFS unemployment trend · Sep',actual:'4.6%',previous:'4.6%',importance:'HIGH',source:'Statistics Norway (SSB) · Labour Force Survey, 22 Oct 2026',url:'https://www.ssb.no/arbeid-og-lonn/sysselsetting/statistikk/arbeidskraftundersokelsen/artikler/arbeidsledigheten-pa-4-6-prosent-i-september',status:'verified-primary',verifiedAt:'2026-10-23T17:45:00Z',force:true},
  {day:'2026-10-23',time:'14:30',ccy:'CAD',match:/^Core Retail Sales m\/m$/i,event:'Core Retail Sales m/m · Aug (ex autos & gasoline)',actual:'1.1%',importance:'HIGH',source:'Wall Street Journal reporting Statistics Canada, 23 Oct 2026',url:'https://www.wsj.com/economy/consumers/canada-retail-sales-look-to-build-on-augusts-rebound-c80f8bec',status:'verified-secondary',verifiedAt:'2026-10-23T14:15:00Z',force:true},
  {day:'2026-10-23',time:'14:30',ccy:'CAD',match:/^Retail Sales m\/m$/i,event:'Retail Sales m/m · Aug',actual:'1.2%',importance:'HIGH',source:'Reuters reporting Statistics Canada, 23 Oct 2026',url:'https://www.reuters.com/world/americas/canada-august-retail-sales-rise-12-2026-10-23/',status:'verified-secondary',verifiedAt:'2026-10-23T14:12:00Z',force:true},
