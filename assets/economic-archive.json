@@ -5446,7 +5446,7 @@
     "checkedAt": "2026-10-23T10:18:00.332Z",
     "cutoff": "2026-10-23",
     "scope": "Statistics Canada unemployment Apr-Sep verified from six official monthly releases; remaining legacy observations not verified.; USD headline/core CPI Mar–Aug verified against six original BLS releases with official release timestamps.; NZD March CPI and revised March unemployment/GDP verified from Stats NZ; duplicate unverified quarterly unemployment rows replaced.; GBP CPI Mar–Jul 2026 checked against five original ONS bulletins, with release dates; Aug already verified.; EUR retail sales original release dates Mar–Jul 2026 verified against Eurostat bulletins; actuals remain revised values from 6 Oct 2026.; USD PPI Apr-Sep 2026 official revised BLS table verified, and Sep headline/core CPI official BLS release added.; AUD Apr-Sep seasonally adjusted unemployment revised history verified from ABS 15 Oct; EUR Apr-Sep HICP final Eurostat 16 Oct; GBP Q1 GDP verified from ONS revised Q2 bulletin.; AUD Apr-Jul release dates verified against ABS publication calendar; EUR Sep final HICP release date corrected to 16 Oct (flash was 2 Oct).; USD Jul/Aug revised NFP original release dates verified from BLS calendar (Aug 7 / Sep 4); Q1 revised GDP 2.5% published in BEA Sep 30 revision.; CAD CPI March-September 2026 backfilled from seven Statistics Canada official monthly releases with source URLs and release dates.; USD Apr–Aug unemployment rate SA backfilled against original BLS Employment Situation releases (May 8, Jun 5, Jul 2, Aug 7, Sep 4); September previously verified.; JPY Mar–Sep headline/core CPI 2025-base history verified against Statistics Bureau of Japan 23 Oct revised national CPI table; 3 series × 7 months, original release dates from official CPI schedule. June headline legacy value corrected from 1.7 to 1.6.; CHF CPI y/y Apr–Aug 2026 independently verified from five Swiss Federal Statistical Office press releases (FSO), release dates 5 May–3 Sep; added May and July and verified three existing legacy values.; 23 Oct: integrated 12 existing ONS/Stats NZ primary-verified CPI addendum records into main archive, plus 7 ONS core CPI y/y monthly readings Mar–Sep 2026 checked against original ONS bulletins; q/q and y/y series remain distinct.",
-    "verified": 180,
+    "verified": 181,
     "total": 305,
     "lastBackfill": {
       "verifiedAt": "2026-10-23T10:18:00.332Z",
@@ -5454,7 +5454,9 @@
       "addedFromExistingAddendum": 12,
       "newCoreCpiObservations": 7,
       "scope": "GBP CPI y/y, m/m, core y/y; NZD quarterly CPI y/y and q/q",
-      "note": "One older JPY household-spending row is flagged verified-primary but has no sourceUpdatedAt, excluded from verified audit count."
-    }
+      "note": "181 official-value-verified observations, 180 with full release/source-update provenance. One older JPY household-spending row lacks sourceUpdatedAt and is excluded from freshness/coverage certification."
+    },
+    "provenanceComplete": 180,
+    "undatedVerified": 1
   }
 }
