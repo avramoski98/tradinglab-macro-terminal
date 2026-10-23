@@ -63,7 +63,7 @@ test('Sweden final CPI CPIF and core CPIF each have six official monthly release
   assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.stage==='final'&&x.sourceUrl.includes('scb.se')&&x.releaseDate&&x.sourceUpdatedAt),name+' provenance');
  }
  const latest=d.currencies.SEK.filter(x=>x.reference==='2026-09'&&names.includes(x.event));
- assert.deepEqual(latest.map(x=>x.actual),[1.1,1.5,0.5]);
+ assert.deepEqual(names.map(name=>latest.find(x=>x.event===name)?.actual),[1.1,1.5,0.5]);
 });
 
 
