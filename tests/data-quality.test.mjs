@@ -216,3 +216,16 @@ test('GBP unemployment ONS revised rolling-quarter history is six observations w
  assert.ok(series.every(e=>e.verificationStatus==='verified-primary'&&e.sourceUrl?.includes('ons.gov.uk')&&e.releaseDate&&e.sourceUpdatedAt&&e.referencePeriod&&e.revisionVintage==='2026-10-20'));
  assert.equal(archive.currencies.GBP.filter(e=>e.event==='LFS unemployment · 3M SA').length,0);
 });
+
+test('NZD BusinessNZ Manufacturing PMI has six primary-verified months and documented revision vintages',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.NZD.filter(x=>x.event==='BusinessNZ Manufacturing PMI');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[50.5,51.4,60.1,54.4,53.3,56.5]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-15','2026-06-12','2026-07-09','2026-08-14','2026-09-11','2026-10-16']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.releaseTimeKnown===false&&x.sourceUrl.startsWith('https://businessnz.org.nz/')&&x.sourceUpdatedAt&&x.verifiedAt));
+ assert.equal(rows[0].sourceUpdatedAt,'2026-09-11T00:00:00Z');
+ assert.ok(rows.slice(1).every(x=>x.sourceUpdatedAt==='2026-10-16T00:00:00Z'));
+ assert.equal(d.audit.lastBackfill.corrected,4);
+ assert.equal(d.audit.lastBackfill.added,1);
+});
