@@ -63,8 +63,6 @@ export function applyVerifiedReleaseOverlay(payload){
   };
   if(i>=0)rows[i]=record;else rows.push(record);
  }
- const audDate='2026-10-15T02:30:00+02:00';
- if(!rows.some(e=>e.currency==='AUD'&&String(e.date||'').slice(0,10)==='2026-10-15'&&/Employment Change|Unemployment Rate|Labour Force/i.test(String(e.event||''))))rows.push({date:audDate,sourceDate:audDate,timeZone:'Europe/Skopje',country:'AUD',currency:'AUD',event:'Labour Force · Sep',importance:'HIGH',previous:'—',forecast:'—',actual:'—',label:'Scheduled',impact:'Neutral',releaseState:Date.parse(audDate)>Date.now()?'scheduled':'overdue',source:'Australian Bureau of Statistics',sourceUrl:'https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release',verificationStatus:'official-schedule'});
  for(const o of OFFICIAL_UPCOMING){
   if(rows.some(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.date.slice(0,10)&&o.match.test(String(e.event||''))))continue;
   const upcoming=Date.parse(o.date)>Date.now();
