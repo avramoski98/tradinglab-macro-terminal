@@ -358,3 +358,14 @@ test('BEA October 6 revised-vintage USD goods-and-services trade balance has six
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
 });
+
+
+test('SSB October 9 official NOK total PPI table verifies six monthly y/y readings without implying consumer CPI',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.NOK.filter(x=>x.category==='inflation'&&x.event==='Producer Price Index (PPI) total y/y').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[22.7,24.0,14.9,23.4,30.1,48.8]);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.stage==='official-revised-table'&&x.sourceUrl.includes('ssb.no/en/priser-og-prisindekser/')&&x.sourceUpdatedAt==='2026-10-09T08:00:00Z'&&x.releaseDate==='2026-10-09T08:00:00Z'&&x.revisionNote.includes('NOT the original first release')&&x.revisionNote.includes('not consumer CPI')));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+});
