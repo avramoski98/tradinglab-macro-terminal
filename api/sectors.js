@@ -27,6 +27,6 @@ export default async function handler(req,res){
     const spy=raw.find(x=>x.id==='SPY');
     if(!spy) throw new Error('SPY benchmark unavailable');
     const sectors=raw.filter(x=>!x.benchmark).map(x=>({...x,rel1d:Number.isFinite(x.d1)&&Number.isFinite(spy.d1)?x.d1-spy.d1:null,rel1w:Number.isFinite(x.w1)&&Number.isFinite(spy.w1)?x.w1-spy.w1:null,rel1m:Number.isFinite(x.m1)&&Number.isFinite(spy.m1)?x.m1-spy.m1:null}));
-    return res.status(200).json({mode:'live',provider:'TradingView',updatedAt:new Date().toISOString(),benchmark:spy,sectors});
+    return res.status(200).json({mode:'snapshot',provider:'TradingView',quoteTimestamp:null,freshnessStatus:'UNVERIFIED_QUOTE_TIME',notice:'Sector ETF prices and performance are last available snapshots; retrieval time is not exchange quote time.',updatedAt:new Date().toISOString(),benchmark:spy,sectors});
   }catch(error){res.setHeader('Cache-Control','no-store');return res.status(503).json({mode:'error',updatedAt:new Date().toISOString(),sectors:[],error:String(error?.message||error)});}
 }
