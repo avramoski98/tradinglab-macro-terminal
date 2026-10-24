@@ -591,3 +591,21 @@ test('Census August wholesale inventories final is released, distinct from the a
  assert.equal(row.forecastVerificationStatus,'provider-unverified');
  assert.equal(out.overdue,0);
 });
+
+test('NZIER Q3 business confidence is primary-verified, SA-consistent, and on the actual October 6 release date',()=>{
+ const input={mode:'schedule-fallback',events:[{date:'2026-10-05T21:00:00+02:00',currency:'NZD',event:'NZIER Business Confidence',actual:'—',previous:'8%',releaseState:'overdue'}]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const row=out.events.find(x=>x.currency==='NZD'&&x.event.startsWith('NZIER Business Confidence'));
+ assert.equal(row.actual,'+40%');assert.equal(row.previous,'+14%');assert.equal(row.forecast,'—');
+ assert.equal(row.date,'2026-10-06T01:00:00+02:00');assert.equal(row.releaseState,'released');
+ assert.equal(row.verificationStatus,'verified-primary');assert.match(row.sourceUrl,/nzier.org.nz/);
+ assert.equal(out.events.filter(x=>x.currency==='NZD'&&/NZIER Business Confidence/i.test(x.event)).length,1);
+});
+test('RICS September house price balance is released with primary source and no invented consensus',()=>{
+ const input={mode:'live',events:[{date:'2026-10-08T01:01:00+02:00',currency:'GBP',event:'RICS Housing Price Balance',actual:'—',previous:'-28%',releaseState:'overdue'}]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const row=out.events.find(x=>x.currency==='GBP'&&x.event.startsWith('RICS Housing Price Balance'));
+ assert.equal(row.actual,'-32%');assert.equal(row.previous,'-28%');assert.equal(row.forecast,'—');
+ assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-primary');
+ assert.match(row.sourceUrl,/rics.org/);assert.equal(out.overdue,0);
+});
