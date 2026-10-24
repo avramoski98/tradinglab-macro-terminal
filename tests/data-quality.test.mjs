@@ -252,3 +252,12 @@ test('ONS revised GBP retail volume index has six consistent verified April-Sept
  assert.equal(d.audit.lastBackfill.corrected,0);
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
+
+test('Oct 23 flash PMI secondary actuals clear overdue statuses without invented consensus',()=>{
+ const cases=[['USD','Flash Manufacturing PMI','56.0'],['USD','Flash Services PMI','57.9'],['EUR','Flash Manufacturing PMI','52.4'],['EUR','Flash Services PMI','51.7'],['GBP','Flash Manufacturing PMI','52.8'],['GBP','Flash Services PMI','53.1'],['EUR','German Flash Manufacturing PMI','54.2'],['EUR','German Flash Services PMI','51.7']];
+ const events=cases.map(([currency,event])=>({date:'2026-10-23T10:00:00+02:00',currency,event,actual:'—',forecast:'—',releaseState:'overdue',importance:'HIGH'}));
+ const result=applyVerifiedReleaseOverlay({mode:'live',events});
+ for(const [currency,event,actual] of cases){const row=result.events.find(x=>x.currency===currency&&x.event.startsWith(event+' · Oct'));
+  assert.ok(row,currency+' '+event+' missing');assert.equal(row.actual,actual);assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-secondary');assert.equal(row.forecastVerificationStatus,'provider-unverified');}
+ assert.equal(result.events.filter(x=>x.releaseState==='overdue').length,0);
+});
