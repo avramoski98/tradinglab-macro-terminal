@@ -2,6 +2,11 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // October 6 NZIER QSBO: use the seasonally adjusted net balance consistently (40 vs 14), not the unadjusted 43 vs 8.
+ // Official NZIER release was 10:00 NZDT on Oct 6 = 01:00 Europe/Skopje on Oct 6.
+ {day:'2026-10-06',matchDays:['2026-10-05','2026-10-06'],time:'01:00',dateOverride:'2026-10-06T01:00:00+02:00',ccy:'NZD',match:/^NZIER Business Confidence(?: ·.*)?$/i,event:'NZIER Business Confidence · Q3 (seasonally adjusted)',actual:'+40%',previous:'+14%',forecast:'—',importance:'MED',source:'NZIER · Quarterly Survey of Business Opinion, 6 Oct 2026',url:'https://www.nzier.org.nz/news/nziers-qsbo-shows-a-further-lift-in-business-confidence-despite-soft-activity',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:true,verifiedAt:'2026-10-24T21:15:00Z',force:true},
+ // September RICS housing price balance: -32 net balance points, not a 32% house-price decline.
+ {day:'2026-10-08',time:'01:00',ccy:'GBP',match:/^RICS Housing Price Balance(?: ·.*)?$/i,event:'RICS Housing Price Balance · Sep (net balance)',actual:'-32%',previous:'-28%',forecast:'—',importance:'MED',source:'RICS · UK Residential Market Survey September 2026',url:'https://www.rics.org/news-insights/uk-residential-survey-september-2026',status:'verified-primary',sourcePublishedAt:'2026-10-08',releaseTimeVerified:false,verifiedAt:'2026-10-24T21:15:00Z',force:true},
  // Official Oct 5–6 releases previously left OVERDUE by the calendar feed. Forecasts are not independently verified.
  {day:'2026-10-05',time:'06:00',ccy:'JPY',match:/^Consumer Confidence(?: ·.*)?$/i,event:'Consumer Confidence · Sep (seasonally adjusted)',actual:'35.4',previous:'35.5',importance:'HIGH',source:'Cabinet Office of Japan · Consumer Confidence Survey, 5 Oct 2026',url:'https://www.esri.cao.go.jp/en/stat/shouhi/shouhi-e.html',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:false,verifiedAt:'2026-10-24T18:15:00Z',force:true},
  {day:'2026-10-06',time:'10:00',ccy:'CHF',match:/^Unemployment Rate(?: ·.*)?$/i,event:'Unemployment Rate · Sep (seasonally adjusted)',actual:'3.1%',previous:'3.1%',importance:'MED',source:'Swiss SECO · Labour Market Situation, 6 Oct 2026',url:'https://www.skb.admin.ch/fr/newnsb/Cdju9-o8WGML',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:false,verifiedAt:'2026-10-24T18:15:00Z',force:true},
@@ -83,12 +88,13 @@ export function applyVerifiedReleaseOverlay(payload){
  const rows=payload.events.map(e=>({...e}));
  const activeDates=new Set(rows.map(e=>String(e.date||'').slice(0,10)));
  for(const o of VERIFIED){
-  let i=rows.findIndex(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.day&&o.match.test(String(e.event||'')));
+  const matchDays=o.matchDays||[o.day];
+  let i=rows.findIndex(e=>e.currency===o.ccy&&matchDays.includes(String(e.date||'').slice(0,10))&&o.match.test(String(e.event||'')));
   const base=i>=0?rows[i]:null;
-  if(!base&&!activeDates.has(o.day)&&!o.force)continue;
+  if(!base&&!matchDays.some(day=>activeDates.has(day))&&!o.force)continue;
   const record={
-   ...(base||{}),date:base?.date||o.day+'T'+o.time+':00+02:00',
-   sourceDate:base?.sourceDate||o.day+'T'+o.time+':00+02:00',
+   ...(base||{}),date:o.dateOverride||base?.date||o.day+'T'+o.time+':00+02:00',
+   sourceDate:o.dateOverride||base?.sourceDate||o.day+'T'+o.time+':00+02:00',
    timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
    actual:o.actual,previous:o.previous??base?.previous??'—',
    forecast:o.forecast??base?.forecast??'—',
