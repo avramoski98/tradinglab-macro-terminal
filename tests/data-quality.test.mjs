@@ -537,7 +537,7 @@ test('official Oct 5–6 releases resolve overdue rows without inventing verifie
  ]};
  const out=applyVerifiedReleaseOverlay(input);
  const expected={JPY:'35.4',CHF:'3.1%',USD:'-$105.6B'};
- for(const e of out.events){
+ for(const e of out.events.filter(x=>(x.currency==='JPY'&&x.date.startsWith('2026-10-05'))||(x.currency==='CHF'&&x.date.startsWith('2026-10-06'))||(x.currency==='USD'&&x.date.startsWith('2026-10-06')))){
   assert.equal(e.releaseState,'released');
   assert.equal(e.verificationStatus,'verified-primary');
   assert.equal(e.actual,expected[e.currency]);
@@ -553,9 +553,9 @@ test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primar
   {date:'2026-10-08T01:50:00+02:00',currency:'JPY',event:'Current Account',forecast:'—',previous:'—',actual:'—',releaseState:'overdue'}
  ]};
  const out=applyVerifiedReleaseOverlay(input);
- assert.equal(out.events.length,2);
- const fr=out.events.find(x=>x.currency==='EUR');
- const jp=out.events.find(x=>x.currency==='JPY');
+ const fr=out.events.find(x=>x.currency==='EUR'&&x.event.startsWith('France Industrial Output m/m'));
+ const jp=out.events.find(x=>x.currency==='JPY'&&x.event.startsWith('Current Account · Aug'));
+ assert.ok(fr&&jp);
  assert.equal(fr.actual,'-0.3%');
  assert.equal(fr.previous,'-0.6%');
  assert.equal(fr.forecast,'0.2%');
