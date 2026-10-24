@@ -261,3 +261,21 @@ test('Oct 23 flash PMI secondary actuals clear overdue statuses without invented
   assert.ok(row,currency+' '+event+' missing');assert.equal(row.actual,actual);assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-secondary');assert.equal(row.forecastVerificationStatus,'provider-unverified');}
  assert.equal(result.events.filter(x=>x.releaseState==='overdue').length,0);
 });
+
+
+test('USD Census retail sales Apr-Sep 2026 primary backfill preserves original and revised vintages',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.USD.filter(x=>x.event==='Retail Sales m/m'&&x.verificationStatus==='verified-primary');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[0.5,0.9,0.2,-0.4,1.3,0.8]);
+ assert.ok(rows.every(x=>x.releaseDate&&x.sourceUpdatedAt&&x.sourceUrl.includes('census.gov')&&x.revisionNote.includes('NOT interpret as a fully harmonized revised series')));
+ assert.ok(rows.slice(0,3).every(x=>x.stage==='first-release-vintage'));
+ assert.ok(rows.slice(3,5).every(x=>x.stage==='revised-oct15-2026'));
+ assert.equal(rows[5].stage,'advance-oct15-2026');
+ assert.equal(d.audit.lastBackfill.newlyVerified,6);
+ assert.equal(d.audit.lastBackfill.corrected,3);
+ assert.equal(d.audit.lastBackfill.added,1);
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.ok(html.includes('MIXED VINTAGES — not one harmonized revision series.'));
+});
