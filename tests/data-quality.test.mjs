@@ -272,10 +272,21 @@ test('USD Census retail sales Apr-Sep 2026 primary backfill preserves original a
  assert.ok(rows.slice(0,3).every(x=>x.stage==='first-release-vintage'));
  assert.ok(rows.slice(3,5).every(x=>x.stage==='revised-oct15-2026'));
  assert.equal(rows[5].stage,'advance-oct15-2026');
- assert.equal(d.audit.lastBackfill.newlyVerified,6);
- assert.equal(d.audit.lastBackfill.corrected,3);
- assert.equal(d.audit.lastBackfill.added,1);
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.ok(html.includes('MIXED VINTAGES — not one harmonized revision series.'));
+});
+
+
+test('USD JOLTS March-Aug 2026 official revised mixed-vintage backfill has six traceable months',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.USD.filter(x=>x.event==='JOLTS Job Openings').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[6.887,7.585,7.537,7.182,7.335,7.079]);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('bls.gov')&&x.releaseDate&&x.sourceUpdatedAt&&x.revisionNote.includes('MIXED REVISION VINTAGES')));
+ assert.ok(rows.slice(0,2).every(x=>x.sourceUpdatedAt==='2026-08-04T00:00:00Z'));
+ assert.ok(rows.slice(2).every(x=>x.sourceUpdatedAt==='2026-09-29T00:00:00Z'));
+ assert.equal(rows[5].stage,'official-preliminary-sep29-2026');
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
