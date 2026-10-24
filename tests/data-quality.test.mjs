@@ -346,3 +346,15 @@ test('JPY G10 labor UI keeps nominal and real wages as distinct six-month series
  assert.deepEqual(jp[1].p.map(x=>x[1]).join(','),'1.4,2,1.6,2.2,2,1.5');
  assert.equal(c.econIndicatorList('EUR','labor').length,1,'no extra real-wage indicator for other G10');
 });
+
+test('BEA October 6 revised-vintage USD goods-and-services trade balance has six verified monthly readings',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.USD.filter(x=>x.category==='growth'&&x.event==='Trade Balance').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[-53.657,-52.883,-75.752,-71.182,-92.826,-105.572]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-05T12:30:00Z','2026-06-09T12:30:00Z','2026-07-07T12:30:00Z','2026-08-04T12:30:00Z','2026-09-03T12:30:00Z','2026-10-06T12:30:00Z']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUpdatedAt==='2026-10-06T12:30:00Z'&&x.revisionVintage==='2026-10-06'&&x.sourceUrl.includes('bea.gov/sites/default/files/2026-10/trad0826.pdf')&&x.revisionNote.includes('GOODS AND SERVICES')));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
+});
