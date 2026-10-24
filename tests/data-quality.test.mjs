@@ -636,3 +636,10 @@ test('official Japan Oct 6 Ueda speech and Oct 8 Economy Watchers are released w
   assert.equal(row.lastUpdate.slice(0,10),row.date.slice(0,10));
  }
 });
+
+test('Weekly Focus and Overview never claim a fixed October freshness date',()=>{
+ assert.ok(html.includes('Currency Focus · Latest verified catalysts + upcoming policy week'));
+ assert.ok(html.includes('Source verification and publication timestamps are shown per release'));
+ assert.ok(!html.includes('Official releases below were checked on 7 October 2026'));
+ assert.ok(!html.includes('Currency Focus · 23 October catalysts + next policy week'));
+});
