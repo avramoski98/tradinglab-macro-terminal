@@ -478,3 +478,19 @@ test('NOK LFS six verified trend observations are not relabeled as SA',()=>{
  assert.ok(html.includes("ccy==='NOK'?/^Unemployment rate · trend$/i.test(ev)"));
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
+
+
+test('Canada S&P manufacturing PMI has six dated observations with explicit primary versus secondary provenance',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.CAD.filter(x=>x.event==='S&P Manufacturing PMI').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[53.3,52.9,53.0,53.5,53.0,51.5]);
+ assert.deepEqual(rows.map(x=>x.verificationStatus),['verified-primary','verified-primary','verified-secondary','verified-secondary','verified-secondary','verified-secondary']);
+ assert.ok(rows.every(x=>x.releaseDate&&x.sourceUpdatedAt&&x.sourceUrl&&x.verifiedAt&&x.forecast===null));
+ assert.ok(rows.slice(0,2).every(x=>new URL(x.sourceUrl).hostname==='www.pmi.spglobal.com'&&x.releaseTimeKnown));
+ assert.ok(rows.slice(2).every(x=>x.releaseTimeKnown===false&&x.sourceTimestampPrecision==='date'));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ // Secondary Reuters checks are traceable, but primary-only coverage must stay incomplete.
+ assert.equal(rows.filter(x=>x.verificationStatus==='verified-primary').length,2);
+});
