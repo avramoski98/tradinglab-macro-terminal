@@ -392,3 +392,18 @@ test('USD wage m/m backfill stays separate from annual wage growth in Economic T
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
+
+
+test('JPY household consumption six-month official revised history is source-linked and independently selectable',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.JPY.filter(x=>x.event==='Household Consumption Expenditure y/y · real').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[-2.9,-0.5,-0.4,-3.3,-3.6,-3.1]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-12','2026-06-05','2026-07-07','2026-08-07','2026-09-04','2026-10-09']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl==='https://www.stat.go.jp/data/kakei/sokuhou/tsuki/pdf/fies_mr.pdf'&&x.sourceUpdatedAt==='2026-10-09T00:00:00Z'&&x.frequency==='monthly'&&x.forecast===null));
+ assert.ok(rows.every(x=>x.revisionNote.includes('retrospective CPI 2025-base revision')));
+ assert.ok(html.includes("if(ccy==='JPY'&&cat==='growth')defs="));
+ assert.ok(html.includes("id:'household',label:'Household Consumption y/y · real'"));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+});
