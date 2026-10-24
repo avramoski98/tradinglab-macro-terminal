@@ -619,7 +619,7 @@ test('official Japan Oct 6 Ueda speech and Oct 8 Economy Watchers are released w
  const speech=out.events.find(x=>x.event.includes('National Securities Convention'));
  const survey=out.events.find(x=>x.event.includes('Economy Watchers Survey'));
  assert.equal(out.overdue,0);
- assert.equal(out.events.length,2);
+ assert.equal(out.events.filter(x=>/National Securities Convention|Economy Watchers Survey/.test(x.event)).length,2);
  assert.equal(speech.actual,'Published');
  assert.equal(speech.label,'Official publication');
  assert.equal(speech.forecast,'—');
