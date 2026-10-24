@@ -514,6 +514,6 @@ test('qualitative Fed and ECB minutes are published, not overdue or numeric surp
   assert.equal(row.lastUpdate.slice(0,10),row.date.slice(0,10));
   assert.ok(row.sourceUrl.startsWith('https://'));
  }
- assert.equal(out.events.find(x=>x.currency==='EUR').releaseTimeVerified,false);
- assert.equal(out.events.find(x=>x.currency==='USD').releaseTimeVerified,true);
+ assert.equal(publications.find(x=>x.currency==='EUR').releaseTimeVerified,false);
+ assert.equal(publications.find(x=>x.currency==='USD').releaseTimeVerified,true);
 });
