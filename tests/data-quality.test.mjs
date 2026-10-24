@@ -643,3 +643,18 @@ test('Weekly Focus and Overview never claim a fixed October freshness date',()=>
  assert.ok(!html.includes('Official releases below were checked on 7 October 2026'));
  assert.ok(!html.includes('Currency Focus · 23 October catalysts + next policy week'));
 });
+
+test('Oct 7 CHF foreign currency reserves are released with secondary-only provenance',()=>{
+ const input={mode:'schedule-fallback',events:[{date:'2026-10-07T09:00:00+02:00',currency:'CHF',event:'Foreign Currency Reserves',actual:'—',previous:'770B',forecast:'—',importance:'MED',releaseState:'overdue'}]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const row=out.events.find(x=>x.currency==='CHF'&&x.event.startsWith('Foreign Currency Reserves'));
+ assert.equal(row.actual,'CHF 770.476B');
+ assert.equal(row.previous,'CHF 770.074B');
+ assert.equal(row.forecast,'—');
+ assert.equal(row.releaseState,'released');
+ assert.equal(row.verificationStatus,'verified-secondary');
+ assert.equal(row.releaseTimeVerified,false);
+ assert.match(row.sourceUrl,/metatrader.com/);
+ assert.equal(out.events.filter(x=>x.currency==='CHF'&&/Foreign Currency Reserves/.test(x.event)).length,1);
+ assert.equal(out.overdue,0);
+});
