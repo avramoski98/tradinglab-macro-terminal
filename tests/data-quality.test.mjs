@@ -561,6 +561,8 @@ test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primar
  assert.equal(fr.forecast,'0.2%');
  assert.match(fr.event,/total industry/);
  assert.equal(jp.actual,'¥4.062T');
+ assert.equal(jp.previous,'¥2.989T');
+ assert.equal(jp.forecast,'—'); // Provider forecast belonged to a seasonally adjusted series.
  assert.match(jp.event,/unadjusted/);
  for(const e of [fr,jp]){
   assert.equal(e.releaseState,'released');
