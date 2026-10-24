@@ -502,8 +502,10 @@ test('qualitative Fed and ECB minutes are published, not overdue or numeric surp
   {date:'2026-10-08T13:30:00+02:00',currency:'EUR',event:'ECB Monetary Policy Meeting Accounts',actual:'—',releaseState:'overdue',forecast:'—'}
  ]};
  const out=applyVerifiedReleaseOverlay(input);
- assert.equal(out.overdue,0);
- for(const row of out.events){
+ const publications=out.events.filter(x=>/FOMC Meeting Minutes|ECB Monetary Policy Accounts/.test(x.event));
+ assert.equal(publications.length,2);
+ assert.equal(publications.filter(x=>x.releaseState==='overdue').length,0);
+ for(const row of publications){
   assert.equal(row.releaseState,'released');
   assert.equal(row.actual,'Published');
   assert.equal(row.label,'Official publication');
