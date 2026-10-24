@@ -724,7 +724,7 @@ const ECON_TRENDS={
    AUD:{metric:'Unemployment rate · SA',p:[['2026-04',4.5],['2026-05',4.4],['2026-06',4.4],['2026-07',4.5],['2026-08',4.6]]},
    NZD:{metric:'Unemployment rate · quarterly',p:[['2026-03',5.3],['2026-06',5.6]]},
    SEK:{metric:'Unemployment rate · SA',p:[['2026-04',8.6],['2026-08',8.7]]},
-   NOK:{metric:'Unemployment rate · SA',p:[['2026-04',4.6],['2026-05',4.4],['2026-07',4.2],['2026-08',4.5]]}
+   NOK:{metric:'Unemployment rate · trend (LFS 15–74)',source:'Statistics Norway (SSB) · Labour Force Survey trend, original/revised official monthly vintages',p:[['2026-04',4.7],['2026-05',4.7],['2026-06',4.5],['2026-07',4.5],['2026-08',4.6],['2026-09',4.6]]}
   }
  },
  growthtrends:{
@@ -923,7 +923,7 @@ function freshnessInfo(latest,quarterly=false){
  const label=days<=(quarterly?110:45)?'FRESH':days<=(quarterly?155:75)?'WATCH':'STALE';
  return {label,tone:label==='FRESH'?'green':label==='WATCH'?'amber':'red',days};
 }
-function verifiedArchiveSeries(ccy,cat,def){return (ARCHIVE_ECON_POINTS[ccy]||[]).filter(e=>{if(e.category!==cat||e.verificationStatus!=='verified-primary'||!e.releaseDate||!Number.isFinite(Number(e.actual)))return false;let ev=String(e.event||'');if(def.primary)return cat==='inflation'?/^(?:Headline CPI|Monthly CPI|Quarterly CPI|CPI|HICP)\s+y\/y\b/i.test(ev):cat==='labor'?/^Unemployment rate/i.test(ev):/manufacturing|proxy/i.test(ev);return (def.re&&def.re.test(ev))||(def.id==='core'&&/CPI-ATE|CPIF|trimmed mean|Core HICP/i.test(ev))}).map(e=>[e.reference,Number(e.actual),e.releaseDate,'verified-primary'])}
+function verifiedArchiveSeries(ccy,cat,def){return (ARCHIVE_ECON_POINTS[ccy]||[]).filter(e=>{if(e.category!==cat||e.verificationStatus!=='verified-primary'||!e.releaseDate||!Number.isFinite(Number(e.actual)))return false;let ev=String(e.event||'');if(def.primary)return cat==='inflation'?/^(?:Headline CPI|Monthly CPI|Quarterly CPI|CPI|HICP)\s+y\/y\b/i.test(ev):cat==='labor'?(ccy==='NOK'?/^Unemployment rate · trend$/i.test(ev):/^Unemployment rate/i.test(ev)):/manufacturing|proxy/i.test(ev);return (def.re&&def.re.test(ev))||(def.id==='core'&&/CPI-ATE|CPIF|trimmed mean|Core HICP/i.test(ev))}).map(e=>[e.reference,Number(e.actual),e.releaseDate,'verified-primary'])}
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=(ccy==='JPY'&&cat==='labor')?[...ECON_INDICATOR_DEFS[cat].map(d=>d.id==='wages'?{...d,re:/^average cash earnings y\/y$/i}:d),{id:'realwages',label:'Real Wage Growth y/y',re:/^real wage growth y\/y$/i,unit:'%',decimals:1}]:ECON_INDICATOR_DEFS[cat],out=[];
  if(ccy==='JPY'&&cat==='growth')defs=[...defs,{id:'household',label:'Household Consumption y/y · real',re:/^household consumption expenditure y\/y · real$/i,unit:'%',decimals:1}];
@@ -937,7 +937,7 @@ function econIndicatorList(ccy,cat){
    p,
    unit:d.primary?(cfg.unit||''):(st?.unit??d.unit??''),
    decimals:d.primary?cfg.decimals:(st?.decimals??d.decimals??1),
-   source:d.primary?cfg.source:(st?.source||'Structured verified releases stored in TradingLab terminal calendar/history.'),
+   source:d.primary?(base?.source||cfg.source):(st?.source||'Structured verified releases stored in TradingLab terminal calendar/history.'),
    coverage,freshness
   });
  }

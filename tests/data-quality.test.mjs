@@ -465,3 +465,16 @@ test('NOK official manufacturing production has six source-verified monthly obse
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
+
+
+test('NOK LFS six verified trend observations are not relabeled as SA',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.NOK.filter(x=>x.event==='Unemployment rate · trend');
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[4.7,4.7,4.5,4.5,4.6,4.6]);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('ssb.no')&&x.releaseDate&&x.sourceUpdatedAt));
+ assert.equal(d.currencies.NOK.filter(x=>x.event==='Unemployment rate · SA').length,0,'unverified SA legacy readings must be retired');
+ assert.ok(html.includes("NOK:{metric:'Unemployment rate · trend (LFS 15–74)'"));
+ assert.ok(html.includes("ccy==='NOK'?/^Unemployment rate · trend$/i.test(ev)"));
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+});
