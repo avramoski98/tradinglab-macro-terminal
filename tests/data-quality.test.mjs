@@ -369,3 +369,26 @@ test('SSB October 9 official NOK total PPI table verifies six monthly y/y readin
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
+
+
+test('USD wage m/m backfill stays separate from annual wage growth in Economic Trends',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const mom=d.currencies.USD.filter(x=>x.event==='Average Hourly Earnings m/m').sort((a,b)=>a.reference.localeCompare(b.reference));
+ const yoy=d.currencies.USD.filter(x=>x.event==='Average Hourly Earnings y/y').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(mom.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(mom.map(x=>x.actual),[0.2,0.3,0.3,0.1,0.3,0.1]);
+ assert.deepEqual(yoy.map(x=>x.actual),[3.6,3.4,3.5,3.2,3.1,3.0]);
+ assert.ok(mom.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl?.includes('bls.gov')&&x.releaseDate&&x.sourceUpdatedAt));
+ assert.ok(mom.slice(0,3).every(x=>x.sourceUpdatedAt==='2026-07-14T12:30:00Z'));
+ assert.ok(mom.slice(3,5).every(x=>x.sourceUpdatedAt==='2026-10-14T12:30:00Z'));
+ const src=html.slice(html.indexOf('const ECON_INDICATOR_DEFS='),html.indexOf('function mergeEconHistory'));
+ const c={};vm.createContext(c);vm.runInContext(src+'\nthis.defs=ECON_INDICATOR_DEFS;',c);
+ const wages=c.defs.labor.find(x=>x.id==='wages');
+ assert.equal(wages.re.test('Average Hourly Earnings y/y'),true);
+ assert.equal(wages.re.test('Average Hourly Earnings m/m'),false,'y/y selector must not include m/m');
+ assert.ok(html.includes("id:'wagesmom',label:'Average Hourly Earnings m/m'"),'separate USD m/m selector');
+ assert.ok(html.includes("if(ccy==='USD'&&cat==='labor')defs="));
+ assert.ok(html.includes("if(ind?.id==='wagesmom')return"),'separate monthly-wage trend semantics');
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+});
