@@ -2,6 +2,9 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // Qualitative publications: official release verified; not numeric economic actuals or consensus.
+ {day:'2026-10-07',time:'20:00',ccy:'USD',match:/^FOMC Meeting Minutes$/i,event:'FOMC Meeting Minutes · Sep 15–16',actual:'Published',label:'Official publication',importance:'HIGH',source:'Federal Reserve Board · 7 Oct 2026',url:'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261007a.htm',status:'verified-primary',sourcePublishedAt:'2026-10-07T18:00:00Z',releaseTimeVerified:true,verifiedAt:VERIFIED_AT,force:true},
+ {day:'2026-10-08',time:'13:30',ccy:'EUR',match:/^ECB Monetary Policy Meeting Accounts$/i,event:'ECB Monetary Policy Accounts · Sep 9–10',actual:'Published',label:'Official publication',importance:'HIGH',source:'European Central Bank · 8 Oct 2026',url:'https://www.ecb.europa.eu/press/accounts/2026/html/ecb.mg261008~a10153d090.en.html',status:'verified-primary',sourcePublishedAt:'2026-10-08',releaseTimeVerified:false,verifiedAt:VERIFIED_AT,force:true},
  // October 23 flash PMI actuals: secondary-verified; consensus remains provider-unverified.
  {day:'2026-10-23',time:'15:45',ccy:'USD',match:/^Flash Manufacturing PMI(?: ·.*)?$/i,event:'Flash Manufacturing PMI · Oct (S&P Global)',actual:'56.0',previous:'55.9',importance:'HIGH',source:'Reuters / S&P Global flash US PMI, 23 Oct 2026',url:'https://www.reuters.com/business/us-business-activity-cools-october-strong-demand-fueling-price-pressures-2026-10-23/',status:'verified-secondary',verifiedAt:VERIFIED_AT,force:true},
  {day:'2026-10-23',time:'15:45',ccy:'USD',match:/^Flash Services PMI(?: ·.*)?$/i,event:'Flash Services PMI · Oct (S&P Global)',actual:'57.9',previous:'58.8',importance:'HIGH',source:'Reuters / S&P Global flash US PMI, 23 Oct 2026',url:'https://www.reuters.com/business/us-business-activity-cools-october-strong-demand-fueling-price-pressures-2026-10-23/',status:'verified-secondary',verifiedAt:VERIFIED_AT,force:true},
@@ -81,9 +84,10 @@ export function applyVerifiedReleaseOverlay(payload){
    actual:o.actual,previous:o.previous||base?.previous||'—',
    forecast:base?.forecast||'—',
    importance:rank[base?.importance]>rank[o.importance]?base.importance:o.importance,
-   label:'Verified actual',impact:'Neutral',releaseState:'released',
+   label:o.label||'Verified actual',impact:'Neutral',releaseState:'released',
    source:o.source,sourceUrl:o.url,verificationStatus:o.status,
-   actualVerifiedAt:o.verifiedAt||VERIFIED_AT,lastUpdate:o.verifiedAt||VERIFIED_AT,
+   actualVerifiedAt:o.verifiedAt||VERIFIED_AT,lastUpdate:o.sourcePublishedAt||o.verifiedAt||VERIFIED_AT,
+   releaseTimeVerified:o.releaseTimeVerified??base?.releaseTimeVerified??null,
    forecastVerificationStatus:'provider-unverified'
   };
   if(i>=0)rows[i]=record;else rows.push(record);
