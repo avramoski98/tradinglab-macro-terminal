@@ -517,3 +517,14 @@ test('qualitative Fed and ECB minutes are published, not overdue or numeric surp
  assert.equal(publications.find(x=>x.currency==='EUR').releaseTimeVerified,false);
  assert.equal(publications.find(x=>x.currency==='USD').releaseTimeVerified,true);
 });
+
+
+test('sector ETF scanner snapshots never claim live quotes without exchange timestamps',()=>{
+ const source=fs.readFileSync('api/sectors.js','utf8');
+ assert.match(source,/mode:'snapshot'/);
+ assert.match(source,/quoteTimestamp:null/);
+ assert.match(source,/freshnessStatus:'UNVERIFIED_QUOTE_TIME'/);
+ assert.ok(!source.includes("mode:'live'"));
+ assert.ok(html.includes('Sector Rotation · Last Available Snapshot'));
+ assert.ok(html.includes('Quote timestamps are unverified; values may be stale'));
+});
