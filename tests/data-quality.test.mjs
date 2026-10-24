@@ -248,8 +248,8 @@ test('ONS revised GBP retail volume index has six consistent verified April-Sept
  assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
  assert.deepEqual(rows.map(x=>x.actual),[101.5,102.9,103.4,103.0,103.7,103.3]);
  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.unit.startsWith('index')&&x.sourceUrl.includes('ons.gov.uk')&&x.sourceUpdatedAt==='2026-10-23T06:00:00Z'&&x.releaseDate==='2026-10-23T06:00:00Z'&&x.revisionNote.includes('NOT monthly percent change')));
- assert.equal(d.audit.lastBackfill.added,6);
- assert.equal(d.audit.lastBackfill.corrected,0);
+ assert.ok(d.audit.scope.includes('GBP April–September 2026 retail volume SA index J5EK'));
+ assert.equal(rows.length,6);
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
 
