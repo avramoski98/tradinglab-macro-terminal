@@ -434,3 +434,15 @@ test('EUR French Customs revised goods trade balance is six-month verified and d
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,d.audit.verified);
 });
+
+test('CHF procure.ch UBS September revised PMI history has six primary-verified monthly observations',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.CHF.filter(x=>x.category==='growth'&&x.event==='procure.ch / UBS PMI').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
+ assert.deepEqual(rows.map(x=>x.actual),[54.5,57.3,54.3,53.2,57.1,55.3]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-04','2026-06-01','2026-07-01','2026-08-03','2026-09-01','2026-10-01T07:30:00Z']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.stage==='official-revised-table'&&x.sourceUpdatedAt==='2026-10-01T07:30:00Z'&&x.revisionVintage==='2026-10-01'&&x.sourceUrl.includes('beitrag_dokument_download.aspx')&&x.revisionNote.includes('licensing')&&x.forecast===null));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.provenanceComplete,d.audit.verified);
+});
