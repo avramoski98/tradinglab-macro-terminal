@@ -494,3 +494,24 @@ test('Canada S&P manufacturing PMI has six dated observations with explicit prim
  // Secondary Reuters checks are traceable, but primary-only coverage must stay incomplete.
  assert.equal(rows.filter(x=>x.verificationStatus==='verified-primary').length,2);
 });
+
+
+test('qualitative Fed and ECB minutes are published, not overdue or numeric surprises',()=>{
+ const input={mode:'schedule-fallback',events:[
+  {date:'2026-10-07T20:00:00+02:00',currency:'USD',event:'FOMC Meeting Minutes',actual:'—',releaseState:'overdue',forecast:'—'},
+  {date:'2026-10-08T13:30:00+02:00',currency:'EUR',event:'ECB Monetary Policy Meeting Accounts',actual:'—',releaseState:'overdue',forecast:'—'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ assert.equal(out.overdue,0);
+ for(const row of out.events){
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.actual,'Published');
+  assert.equal(row.label,'Official publication');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.forecastVerificationStatus,'provider-unverified');
+  assert.equal(row.lastUpdate.slice(0,10),row.date.slice(0,10));
+  assert.ok(row.sourceUrl.startsWith('https://'));
+ }
+ assert.equal(out.events.find(x=>x.currency==='EUR').releaseTimeVerified,false);
+ assert.equal(out.events.find(x=>x.currency==='USD').releaseTimeVerified,true);
+});
