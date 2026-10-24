@@ -303,3 +303,24 @@ test('Swedbank Silf September 2026 revised manufacturing PMI table verifies six 
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
 });
+
+test('MHLW March-August 2026 Japan nominal and real wages use six official revised-history observations',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const cases=[
+  ['Average Cash Earnings y/y',[3.1,3.6,3.3,4.0,4.3,3.8]],
+  ['Real Wage Growth y/y',[1.4,2.0,1.6,2.2,2.0,1.5]]
+ ];
+ const months=['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08'];
+ const dates=['2026-05-08','2026-06-05','2026-07-07','2026-08-05','2026-09-08','2026-10-07'];
+ for(const [name,values] of cases){
+  const rows=d.currencies.JPY.filter(x=>x.event===name);
+  assert.deepEqual(rows.map(x=>x.reference),months,name+' six monthly periods');
+  assert.deepEqual(rows.map(x=>x.actual),values,name+' official values');
+  assert.deepEqual(rows.map(x=>x.releaseDate),dates,name+' original first-release dates');
+  assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl.includes('mhlw.go.jp')&&x.sourceUpdatedAt==='2026-10-07T00:00:00Z'&&x.releaseTimeKnown===false&&x.revisionVintage==='2026-10-07'),name+' primary provenance');
+  assert.ok(rows.slice(0,5).every(x=>x.stage==='official-revised-history-oct07-2026'&&x.revisionNote.includes('not the original preliminary')));
+ }
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
+});
