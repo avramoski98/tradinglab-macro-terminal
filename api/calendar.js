@@ -8,7 +8,7 @@ const VERIFIED=[
  {day:'2026-10-06',time:'14:30',ccy:'USD',match:/^Trade Balance(?: ·.*)?$/i,event:'Trade Balance · Aug (goods and services, SA)',actual:'-$105.6B',previous:'-$92.8B',importance:'MED',source:'U.S. Census Bureau / BEA · International Trade, 6 Oct 2026',url:'https://www.census.gov/foreign-trade/Press-Release/ft900/ft900_2608.pdf',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:false,verifiedAt:'2026-10-24T18:15:00Z',force:true},
  // October 6 and 8 overdue releases, verified against national statistical authorities.
  {day:'2026-10-06',time:'08:45',ccy:'EUR',match:/^France Industrial Output m\/m(?: ·.*)?$/i,event:'France Industrial Output m/m · Aug (total industry, SA)',actual:'-0.3%',previous:'-0.6%',importance:'MED',source:'INSEE · Industrial production index, 6 Oct 2026',url:'https://www.insee.fr/en/statistiques/9068858',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:false,verifiedAt:'2026-10-24T20:05:00Z',force:true},
- {day:'2026-10-08',time:'01:50',ccy:'JPY',match:/^Current Account(?: ·.*)?$/i,event:'Current Account · Aug (unadjusted, preliminary)',actual:'¥4.062T',importance:'MED',source:'Japan Ministry of Finance · August 2026 Balance of Payments, 8 Oct 2026',url:'https://www.mof.go.jp/policy/international_policy/reference/balance_of_payments/preliminary/pg202608.htm',status:'verified-primary',sourcePublishedAt:'2026-10-08',releaseTimeVerified:false,verifiedAt:'2026-10-24T20:05:00Z',force:true},
+ {day:'2026-10-08',time:'01:50',ccy:'JPY',match:/^Current Account(?: ·.*)?$/i,event:'Current Account · Aug (unadjusted, preliminary)',actual:'¥4.062T',previous:'¥2.989T',forecast:'—',importance:'MED',source:'Japan Ministry of Finance · August 2026 Balance of Payments, 8 Oct 2026',url:'https://www.mof.go.jp/policy/international_policy/reference/balance_of_payments/preliminary/pg202608.htm',status:'verified-primary',sourcePublishedAt:'2026-10-08',releaseTimeVerified:false,verifiedAt:'2026-10-24T20:05:00Z',force:true},
  // Qualitative publications: official release verified; not numeric economic actuals or consensus.
  {day:'2026-10-07',time:'20:00',ccy:'USD',match:/^FOMC Meeting Minutes$/i,event:'FOMC Meeting Minutes · Sep 15–16',actual:'Published',label:'Official publication',importance:'HIGH',source:'Federal Reserve Board · 7 Oct 2026',url:'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261007a.htm',status:'verified-primary',sourcePublishedAt:'2026-10-07T18:00:00Z',releaseTimeVerified:true,verifiedAt:VERIFIED_AT,force:true},
  {day:'2026-10-08',time:'13:30',ccy:'EUR',match:/^ECB Monetary Policy Meeting Accounts$/i,event:'ECB Monetary Policy Accounts · Sep 9–10',actual:'Published',label:'Official publication',importance:'HIGH',source:'European Central Bank · 8 Oct 2026',url:'https://www.ecb.europa.eu/press/accounts/2026/html/ecb.mg261008~a10153d090.en.html',status:'verified-primary',sourcePublishedAt:'2026-10-08',releaseTimeVerified:false,verifiedAt:VERIFIED_AT,force:true},
@@ -88,8 +88,8 @@ export function applyVerifiedReleaseOverlay(payload){
    ...(base||{}),date:base?.date||o.day+'T'+o.time+':00+02:00',
    sourceDate:base?.sourceDate||o.day+'T'+o.time+':00+02:00',
    timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
-   actual:o.actual,previous:o.previous||base?.previous||'—',
-   forecast:base?.forecast||'—',
+   actual:o.actual,previous:o.previous??base?.previous??'—',
+   forecast:o.forecast??base?.forecast??'—',
    importance:rank[base?.importance]>rank[o.importance]?base.importance:o.importance,
    label:o.label||'Verified actual',impact:'Neutral',releaseState:'released',
    source:o.source,sourceUrl:o.url,verificationStatus:o.status,
