@@ -874,7 +874,7 @@ const ECON_INDICATOR_DEFS={
   {id:'unemployment',label:'Unemployment Rate',primary:true},
   {id:'employment',label:'Employment / Payrolls',re:/nonfarm payrolls|employment change/i,mode:'employment',unit:'K',decimals:0},
   {id:'claims',label:'Jobless Claims',re:/claims/i,unit:'K',decimals:0},
-  {id:'wages',label:'Wage Growth',re:/hourly earnings|wage/i,unit:'%',decimals:1},
+  {id:'wages',label:'Wage Growth y/y',re:/average hourly earnings y\/y|average cash earnings y\/y|wage growth y\/y/i,unit:'%',decimals:1},
   {id:'jolts',label:'JOLTS / Job Openings',re:/jolts|job openings/i,unit:'M',decimals:3}
  ],
  growth:[
@@ -921,6 +921,7 @@ function freshnessInfo(latest,quarterly=false){
 function verifiedArchiveSeries(ccy,cat,def){return (ARCHIVE_ECON_POINTS[ccy]||[]).filter(e=>{if(e.category!==cat||e.verificationStatus!=='verified-primary'||!e.releaseDate||!Number.isFinite(Number(e.actual)))return false;let ev=String(e.event||'');if(def.primary)return cat==='inflation'?/^(?:Headline CPI|Monthly CPI|Quarterly CPI|CPI|HICP)\s+y\/y\b/i.test(ev):cat==='labor'?/^Unemployment rate/i.test(ev):/manufacturing|proxy/i.test(ev);return (def.re&&def.re.test(ev))||(def.id==='core'&&/CPI-ATE|CPIF|trimmed mean|Core HICP/i.test(ev))}).map(e=>[e.reference,Number(e.actual),e.releaseDate,'verified-primary'])}
 function econIndicatorList(ccy,cat){
  let cfg=econCfg(cat),base=cfg.data[ccy],defs=(ccy==='JPY'&&cat==='labor')?[...ECON_INDICATOR_DEFS[cat].map(d=>d.id==='wages'?{...d,re:/^average cash earnings y\/y$/i}:d),{id:'realwages',label:'Real Wage Growth y/y',re:/^real wage growth y\/y$/i,unit:'%',decimals:1}]:ECON_INDICATOR_DEFS[cat],out=[];
+ if(ccy==='USD'&&cat==='labor')defs=[...defs,{id:'wagesmom',label:'Average Hourly Earnings m/m',re:/^average hourly earnings m\/m$/i,unit:'%',decimals:1}];
  for(const d of defs){
   let staticKey=ccy+'|'+cat+'|'+d.id,st=ECON_STATIC_HISTORY[staticKey],dyn=mergeEconHistory(dynamicIndicatorSeries(ccy,d),verifiedArchiveSeries(ccy,cat,d)),p=d.primary?mergeEconHistory(base?.p||[],dyn):mergeEconHistory(st?.p||[],dyn);
   let coverage=coverageInfo(p,(ccy==='NZD'&&cat==='labor'&&d.id==='unemployment'?'quarterly ':'')+(d.primary?(base?.metric||d.id):(st?.label||d.id))),freshness=freshnessInfo(coverage.latest,coverage.quarterly);
@@ -946,6 +947,7 @@ function econTrendLabel(cat,p,ind){
  let d6=metricDelta(p,6)||metricDelta(p,3)||metricDelta(p,1),d=d6?.v||0,last=p[p.length-1][1];
  if(cat==='inflation')return Math.abs(d)<.15?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'RISING',cls:'econ-trend-up'}:{label:'COOLING',cls:'econ-trend-down'};
  if(cat==='labor'){
+  if(ind?.id==='wagesmom')return Math.abs(d)<.1?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WAGE GROWTH ACCELERATING',cls:'econ-trend-up'}:{label:'WAGE GROWTH COOLING',cls:'econ-trend-down'};
   if(ind?.id==='employment'||ind?.id==='wages'||ind?.id==='realwages'||ind?.id==='jolts')return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'IMPROVING',cls:'econ-trend-down'}:{label:'WEAKENING',cls:'econ-trend-up'};
   return Math.abs(d)<.12?{label:'STABLE',cls:'econ-trend-flat'}:d>0?{label:'WEAKENING',cls:'econ-trend-up'}:{label:'IMPROVING',cls:'econ-trend-down'};
  }
