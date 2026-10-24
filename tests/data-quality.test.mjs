@@ -421,3 +421,16 @@ test('EUR German industrial production six-month official mixed-vintage backfill
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,d.audit.verified);
 });
+
+test('EUR French Customs revised goods trade balance is six-month verified and dated',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.EUR.filter(x=>x.event==='French Trade Balance').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[-6.5,-5.7,-7.6,-5.8,-6.6,-6.1]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-07','2026-06-05','2026-07-07','2026-08-07','2026-09-08','2026-10-07']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl==='https://lekiosque.finances.gouv.fr/'&&x.sourceUpdatedAt&&x.forecast===null));
+ assert.ok(rows.slice(0,5).every(x=>x.stage==='revised-vintage'&&x.revisionDate==='2026-10-07'&&x.provenanceNote.includes('revised')));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.provenanceComplete,d.audit.verified);
+});
