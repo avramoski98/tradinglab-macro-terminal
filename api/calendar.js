@@ -2,6 +2,12 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // SNB foreign currency reserves for Sep 2026: CHF 770.476bn (Aug revised CHF 770.074bn).
+ // Release on 7 Oct corroborated by ForexFactory, MetaTrader and TradingEconomics.
+ // SNB publication calendar confirms an SDDS update on 7 Oct, but the exact figure
+ // was not independently extracted from the SNB primary data cube: SECONDARY, not PRIMARY.
+ // Keep the market consensus blank rather than reusing the stale fallback.
+ {day:'2026-10-07',time:'09:00',ccy:'CHF',match:/^Foreign Currency Reserves(?: ·.*)?$/i,event:'Foreign Currency Reserves · Sep (CHF bn)',actual:'CHF 770.476B',previous:'CHF 770.074B',forecast:'—',importance:'MED',source:'MetaTrader / TradingEconomics reporting SNB Sep 2026 reserves',url:'https://www.metatrader.com/en/economic-calendar/switzerland/foreign-currency-reserves',status:'verified-secondary',sourcePublishedAt:'2026-10-07',releaseTimeVerified:false,verifiedAt:'2026-10-24T23:24:00Z',force:true},
  // October 6 NZIER QSBO: use the seasonally adjusted net balance consistently (40 vs 14), not the unadjusted 43 vs 8.
  // Official NZIER release was 10:00 NZDT on Oct 6 = 01:00 Europe/Skopje on Oct 6.
  {day:'2026-10-06',matchDays:['2026-10-05','2026-10-06'],time:'01:00',dateOverride:'2026-10-06T01:00:00+02:00',ccy:'NZD',match:/^NZIER Business Confidence(?: ·.*)?$/i,event:'NZIER Business Confidence · Q3 (seasonally adjusted)',actual:'+40%',previous:'+14%',forecast:'—',importance:'MED',source:'NZIER · Quarterly Survey of Business Opinion, 6 Oct 2026',url:'https://www.nzier.org.nz/news/nziers-qsbo-shows-a-further-lift-in-business-confidence-despite-soft-activity',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:true,verifiedAt:'2026-10-24T21:15:00Z',force:true},
