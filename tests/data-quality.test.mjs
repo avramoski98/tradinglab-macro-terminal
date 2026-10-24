@@ -407,3 +407,17 @@ test('JPY household consumption six-month official revised history is source-lin
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
 });
+
+
+test('EUR German industrial production six-month official mixed-vintage backfill is independently verified',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.EUR.filter(x=>x.event==='German Industrial Production m/m').sort((a,b)=>a.reference.localeCompare(b.reference));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[-0.1,0.2,0.7,0,-1.2,2]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-08','2026-06-09','2026-07-07','2026-08-07','2026-09-07','2026-10-07']);
+ assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.source==='Destatis · Production in industry, real, seasonally/calendar adjusted, month-on-month'&&x.sourceUrl.startsWith('https://www.destatis.de/EN/Press/2026/')&&x.forecast===null));
+ assert.ok(rows.slice(0,5).every(x=>x.stage==='revised-vintage'&&x.revisionDate&&x.provenanceNote.includes('MIXED REVISION VINTAGES')));
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.provenanceComplete,d.audit.verified);
+});
