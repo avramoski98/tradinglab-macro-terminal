@@ -45,8 +45,11 @@ export default async function handler(req, res) {
     if (!markets.length) throw new Error('empty market response');
 
     return res.status(200).json({
-      mode: 'live',
+      mode: 'snapshot',
       provider: 'TradingView',
+      quoteTimestamp: null,
+      freshnessStatus: 'UNVERIFIED_QUOTE_TIME',
+      notice: 'Scanner prices are last available; retrieval time is not exchange quote time.',
       updatedAt: new Date().toISOString(),
       markets
     });
