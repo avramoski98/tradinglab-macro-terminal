@@ -446,3 +446,22 @@ test('CHF procure.ch UBS September revised PMI history has six primary-verified 
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,d.audit.verified);
 });
+
+test('NOK official manufacturing production has six source-verified monthly observations, no legacy PMI proxy',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.NOK.filter(x=>x.event==='Manufacturing Production m/m · SA');
+ assert.equal(rows.length,6);
+ assert.deepEqual(rows.map(x=>x.reference),['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08']);
+ assert.deepEqual(rows.map(x=>x.actual),[2.0,-0.9,0.8,-1.0,0.7,-0.4]);
+ for(const x of rows){
+  assert.equal(x.verificationStatus,'verified-primary');
+  assert.equal(x.frequency,'monthly');
+  assert.match(x.sourceUrl,/^https:\/\/www\.ssb\.no\//);
+  assert.ok(Date.parse(x.releaseDate)<=Date.now());
+  assert.ok(Date.parse(x.sourceUpdatedAt)<=Date.now());
+  assert.ok(x.provenanceNote);
+ }
+ assert.equal(d.currencies.NOK.filter(x=>x.event==='Manufacturing output y/y · proxy').length,0);
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+});
