@@ -546,3 +546,28 @@ test('official Oct 5–6 releases resolve overdue rows without inventing verifie
  }
  assert.equal(out.overdue,0);
 });
+
+test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primary provenance',()=>{
+ const input={mode:'live',events:[
+  {date:'2026-10-06T08:45:00+02:00',currency:'EUR',event:'France Industrial Output m/m',forecast:'0.2%',previous:'-0.6%',actual:'—',releaseState:'overdue'},
+  {date:'2026-10-08T01:50:00+02:00',currency:'JPY',event:'Current Account',forecast:'—',previous:'—',actual:'—',releaseState:'overdue'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ assert.equal(out.events.length,2);
+ const fr=out.events.find(x=>x.currency==='EUR');
+ const jp=out.events.find(x=>x.currency==='JPY');
+ assert.equal(fr.actual,'-0.3%');
+ assert.equal(fr.previous,'-0.6%');
+ assert.equal(fr.forecast,'0.2%');
+ assert.match(fr.event,/total industry/);
+ assert.equal(jp.actual,'¥4.062T');
+ assert.match(jp.event,/unadjusted/);
+ for(const e of [fr,jp]){
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.forecastVerificationStatus,'provider-unverified');
+  assert.ok(e.sourceUrl.startsWith('https://'));
+  assert.equal(e.lastUpdate.slice(0,10),e.date.slice(0,10));
+ }
+ assert.equal(out.overdue,0);
+});
