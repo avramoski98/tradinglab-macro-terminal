@@ -324,3 +324,25 @@ test('MHLW March-August 2026 Japan nominal and real wages use six official revis
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
 });
+
+test('JPY G10 labor UI keeps nominal and real wages as distinct six-month series',()=>{
+ const archive=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const html=fs.readFileSync('index.html','utf8');
+ const src=html.slice(html.indexOf('function econIndicatorList('),html.indexOf('function activeIndicator('));
+ const c={
+  econCfg:()=>({data:{JPY:{},EUR:{}},unit:'%',decimals:1,source:'MHLW'}),
+  ECON_INDICATOR_DEFS:{labor:[{id:'wages',label:'Wage Growth',re:/hourly earnings|wage/i,unit:'%',decimals:1}]},
+  ECON_STATIC_HISTORY:{},
+  dynamicIndicatorSeries:()=>[],
+  verifiedArchiveSeries:(ccy,cat,def)=>(archive.currencies[ccy]||[]).filter(x=>x.category===cat&&def.re.test(x.event)&&x.verificationStatus==='verified-primary').map(x=>[x.reference,x.actual,x.releaseDate,'verified-primary']),
+  mergeEconHistory:(a,b)=>b,
+  coverageInfo:p=>({count:p.length,latest:p.at(-1)?.[2]||null}),
+  freshnessInfo:()=>({label:'FRESH'})
+ };
+ vm.createContext(c);vm.runInContext(src,c);
+ const jp=c.econIndicatorList('JPY','labor');
+ assert.deepEqual(jp.map(x=>x.id).join(','),'wages,realwages');
+ assert.deepEqual(jp[0].p.map(x=>x[1]).join(','),'3.1,3.6,3.3,4,4.3,3.8');
+ assert.deepEqual(jp[1].p.map(x=>x[1]).join(','),'1.4,2,1.6,2.2,2,1.5');
+ assert.equal(c.econIndicatorList('EUR','labor').length,1,'no extra real-wage indicator for other G10');
+});
