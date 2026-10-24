@@ -573,3 +573,21 @@ test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primar
  }
  assert.equal(out.overdue,0);
 });
+
+test('Census August wholesale inventories final is released, distinct from the advance estimate',()=>{
+ const input={mode:'schedule-fallback',events:[
+  {date:'2026-10-08T16:00:00+02:00',currency:'USD',event:'Wholesale Inventories m/m',actual:'—',previous:'0.7%',forecast:'0.7%',releaseState:'overdue'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const row=out.events.find(x=>x.currency==='USD'&&x.event.includes('Wholesale Inventories'));
+ assert.equal(row.actual,'+0.5%');
+ assert.equal(row.previous,'+1.4%');
+ assert.equal(row.forecast,'—');
+ assert.equal(row.releaseState,'released');
+ assert.equal(row.verificationStatus,'verified-primary');
+ assert.equal(row.sourceUrl,'https://www.census.gov/wholesale/current/index.html');
+ assert.equal(row.lastUpdate,'2026-10-08');
+ assert.equal(row.releaseTimeVerified,false);
+ assert.equal(row.forecastVerificationStatus,'provider-unverified');
+ assert.equal(out.overdue,0);
+});
