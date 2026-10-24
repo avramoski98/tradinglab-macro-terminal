@@ -609,3 +609,30 @@ test('RICS September house price balance is released with primary source and no 
  assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-primary');
  assert.match(row.sourceUrl,/rics.org/);assert.equal(out.overdue,0);
 });
+
+test('official Japan Oct 6 Ueda speech and Oct 8 Economy Watchers are released with original-source provenance',()=>{
+ const input={mode:'schedule-fallback',events:[
+  {date:'2026-10-06T08:35:00+02:00',currency:'JPY',event:'BOJ Gov Ueda Speaks',actual:'—',previous:'—',forecast:'Policy / normalization outlook',releaseState:'overdue',importance:'HIGH'},
+  {date:'2026-10-08T07:00:00+02:00',currency:'JPY',event:'Eco Watchers Survey: Current',actual:'—',previous:'46.4',forecast:'46.8',releaseState:'overdue',importance:'MED'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const speech=out.events.find(x=>x.event.includes('National Securities Convention'));
+ const survey=out.events.find(x=>x.event.includes('Economy Watchers Survey'));
+ assert.equal(out.overdue,0);
+ assert.equal(out.events.length,2);
+ assert.equal(speech.actual,'Published');
+ assert.equal(speech.label,'Official publication');
+ assert.equal(speech.forecast,'—');
+ assert.equal(survey.actual,'47.0');
+ assert.equal(survey.previous,'46.4');
+ assert.equal(survey.forecast,'—');
+ assert.match(survey.event,/seasonally adjusted/);
+ for(const row of [speech,survey]){
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.forecastVerificationStatus,'provider-unverified');
+  assert.equal(row.releaseTimeVerified,false);
+  assert.ok(row.sourceUrl.startsWith('https://'));
+  assert.equal(row.lastUpdate.slice(0,10),row.date.slice(0,10));
+ }
+});
