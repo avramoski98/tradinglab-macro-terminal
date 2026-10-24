@@ -528,3 +528,21 @@ test('sector ETF scanner snapshots never claim live quotes without exchange time
  assert.ok(html.includes('Sector Rotation · Last Available Snapshot'));
  assert.ok(html.includes('Quote timestamps are unverified; values may be stale'));
 });
+
+test('official Oct 5–6 releases resolve overdue rows without inventing verified forecasts',()=>{
+ const input={mode:'live',events:[
+  {date:'2026-10-05T06:00:00+02:00',currency:'JPY',event:'Consumer Confidence',forecast:'35.3',previous:'35.5',actual:'—',importance:'HIGH',releaseState:'overdue'},
+  {date:'2026-10-06T10:00:00+02:00',currency:'CHF',event:'Unemployment Rate',forecast:'3.1%',previous:'3.1%',actual:'—',importance:'MED',releaseState:'overdue'},
+  {date:'2026-10-06T14:30:00+02:00',currency:'USD',event:'Trade Balance',forecast:'-89.8B',previous:'-88.6B',actual:'—',importance:'MED',releaseState:'overdue'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ const expected={JPY:'35.4',CHF:'3.1%',USD:'-$105.6B'};
+ for(const e of out.events){
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.actual,expected[e.currency]);
+  assert.equal(e.forecastVerificationStatus,'provider-unverified');
+  assert.ok(e.sourceUrl.startsWith('https://'));
+ }
+ assert.equal(out.overdue,0);
+});
