@@ -796,3 +796,15 @@ test('calendar suppresses inherited duplicates but preserves distinct simultaneo
  assert.ok(out.events.some(x=>x.event==='National Core CPI ex fresh food y/y · Sep'));
  assert.equal(out.overdue,0);
 });
+
+test('past qualitative speeches await confirmation instead of false OVERDUE or PENDING',()=>{
+ const c={Date,Intl,console,AbortSignal,process,setTimeout,clearTimeout};
+ vm.createContext(c);
+ vm.runInContext(fs.readFileSync('lib/calendar-legacy.mjs','utf8').replace('export default async function','async function'),c);
+ const now=Date.parse('2026-10-25T21:35:00Z');
+ assert.equal(c.eventState({date:'2026-10-25T22:10:00+01:00',event:'RBA Assist Gov Jones Speaks',actual:'—'},now),'awaiting-confirmation');
+ assert.equal(c.eventState({date:'2026-10-25T22:10:00+01:00',event:'CPI y/y',actual:'—'},now),'overdue');
+ assert.equal(c.eventState({date:'2026-10-28T19:00:00+01:00',event:'FOMC Rate Decision',actual:'—'},now),'scheduled');
+ assert.match(html,/SPEECH · CONFIRMATION PENDING/);
+ assert.match(html,/SPEECH · UNCONFIRMED/);
+});
