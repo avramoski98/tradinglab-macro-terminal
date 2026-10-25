@@ -2,6 +2,18 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 25 Oct audit: independently verified 5–6 Oct releases previously left OVERDUE.
+ // Sentix primary survey report confirms a 2.4-point fall from September's 5.1 to 2.7.
+ // Consensus forecasts are not source-verified and are deliberately suppressed.
+ {day:'2026-10-05',time:'09:30',ccy:'EUR',match:/^Sentix Investor Confidence(?: ·.*)?$/i,event:'Sentix Investor Confidence · Oct (Euro Area)',actual:'2.7',previous:'5.1',forecast:'—',importance:'MED',source:'sentix · October 2026 Economic News, 4 Oct 2026',url:'https://www.sentix.de/index.php/sentix-Economic-News/weltwirtschaft-trotzt-bislang-den-steigenden-zinsen.html',status:'verified-primary',sourcePublishedAt:'2026-10-04',releaseTimeVerified:false,verifiedAt:'2026-10-25T05:40:00Z',force:true},
+ // Statistics Canada Daily: August 2026 merchandise trade, seasonally adjusted CAD.
+ {day:'2026-10-06',time:'14:30',ccy:'CAD',match:/^Trade Balance(?: ·.*)?$/i,event:'Trade Balance · Aug (merchandise, SA)',actual:'C$4.2B',previous:'C$0.787B',forecast:'—',importance:'MED',source:'Statistics Canada · Canadian international merchandise trade, 6 Oct 2026',url:'https://www150.statcan.gc.ca/n1/daily-quotidien/261006/dq261006a-eng.pdf',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:true,verifiedAt:'2026-10-25T05:40:00Z',force:true},
+ // Ivey Business School September 2026 seasonally adjusted PMI, 6 Oct release.
+ {day:'2026-10-06',time:'16:00',ccy:'CAD',match:/^Ivey PMI(?: ·.*)?$/i,event:'Ivey PMI · Sep (seasonally adjusted)',actual:'58.2',previous:'64.3',forecast:'—',importance:'MED',source:'Ivey Business School · Ivey PMI September 2026',url:'https://iveypmi.uwo.ca/historic-data/',status:'verified-primary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:true,verifiedAt:'2026-10-25T05:40:00Z',force:true},
+ // S&P Global UK Construction PMI: verified through Reuters report of S&P release.
+ // Not tagged primary because the original 2026 S&P press release was not retrieved.
+ {day:'2026-10-06',time:'10:30',ccy:'GBP',match:/^Construction PMI(?: ·.*)?$/i,event:'Construction PMI · Sep (S&P Global)',actual:'46.1',previous:'44.3',forecast:'—',importance:'MED',source:'Reuters reporting S&P Global UK Construction PMI, 6 Oct 2026',url:'https://www.reuters.com/world/uk/uk-construction-activity-falls-slowest-pace-since-january-2026-10-06/',status:'verified-secondary',sourcePublishedAt:'2026-10-06',releaseTimeVerified:false,verifiedAt:'2026-10-25T05:40:00Z',force:true},
+
  // September 2026 ISM Services report published 5 Oct 2026: primary-source values.
  // Clear provider-unverified forecasts rather than carrying forward stale consensus.
  {day:'2026-10-05',time:'16:00',ccy:'USD',match:/^ISM (?:Services|Non-Manufacturing)(?: PMI| Index)(?: ·.*)?$/i,event:'ISM Services PMI · Sep',actual:'54.9',previous:'55.4',forecast:'—',importance:'HIGH',source:'Institute for Supply Management · September 2026 Services PMI report, 5 Oct 2026',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:true,verifiedAt:'2026-10-25T02:43:00Z',force:true},
