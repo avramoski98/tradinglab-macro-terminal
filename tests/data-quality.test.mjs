@@ -689,12 +689,14 @@ test('ISM September 2026 Services PMI, prices and employment resolve overdue wit
 });
 
 
-test('Sunday Gulf equities confirm regional risk-off without inventing oil futures or physical outages',()=>{
- assert.ok(html.includes('NEW / HIGH-IMPACT REGIONAL MARKET TRANSMISSION · 25 ОКТ 2026'));
- assert.ok(html.includes('Saudi TASI −2.6%'));assert.ok(html.includes('Egypt EGX30 −2.5%'));
+test('Sunday Gulf closing prices confirm regional risk-off without inventing oil outages',()=>{
+ assert.ok(html.includes('NEW / CONFIRMED GULF SUNDAY CLOSE · 25 ОКТ 2026'));
+ assert.ok(html.includes('Saudi TASI затвори −2.7%'));
+ assert.ok(html.includes('Egypt EGX30 −3.6%'));
  assert.ok(html.includes('gulf-bourses-slip-houthi-saudi-clashes-rattle-investors-2026-10-25'));
- assert.ok(html.includes('Regional equity risk-off is observed'));
- assert.ok(html.includes('no new verified oil-infrastructure outage'));
+ assert.ok(html.includes('го потврдува regional risk-off'));
+ assert.ok(html.includes('не докажува global risk-off'));
+ assert.ok(html.includes('не е потврден нов physical outage'));
  assert.ok(html.includes('major US/EU cash markets and Brent/WTI futures do not yet provide a fresh post-headline session signal'));
 });
 
