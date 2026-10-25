@@ -116,6 +116,14 @@ const VERIFIED=[
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/UoM 5-Yr Inflation Expectations/i,event:'Prelim UoM 5-Yr Inflation Expectations · Oct',actual:'3.5%',previous:'3.4%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'}
 ];
 const OFFICIAL_UPCOMING=[
+ // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
+ // 26 Oct 10:30 CET = 10:30 Europe/Skopje.
+ {date:'2026-10-26T10:30:00+01:00',ccy:'EUR',event:'German Ifo Business Climate · Oct',match:/Ifo Business Climate|German Ifo|GE Ifo/i,importance:'HIGH',source:'ifo Institute · official release schedule 26 Oct 2026 10:30 CET',url:'https://www.ifo.de/umfrage/ifo-geschaeftsklima-deutschland'},
+ // 27 Oct 08:30 EDT = 13:30 CET; 10:00 EDT = 15:00 CET.
+ {date:'2026-10-27T13:30:00+01:00',ccy:'USD',event:'Durable Goods Orders m/m · Sep',match:/Durable Goods(?: Orders)?|Core Durable Goods/i,importance:'HIGH',source:'U.S. Census Bureau · advance durable goods 27 Oct 2026 08:30 EDT',url:'https://www.census.gov/economic-indicators/calendar-listview.html'},
+ {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
+ // 28 Oct 08:30 EDT = 13:30 CET.
+ {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // ABS and BEA official release schedules verified on 25 Oct 2026; do not invent forecasts or actuals.
  // 28 Oct 11:30 AEDT = 28 Oct 01:30 CET.
  {date:'2026-10-28T01:30:00+01:00',ccy:'AUD',event:'CPI y/y · Sep (ABS Australia)',match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,importance:'HIGH',source:'Australian Bureau of Statistics · CPI 28 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia'},
