@@ -658,3 +658,25 @@ test('Oct 7 CHF foreign currency reserves are released with secondary-only prove
  assert.equal(out.events.filter(x=>x.currency==='CHF'&&/Foreign Currency Reserves/.test(x.event)).length,1);
  assert.equal(out.overdue,0);
 });
+
+test('ISM September 2026 Services PMI, prices and employment resolve overdue with primary report',()=>{
+ const input={mode:'live',events:[
+  {date:'2026-10-05T16:00:00+02:00',currency:'USD',event:'ISM Services PMI',actual:'—',previous:'55.4',forecast:'55.3',importance:'HIGH',releaseState:'overdue'},
+  {date:'2026-10-05T16:00:00+02:00',currency:'USD',event:'ISM Services Prices Paid',actual:'—',previous:'72.6',forecast:'—',importance:'HIGH',releaseState:'overdue'},
+  {date:'2026-10-05T16:00:00+02:00',currency:'USD',event:'ISM Services Employment Index',actual:'—',previous:'47.8',forecast:'—',importance:'MED',releaseState:'overdue'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ assert.equal(out.overdue,0);
+ assert.equal(out.events.length,3);
+ const expected={'ISM Services PMI · Sep':['54.9','55.4'],'ISM Services Prices Paid · Sep':['74.0','72.6'],'ISM Services Employment Index · Sep':['50.1','47.8']};
+ for(const row of out.events){
+  assert.deepEqual([row.actual,row.previous],expected[row.event]);
+  assert.equal(row.forecast,'—');
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.lastUpdate,'2026-10-05');
+  assert.equal(row.releaseTimeVerified,true);
+  assert.equal(row.forecastVerificationStatus,'provider-unverified');
+  assert.match(row.sourceUrl,/ismworld\.org/);
+ }
+});
