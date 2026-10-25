@@ -727,6 +727,14 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
   assert.ok(rows[0].sourceUrl.includes(domain));
  }
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
- const merged=applyVerifiedReleaseOverlay({mode:'live',events:[existing]});
+ const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
+  existing,
+  {date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Core PCE Price Index m/m',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-30T06:30:00+01:00',currency:'JPY',event:'BOJ Press Conference',actual:'—',releaseState:'scheduled'}
+ ]});
  assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&x.event.includes('CPI y/y')).length,1);
+ assert.equal(merged.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-29')&&x.event.includes('Core PCE')).length,1);
+ const boj=merged.events.filter(x=>x.currency==='JPY'&&x.date.startsWith('2026-10-30')&&x.event.includes('Press Conference'));
+ assert.equal(boj.length,1);
+ assert.equal(boj[0].date,'2026-10-30T07:30:00+01:00');
 });
