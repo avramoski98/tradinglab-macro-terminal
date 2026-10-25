@@ -134,7 +134,9 @@ test('October 23 CAD retail and Michigan final releases resolve overdue without 
  const out=applyVerifiedReleaseOverlay(input);
  const targets=out.events.filter(x=>(x.currency==='CAD'||x.currency==='USD')&&/Retail Sales m\/m|Revised UoM/.test(x.event));
  assert.deepEqual(targets.map(x=>x.actual),['1.1%','1.2%','48.0','4.7%']);
- assert.ok(targets.every(x=>x.releaseState==='released'&&x.verificationStatus==='verified-secondary'&&x.sourceUrl));
+ assert.ok(targets.every(x=>x.releaseState==='released'&&x.sourceUrl));
+ assert.deepEqual(targets.map(x=>x.verificationStatus),['verified-primary','verified-primary','verified-secondary','verified-secondary']);
+ assert.ok(targets.slice(0,2).every(x=>x.sourceUrl==='https://www150.statcan.gc.ca/n1/daily-quotidien/261023/dq261023a-eng.htm'&&x.source.includes('Statistics Canada')));
  assert.deepEqual(targets.map(x=>x.forecast),['1.1%','1.3%','46.3','4.7%']);
  assert.equal(out.overdue,0);
 });
@@ -144,7 +146,10 @@ test('weekly focus includes late October 23 verified-secondary catalysts and cav
  assert.ok(h.includes('US Michigan final (23 Oct, 16:00 CEST)'));
  assert.ok(h.includes('Canada August Retail Sales (23 Oct, 14:30 CEST)'));
  assert.ok(h.includes('not independently verified against the University of Michigan primary bulletin'));
- assert.ok(h.includes('primary bulletin not independently retrieved'));
+ assert.ok(h.includes('NEW / PRIMARY VERIFIED — Canada August Retail Sales'));
+ assert.ok(h.includes('Statistics Canada · Retail trade, August 2026'));
+ assert.ok(h.includes('market forecast is provider-unverified'));
+ assert.ok(!h.includes('primary bulletin not independently retrieved'));
 });
 
 test('G10 revised quarterly GDP Q1/Q2 history has two primary-source observations',()=>{
