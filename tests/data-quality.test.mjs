@@ -1,3 +1,4 @@
+import {regimeHighImpact} from '../api/news.js';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
@@ -737,4 +738,13 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
  const boj=merged.events.filter(x=>x.currency==='JPY'&&x.date.startsWith('2026-10-30')&&x.event.includes('Press Conference'));
  assert.equal(boj.length,1);
  assert.equal(boj[0].date,'2026-10-30T07:30:00+01:00');
+});
+
+test('geopolitical missile and critical-infrastructure reports are highlighted without treating routine updates as high impact',()=>{
+ assert.equal(regimeHighImpact('Saudi-led coalition: intercepted and destroyed ballistic missile launched towards Riyadh'),true);
+ assert.equal(regimeHighImpact('One killed in Ukrainian missile strike on industrial site'),true);
+ assert.equal(regimeHighImpact('Houthis say they struck Saudi Aramco site in Yanbu'),true);
+ assert.equal(regimeHighImpact('Houthis targeted Riyadh airport'),true);
+ assert.equal(regimeHighImpact('Qatari mediators arrive in Tehran for talks'),false);
+ assert.equal(regimeHighImpact('Bank of Canada rate decision'),true);
 });
