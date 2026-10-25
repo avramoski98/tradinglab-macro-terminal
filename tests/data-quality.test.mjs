@@ -753,3 +753,23 @@ test('geopolitical missile and critical-infrastructure reports are highlighted w
  assert.equal(regimeHighImpact('Qatari mediators arrive in Tehran for talks'),false);
  assert.equal(regimeHighImpact('Bank of Canada rate decision'),true);
 });
+
+
+test('calendar suppresses inherited duplicates but preserves distinct simultaneous releases',()=>{
+ const input={mode:'schedule-fallback',events:[
+  {date:'2026-10-05T09:30:00+02:00',currency:'GBP',event:'UK Final Services PMI · Sep',actual:'52.1',verificationStatus:'manual-archive',releaseState:'released'},
+  {date:'2026-10-05T09:30:00+02:00',currency:'GBP',event:'Final Services PMI · Sep (S&P Global UK)',actual:'52.1',verificationStatus:'verified-secondary',releaseState:'released'},
+  {date:'2026-10-05T10:00:00+02:00',currency:'EUR',event:'Euro Area PPI y/y · Aug',actual:'8.2%',verificationStatus:'manual-archive',releaseState:'released'},
+  {date:'2026-10-05T10:00:00+02:00',currency:'EUR',event:'Euro Area PPI m/m · Aug',actual:'1.9%',verificationStatus:'verified-primary',releaseState:'released'},
+  {date:'2026-10-23T01:30:00+02:00',currency:'JPY',event:'National CPI y/y · Sep (2025-base)',actual:'2.1%',verificationStatus:'verified-primary',releaseState:'released'},
+  {date:'2026-10-23T01:30:00+02:00',currency:'JPY',event:'National Core CPI ex fresh food y/y · Sep',actual:'2.1%',verificationStatus:'verified-primary',releaseState:'released'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(input);
+ assert.equal(out.events.filter(x=>x.currency==='GBP'&&/Final Services PMI/.test(x.event)).length,1);
+ assert.ok(!out.events.some(x=>x.event==='UK Final Services PMI · Sep'));
+ assert.ok(out.events.some(x=>x.event==='Euro Area PPI y/y · Aug'));
+ assert.ok(out.events.some(x=>x.event==='Euro Area PPI m/m · Aug'));
+ assert.ok(out.events.some(x=>x.event==='National CPI y/y · Sep (2025-base)'));
+ assert.ok(out.events.some(x=>x.event==='National Core CPI ex fresh food y/y · Sep'));
+ assert.equal(out.overdue,0);
+});
