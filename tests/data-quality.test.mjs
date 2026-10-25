@@ -708,3 +708,25 @@ test('Weekly Focus explicitly includes BoC, all five rate decisions and the next
  assert.ok(html.includes('Employment Cost Index'));
  assert.ok(html.includes('.slice(0,16)'));
 });
+
+
+test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactory is in fallback',()=>{
+ const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
+ const expected=[
+  ['AUD','CPI y/y · Sep','2026-10-28T01:30:00+01:00','abs.gov.au'],
+  ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','bea.gov'],
+  ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov']
+ ];
+ for(const [currency,prefix,date,domain] of expected){
+  const rows=out.events.filter(x=>x.currency===currency&&x.event.startsWith(prefix));
+  assert.equal(rows.length,1,currency+' '+prefix+' missing or duplicated');
+  assert.equal(rows[0].date,date);
+  assert.equal(rows[0].verificationStatus,'official-schedule');
+  assert.equal(rows[0].actual,'—');
+  assert.equal(rows[0].forecast,'—');
+  assert.ok(rows[0].sourceUrl.includes(domain));
+ }
+ const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
+ const merged=applyVerifiedReleaseOverlay({mode:'live',events:[existing]});
+ assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&/CPI y\\/y/.test(x.event)).length,1);
+});
