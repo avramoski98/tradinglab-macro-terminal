@@ -729,7 +729,11 @@ test('Weekly Focus policy matcher includes official fallback decision names with
   'ECB Rate Decision',
   'ECB Press Conference',
   'BOJ Governor Ueda Press Conference (policy statement time TBA)',
-  'Employment Cost Index · Q3'
+  'Employment Cost Index · Q3',
+  'German Ifo Business Climate · Oct',
+  'Durable Goods Orders m/m · Sep',
+  'New Home Sales · Sep',
+  'Advance Goods Trade Balance · Sep'
  ];
  for(const event of accepted)assert.equal(c.weeklyPolicyEventName(event),true,event);
  for(const event of ['Consumer Confidence','EIA Crude Oil Inventories','Retail Sales m/m'])assert.equal(c.weeklyPolicyEventName(event),false,event);
@@ -807,4 +811,34 @@ test('past qualitative speeches await confirmation instead of false OVERDUE or P
  assert.equal(c.eventState({date:'2026-10-28T19:00:00+01:00',event:'FOMC Rate Decision',actual:'—'},now),'scheduled');
  assert.match(html,/SPEECH · CONFIRMATION PENDING/);
  assert.match(html,/SPEECH · UNCONFIRMED/);
+});
+
+test('verified Oct 26–28 G10 activity calendar is present in fallback without invented actuals',()=>{
+ const expected=[
+  ['EUR','German Ifo Business Climate · Oct','2026-10-26T10:30:00+01:00','ifo.de'],
+  ['USD','Durable Goods Orders m/m · Sep','2026-10-27T13:30:00+01:00','census.gov'],
+  ['USD','New Home Sales · Sep','2026-10-27T15:00:00+01:00','census.gov'],
+  ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov']
+ ];
+ const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
+ for(const [currency,name,date,domain] of expected){
+  const rows=out.events.filter(x=>x.currency===currency&&x.event===name);
+  assert.equal(rows.length,1,name+' should appear exactly once');
+  assert.equal(rows[0].date,date);
+  assert.equal(rows[0].verificationStatus,'official-schedule');
+  assert.equal(rows[0].actual,'—');
+  assert.equal(rows[0].forecast,'—');
+  assert.ok(rows[0].sourceUrl.includes(domain));
+ }
+ const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
+  {date:'2026-10-26T10:30:00+01:00',currency:'EUR',event:'German Ifo Business Climate',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-27T13:30:00+01:00',currency:'USD',event:'Durable Goods Orders',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-27T15:00:00+01:00',currency:'USD',event:'New Home Sales',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Advance Goods Trade Balance',actual:'—',releaseState:'scheduled'}
+ ]});
+ for(const [currency,name,date] of expected){
+  const aliases=merged.events.filter(x=>x.currency===currency&&x.date===date&&
+   (x.event===name||/Ifo Business Climate|Durable Goods Orders|New Home Sales|Advance Goods Trade Balance/.test(x.event)));
+  assert.equal(aliases.length,1,'duplicate '+name);
+ }
 });
