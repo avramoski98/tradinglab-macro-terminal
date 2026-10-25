@@ -121,7 +121,7 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-28T01:30:00+01:00',ccy:'AUD',event:'CPI y/y · Sep (ABS Australia)',match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,importance:'HIGH',source:'Australian Bureau of Statistics · CPI 28 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia'},
  // 29 Oct 08:30 EDT = 29 Oct 13:30 CET.
  {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Advance GDP q/q · Q3 (annualized, BEA)',match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Q3 GDP advance 29 Oct 2026 08:30 ET',url:'https://www.bea.gov/news/schedule'},
- {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Core PCE Price Index m/m · Sep (BEA)',match:/^(?:Core PCE Price Index|Core PCE|PCE Price Index excluding food and energy)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Personal Income and Outlays Sep 2026, 29 Oct 08:30 ET',url:'https://www.bea.gov/news/schedule'},
+ {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Core PCE Price Index m/m · Sep (BEA)',match:/^(?:Core PCE Price Index m\/m|Core PCE|PCE Price Index excluding food and energy)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Personal Income and Outlays Sep 2026, 29 Oct 08:30 ET',url:'https://www.bea.gov/news/schedule'},
  {date:'2026-10-28T02:00:00+01:00',ccy:'NZD',event:'RBNZ Official Cash Rate Decision',match:/RBNZ|Official Cash Rate|OCR Decision/i,importance:'EXTREME',source:'Reserve Bank of New Zealand',url:'https://www.rbnz.govt.nz/monetary-policy/about-monetary-policy/the-official-cash-rate'},
  {date:'2026-10-28T14:45:00+01:00',ccy:'CAD',event:'Bank of Canada Rate Decision & Monetary Policy Report',match:/BoC|Bank of Canada.*Rate|Overnight Rate/i,importance:'EXTREME',source:'Bank of Canada',url:'https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/'},
  {date:'2026-10-28T19:00:00+01:00',ccy:'USD',event:'FOMC Rate Decision',match:/FOMC.*Rate|Federal Funds Rate|Fed Rate Decision/i,importance:'EXTREME',source:'Federal Reserve',url:'https://www.federalreserve.gov/newsevents/2026-october.htm'},
@@ -157,7 +157,17 @@ export function applyVerifiedReleaseOverlay(payload){
   if(i>=0)rows[i]=record;else rows.push(record);
  }
  for(const o of OFFICIAL_UPCOMING){
-  if(rows.some(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.date.slice(0,10)&&o.match.test(String(e.event||''))))continue;
+  const matching=rows.findIndex(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.date.slice(0,10)&&o.match.test(String(e.event||'')));
+  if(matching>=0){
+   // ForexFactory has shown 06:30 CET for the BoJ 15:30 JST press conference;
+   // 15:30 JST is 07:30 CET after the 25 Oct DST change. Override the feed time.
+   if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)){
+    rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+     event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+     verificationStatus:'official-schedule',releaseTimeVerified:true};
+   }
+   continue;
+  }
   const upcoming=Date.parse(o.date)>Date.now();
   rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
    importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?'Scheduled · official':'OVERDUE · unverified',
