@@ -696,3 +696,15 @@ test('Sunday Gulf equities confirm regional risk-off without inventing oil futur
  assert.ok(html.includes('no new verified oil-infrastructure outage'));
  assert.ok(html.includes('major US/EU cash markets and Brent/WTI futures do not yet provide a fresh post-headline session signal'));
 });
+
+
+test('Weekly Focus explicitly includes BoC, all five rate decisions and the next high-impact data',()=>{
+ assert.ok(html.includes('Official Cash Rate|RBNZ Press Conference'));
+ assert.ok(html.includes('Overnight Rate|BOC Press Conference'));
+ assert.ok(html.includes('Federal Funds Rate|FOMC'));
+ assert.ok(html.includes('Main Refinancing Rate|ECB Press Conference'));
+ assert.ok(html.includes('BOJ Policy Rate|BOJ'));
+ assert.ok(html.includes('Advance GDP q\\/q'));
+ assert.ok(html.includes('Employment Cost Index'));
+ assert.ok(html.includes('.slice(0,16)'));
+});
