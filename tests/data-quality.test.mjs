@@ -713,6 +713,29 @@ test('Weekly Focus explicitly includes BoC, all five rate decisions and the next
 });
 
 
+test('Weekly Focus policy matcher includes official fallback decision names without inventing events',()=>{
+ const start=html.indexOf('function weeklyPolicyEventName(');
+ const end=html.indexOf('function weekly(){',start);
+ assert.ok(start>0&&end>start,'policy matcher must be a standalone testable helper');
+ const c={};vm.createContext(c);vm.runInContext(html.slice(start,end),c);
+ const accepted=[
+  'CPI y/y · Sep (ABS Australia)',
+  'RBNZ Official Cash Rate Decision',
+  'Bank of Canada Rate Decision & Monetary Policy Report',
+  'FOMC Rate Decision',
+  'FOMC Chair Press Conference',
+  'Advance GDP q/q · Q3 (annualized, BEA)',
+  'Core PCE Price Index m/m · Sep (BEA)',
+  'ECB Rate Decision',
+  'ECB Press Conference',
+  'BOJ Governor Ueda Press Conference (policy statement time TBA)',
+  'Employment Cost Index · Q3'
+ ];
+ for(const event of accepted)assert.equal(c.weeklyPolicyEventName(event),true,event);
+ for(const event of ['Consumer Confidence','EIA Crude Oil Inventories','Retail Sales m/m'])assert.equal(c.weeklyPolicyEventName(event),false,event);
+ assert.ok(html.includes('&&weeklyPolicyEventName(x[3])'),'Weekly Focus must use this matcher, not an older inline regex');
+});
+
 test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactory is in fallback',()=>{
  const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  const expected=[
