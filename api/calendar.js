@@ -174,10 +174,32 @@ export function applyVerifiedReleaseOverlay(payload){
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
    verificationStatus:'official-schedule',lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
- rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
- return {...payload,events:rows,
-  overdue:rows.filter(e=>e.releaseState==='overdue').length,
-  checking:rows.filter(e=>e.releaseState==='checking').length,
+ // The fallback archive can contain the same release under a different title.
+ // Prefer a source-verified overlay over the manually inherited duplicate.
+ // Explicit aliases avoid merging genuinely distinct metrics (e.g. CPI y/y vs core CPI).
+ const manualDuplicateAliases=[
+  ['AUD',/^TD-MI Inflation Gauge m\\/m/i,/^MI Inflation Gauge m\\/m/i],
+  ['EUR',/^Bundesbank President Nagel Speaks$/i,/^Bundesbank President Nagel ·/i],
+  ['GBP',/^UK Final Services PMI/i,/^Final Services PMI · Sep \\(S&P Global UK\\)/i],
+  ['USD',/^S&P Global Services PMI · Sep final/i,/^Final Services PMI · Sep \\(S&P Global US\\)/i],
+  ['EUR',/^French Industrial Production m\\/m/i,/^France Industrial Output m\\/m/i],
+  ['CHF',/^Swiss Unemployment Rate · Sep/i,/^Unemployment Rate · Sep \\(seasonally adjusted\\)/i],
+  ['GBP',/^UK Construction PMI · Sep/i,/^Construction PMI · Sep \\(S&P Global\\)/i],
+  ['CAD',/^Canada Trade Balance · Aug/i,/^Trade Balance · Aug \\(merchandise, SA\\)/i],
+  ['USD',/^US Trade Balance · Aug/i,/^Trade Balance · Aug \\(goods and services, SA\\)/i]
+ ];
+ const verifiedRows=rows.filter(e=>/^verified-(primary|secondary)$/.test(e.verificationStatus||''));
+ const uniqueRows=rows.filter(e=>{
+  if(e.verificationStatus!=='manual-archive')return true;
+  return !manualDuplicateAliases.some(([currency,legacy,verified])=>
+   e.currency===currency&&legacy.test(String(e.event||''))&&
+   verifiedRows.some(v=>v.currency===currency&&v.date===e.date&&verified.test(String(v.event||'')))
+  );
+ });
+ uniqueRows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ return {...payload,events:uniqueRows,
+  overdue:uniqueRows.filter(e=>e.releaseState==='overdue').length,
+  checking:uniqueRows.filter(e=>e.releaseState==='checking').length,
   provider:(payload.provider||'Calendar')+' + official Oct 8–9 release overlay',
   releaseOverlayVerifiedAt:VERIFIED_AT};
 }
