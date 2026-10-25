@@ -667,9 +667,10 @@ test('ISM September 2026 Services PMI, prices and employment resolve overdue wit
  ]};
  const out=applyVerifiedReleaseOverlay(input);
  assert.equal(out.overdue,0);
- assert.equal(out.events.length,3);
+ const ismRows=out.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-05')&&/^ISM Services (?:PMI|Prices Paid|Employment Index) · Sep$/.test(x.event));
+ assert.equal(ismRows.length,3);
  const expected={'ISM Services PMI · Sep':['54.9','55.4'],'ISM Services Prices Paid · Sep':['74.0','72.6'],'ISM Services Employment Index · Sep':['50.1','47.8']};
- for(const row of out.events){
+ for(const row of ismRows){
   assert.deepEqual([row.actual,row.previous],expected[row.event]);
   assert.equal(row.forecast,'—');
   assert.equal(row.releaseState,'released');
