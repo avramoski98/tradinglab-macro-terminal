@@ -2,6 +2,9 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // Official qualitative speech: no numeric actual; publication independently verified.
+ {day:'2026-10-05',time:'08:45',ccy:'EUR',match:/^German Buba President Nagel Speaks(?: ·.*)?$/i,event:'Bundesbank President Nagel · Global Precious Metals Conference',actual:'Published',previous:'—',forecast:'—',label:'Official publication',importance:'HIGH',source:'Deutsche Bundesbank · Joachim Nagel keynote, Sorrento, 5 Oct 2026',url:'https://www.bundesbank.de/en/press/speeches/shifting-ground-how-geopolitics-is-reshaping-growth-monetary-policy-and-the-role-of-gold-as-a-reserve-asset-1010452',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:false,verifiedAt:'2026-10-25T05:50:00Z',force:true},
+
  // 25 Oct audit: independently verified 5–6 Oct releases previously left OVERDUE.
  // Sentix primary survey report confirms a 2.4-point fall from September's 5.1 to 2.7.
  // Consensus forecasts are not source-verified and are deliberately suppressed.
