@@ -54,19 +54,21 @@ export default async function handler(req,res){
  const checks=await Promise.all(names.map(async name=>{
   try{
    const {ok,status,data:d}=await read(name);
-   let ready=ok&&d.mode==='live',reason=ready?'live':d.mode||'upstream error',overdue=0;
+   let ready=ok&&d.mode==='live',reason=ready?'live':d.mode||'upstream error',overdue=0,overdueEvents=[];
    if(name==='calendar'){
-    overdue=(d.events||[]).filter(e=>e.releaseState==='overdue').length;
+    overdueEvents=(d.events||[]).filter(e=>e.releaseState==='overdue').map(e=>({date:e.date,currency:e.currency,event:e.event,source:e.source||null,verificationStatus:e.verificationStatus||null}));
+    overdue=overdueEvents.length;
     const numeric=(d.events||[]).filter(e=>e.releaseState==='overdue'&&!/speaks|minutes|accounts|speech|meetings|auction/i.test(e.event)).length;
     if(numeric){ready=false;reason=numeric+' overdue releases ('+overdue+' total)';}
    }
    if(name==='commodity-calendar'){
-    overdue=(d.events||[]).filter(e=>e.releaseState==='overdue').length;
+    overdueEvents=(d.events||[]).filter(e=>e.releaseState==='overdue').map(e=>({date:e.date,currency:e.currency,event:e.event,source:e.source||null,verificationStatus:e.verificationStatus||null}));
+    overdue=overdueEvents.length;
     if(overdue){ready=false;reason=overdue+' overdue or unverified commodity reports';}
    }
    if(name==='rates'&&d.liveCount<d.totalCount){ready=false;reason=(d.liveCount||0)+'/'+d.totalCount+' banks available';}
    if(name==='markets'&&(!d.quoteTimestamp||!Number.isFinite(Date.parse(d.quoteTimestamp))||Date.now()-Date.parse(d.quoteTimestamp)>15*60000)){ready=false;reason='Provider returned last-available prices without a verifiable quote timestamp';}
-   return {service:name,ready,httpStatus:status,mode:d.mode||null,reason,overdue,sourceUpdatedAt:d.sourceUpdatedAt||null};
+   return {service:name,ready,httpStatus:status,mode:d.mode||null,reason,overdue,overdueEvents,sourceUpdatedAt:d.sourceUpdatedAt||null};
   }catch(e){return {service:name,ready:false,reason:'timeout or invalid response',error:String(e?.message||e)};}
  }));
  const economicHistory=await Promise.all(G10.map(async currency=>{
