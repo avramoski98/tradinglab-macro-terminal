@@ -116,6 +116,12 @@ const VERIFIED=[
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/UoM 5-Yr Inflation Expectations/i,event:'Prelim UoM 5-Yr Inflation Expectations · Oct',actual:'3.5%',previous:'3.4%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'}
 ];
 const OFFICIAL_UPCOMING=[
+ // ABS and BEA official release schedules verified on 25 Oct 2026; do not invent forecasts or actuals.
+ // 28 Oct 11:30 AEDT = 28 Oct 01:30 CET.
+ {date:'2026-10-28T01:30:00+01:00',ccy:'AUD',event:'CPI y/y · Sep (ABS Australia)',match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,importance:'HIGH',source:'Australian Bureau of Statistics · CPI 28 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia'},
+ // 29 Oct 08:30 EDT = 29 Oct 13:30 CET.
+ {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Advance GDP q/q · Q3 (annualized, BEA)',match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Q3 GDP advance 29 Oct 2026 08:30 ET',url:'https://www.bea.gov/news/schedule'},
+ {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Core PCE Price Index m/m · Sep (BEA)',match:/^(?:Core PCE Price Index|Core PCE|PCE Price Index excluding food and energy)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Personal Income and Outlays Sep 2026, 29 Oct 08:30 ET',url:'https://www.bea.gov/news/schedule'},
  {date:'2026-10-28T02:00:00+01:00',ccy:'NZD',event:'RBNZ Official Cash Rate Decision',match:/RBNZ|Official Cash Rate|OCR Decision/i,importance:'EXTREME',source:'Reserve Bank of New Zealand',url:'https://www.rbnz.govt.nz/monetary-policy/about-monetary-policy/the-official-cash-rate'},
  {date:'2026-10-28T14:45:00+01:00',ccy:'CAD',event:'Bank of Canada Rate Decision & Monetary Policy Report',match:/BoC|Bank of Canada.*Rate|Overnight Rate/i,importance:'EXTREME',source:'Bank of Canada',url:'https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/'},
  {date:'2026-10-28T19:00:00+01:00',ccy:'USD',event:'FOMC Rate Decision',match:/FOMC.*Rate|Federal Funds Rate|Fed Rate Decision/i,importance:'EXTREME',source:'Federal Reserve',url:'https://www.federalreserve.gov/newsevents/2026-october.htm'},
