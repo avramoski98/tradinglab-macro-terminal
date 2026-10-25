@@ -2,6 +2,11 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // September 2026 ISM Services report published 5 Oct 2026: primary-source values.
+ // Clear provider-unverified forecasts rather than carrying forward stale consensus.
+ {day:'2026-10-05',time:'16:00',ccy:'USD',match:/^ISM (?:Services|Non-Manufacturing)(?: PMI| Index)(?: ·.*)?$/i,event:'ISM Services PMI · Sep',actual:'54.9',previous:'55.4',forecast:'—',importance:'HIGH',source:'Institute for Supply Management · September 2026 Services PMI report, 5 Oct 2026',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:true,verifiedAt:'2026-10-25T02:43:00Z',force:true},
+ {day:'2026-10-05',time:'16:00',ccy:'USD',match:/^ISM (?:Services|Non-Manufacturing) (?:Prices Paid|Prices Index|Prices)(?: ·.*)?$/i,event:'ISM Services Prices Paid · Sep',actual:'74.0',previous:'72.6',forecast:'—',importance:'HIGH',source:'Institute for Supply Management · September 2026 Services PMI report, 5 Oct 2026',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:true,verifiedAt:'2026-10-25T02:43:00Z',force:true},
+ {day:'2026-10-05',time:'16:00',ccy:'USD',match:/^ISM (?:Services|Non-Manufacturing) Employment(?: Index)?(?: ·.*)?$/i,event:'ISM Services Employment Index · Sep',actual:'50.1',previous:'47.8',forecast:'—',importance:'MED',source:'Institute for Supply Management · September 2026 Services PMI report, 5 Oct 2026',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:true,verifiedAt:'2026-10-25T02:43:00Z',force:true},
  // SNB foreign currency reserves for Sep 2026: CHF 770.476bn (Aug revised CHF 770.074bn).
  // Release on 7 Oct corroborated by ForexFactory, MetaTrader and TradingEconomics.
  // SNB publication calendar confirms an SDDS update on 7 Oct, but the exact figure
