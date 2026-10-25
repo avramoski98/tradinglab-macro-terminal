@@ -728,5 +728,5 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
  }
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
  const merged=applyVerifiedReleaseOverlay({mode:'live',events:[existing]});
- assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&/CPI y\\/y/.test(x.event)).length,1);
+ assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&x.event.includes('CPI y/y')).length,1);
 });
