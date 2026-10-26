@@ -1034,3 +1034,15 @@ test('USDA Oct 26 Crop Progress official publication clears overdue and reaches 
  assert.ok(html.includes('26 OCT · USDA CROP PROGRESS RELEASED'));
  assert.ok(html.includes('NEW / USDA CROP PROGRESS · 26 OCT 2026'));
 });
+
+test('October 26 ECB SAFE and Carney qualification are present in both Macro Watch and Weekly Focus',()=>{
+ const ecb='https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr261026~bde7b6d11a.en.html';
+ const carney='https://www.financialjuice.com/News/9821859/Canadas-PM-Carney-Not-willing-to-sign-US-trade-terms-offered-in-August.aspx?xy=rss';
+ assert.equal(html.split(ecb).length-1,2,'ECB primary source linked in Macro Watch and Weekly Focus');
+ assert.equal(html.split(carney).length-1,2,'Carney secondary headline attributed in both views');
+ assert.match(html,/NEW \/ ECB SAFE Q3 2026[^<]*· 26 OCT · VERIFIED PRIMARY/);
+ assert.match(html,/26 OCT · ECB SAFE Q3 2026 \(EUR \/ FINANCING CONDITIONS\)/);
+ assert.match(html,/26 OCT 20:34–20:40 UTC · CARNEY QUALIFIES CANADA–US TRADE OPTIMISM/);
+ assert.match(html,/NOT an ECB policy decision or live rate probability/);
+ assert.match(html,/not a signed agreement, confirmed tariff reduction or independently verified full transcript/);
+});
