@@ -1,4 +1,4 @@
-import {regimeHighImpact} from '../api/news.js';
+import {regimeHighImpact,categories} from '../api/news.js';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
@@ -1004,4 +1004,18 @@ test('UKMTO fire report near Al-Faw is high-impact maritime risk, not a confirme
  assert.ok(html.includes('26 OCT · UKMTO VESSEL FIRE REPORT OFF IRAQ'));
  assert.ok(html.includes('63 nautical miles southeast of Al-Faw'));
  assert.ok(html.includes('not confirmation of an attack'));
+});
+
+
+test('Oct 26 US–Canada tariff talks appear in Macro Watch and Weekly Focus with explicit no-deal caveat',()=>{
+ assert.ok(html.includes('NEW / US–CANADA SECTION 232 TARIFF TALKS'));
+ assert.ok(html.includes('26 OCT · US–CANADA SECTION 232 TRADE NEGOTIATIONS'));
+ assert.ok(html.includes('Talks are NOT a signed agreement'));
+ assert.ok(html.includes('not signed or implemented'));
+ assert.ok(html.includes('us-canada-working-deal-ease-steel-auto-tariffs-sources-say-2026-10-26'));
+});
+test('Plural tariffs headline is geopolitics but preliminary talks are not a confirmed high-impact shock',()=>{
+ const headline='The US and Canada are working on a deal to ease US tariffs on Canadian steel and auto imports - Sources';
+ assert.ok(categories(headline).includes('GEOPOLITICS'));
+ assert.equal(regimeHighImpact(headline),false);
 });
