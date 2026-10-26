@@ -7,7 +7,7 @@ const VERIFIED=[
  // wording for the headline balance. Do NOT treat -10 as the October numeric actual.
  // Preserve RELEASED status, but leave the numeric Actual missing until CBI confirms it.
  {day:'2026-10-26',time:'12:00',dateOverride:'2026-10-26T12:00:00+01:00',ccy:'GBP',
-  match:/^(?:CBI Realized Sales|CBI Distributive Trades(?: Survey)?|CBI Retail Sales)(?:\\s*·.*)?$/i,
+  match:/^(?:CBI Realized Sales|CBI Distributive Trades(?: Survey)?|CBI Retail Sales)(?:.*)?$/i,
   event:'CBI Distributive Trades · Oct (numeric actual unverified)',actual:'—',previous:'-55',forecast:'—',
   label:'RELEASED · actual unverified',importance:'MED',
   source:'Reuters reporting CBI October 2026 Distributive Trades Survey (publication verified; numeric headline ambiguous)',
