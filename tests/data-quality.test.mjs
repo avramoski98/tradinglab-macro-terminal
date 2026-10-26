@@ -733,7 +733,8 @@ test('Weekly Focus policy matcher includes official fallback decision names with
   'German Ifo Business Climate · Oct',
   'Durable Goods Orders m/m · Sep',
   'New Home Sales · Sep',
-  'Advance Goods Trade Balance · Sep'
+  'Advance Goods Trade Balance · Sep',
+  'UK Budget Statement & OBR Forecast · 2026'
  ];
  for(const event of accepted)assert.equal(c.weeklyPolicyEventName(event),true,event);
  for(const event of ['Consumer Confidence','EIA Crude Oil Inventories','Retail Sales m/m'])assert.equal(c.weeklyPolicyEventName(event),false,event);
@@ -845,7 +846,8 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   ['EUR','German Ifo Business Climate · Oct','2026-10-26T10:30:00+01:00','ifo.de'],
   ['USD','Durable Goods Orders m/m · Sep','2026-10-27T13:30:00+01:00','census.gov'],
   ['USD','New Home Sales · Sep','2026-10-27T15:00:00+01:00','census.gov'],
-  ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov']
+  ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov'],
+  ['GBP','UK Budget Statement & OBR Forecast · 2026','2026-10-28T13:30:00+01:00','parliament.uk']
  ];
  const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  for(const [currency,name,date,domain] of expected){
@@ -861,11 +863,18 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   {date:'2026-10-26T10:30:00+01:00',currency:'EUR',event:'German Ifo Business Climate',actual:'—',releaseState:'scheduled'},
   {date:'2026-10-27T13:30:00+01:00',currency:'USD',event:'Durable Goods Orders',actual:'—',releaseState:'scheduled'},
   {date:'2026-10-27T15:00:00+01:00',currency:'USD',event:'New Home Sales',actual:'—',releaseState:'scheduled'},
-  {date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Advance Goods Trade Balance',actual:'—',releaseState:'scheduled'}
+  {date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Advance Goods Trade Balance',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-28T12:30:00+01:00',currency:'GBP',event:'Annual Budget Release',actual:'—',releaseState:'scheduled'}
  ]});
  for(const [currency,name,date] of expected){
   const aliases=merged.events.filter(x=>x.currency===currency&&x.date===date&&
-   (x.event===name||/Ifo Business Climate|Durable Goods Orders|New Home Sales|Advance Goods Trade Balance/.test(x.event)));
+   (x.event===name||/Ifo Business Climate|Durable Goods Orders|New Home Sales|Advance Goods Trade Balance|UK Budget Statement|Annual Budget Release/.test(x.event)));
   assert.equal(aliases.length,1,'duplicate '+name);
  }
+ const budget=out.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
+ assert.match(budget.label,/approximate time/);
+ assert.equal(budget.releaseTimeVerified,false);
+ const budgetLive=merged.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
+ assert.equal(budgetLive.date,'2026-10-28T13:30:00+01:00');
+ assert.equal(budgetLive.releaseTimeVerified,false);
 });

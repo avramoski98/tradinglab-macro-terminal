@@ -124,6 +124,8 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
+ // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
+ {date:'2026-10-28T13:30:00+01:00',ccy:'GBP',event:'UK Budget Statement & OBR Forecast · 2026',match:/Annual Budget Release|Budget Statement|Autumn Budget|UK Budget/i,importance:'EXTREME',approximate:true,source:'UK Parliament · Budget Statement 28 Oct 2026 approximately 12:30 GMT; OBR forecast and Treasury documents after speech',url:'https://www.parliament.uk/business/news/2026/october-2026/budget-statement-wednesday-28-october/'},
  // ABS and BEA official release schedules verified on 25 Oct 2026; do not invent forecasts or actuals.
  // 28 Oct 11:30 AEDT = 28 Oct 01:30 CET.
  {date:'2026-10-28T01:30:00+01:00',ccy:'AUD',event:'CPI y/y · Sep (ABS Australia)',match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,importance:'HIGH',source:'Australian Bureau of Statistics · CPI 28 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia'},
@@ -173,6 +175,13 @@ export function applyVerifiedReleaseOverlay(payload){
   if(matching>=0){
    // ForexFactory has shown 06:30 CET for the BoJ 15:30 JST press conference;
    // 15:30 JST is 07:30 CET after the 25 Oct DST change. Override the feed time.
+   if(o.approximate===true){
+    // Official day is confirmed; approximate UK Budget start must never appear as an exact release timestamp.
+    rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+     event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+     verificationStatus:'official-schedule',releaseTimeVerified:false,label:'Scheduled · approximate time',
+     forecastVerificationStatus:'provider-unverified'};
+   }
    if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)){
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
      event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
@@ -182,9 +191,9 @@ export function applyVerifiedReleaseOverlay(payload){
   }
   const upcoming=Date.parse(o.date)>Date.now();
   rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
-   importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?'Scheduled · official':'OVERDUE · unverified',
+   importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?(o.approximate?'Scheduled · approximate time':'Scheduled · official'):'OVERDUE · unverified',
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
-   verificationStatus:'official-schedule',lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+   verificationStatus:'official-schedule',releaseTimeVerified:o.approximate?false:null,lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
  // The fallback archive can contain the same release under a different title.
  // Prefer a source-verified overlay over the manually inherited duplicate.
