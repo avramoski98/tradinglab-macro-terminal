@@ -1020,3 +1020,17 @@ test('Plural tariffs headline is geopolitics but preliminary talks are not a con
  assert.ok(categories(headline).includes('GEOPOLITICS'));
  assert.equal(regimeHighImpact(headline),false);
 });
+
+test('USDA Oct 26 Crop Progress official publication clears overdue and reaches Weekly Focus',()=>{
+ const c={Date,fetch:async()=>({ok:false}),console};
+ vm.createContext(c);
+ vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
+ const row=c.usdaRows().find(x=>x.date.startsWith('2026-10-26')&&x.event==='Crop Progress');
+ assert.ok(row,'Oct 26 USDA row exists');
+ assert.equal(row.releaseState,'released');
+ assert.equal(row.verificationStatus,'verified-primary');
+ assert.equal(row.actual,'—','multi-metric report has no single Actual');
+ assert.equal(row.sourceUrl,'https://esmis.nal.usda.gov/sites/default/release-files/796124/prog4326.txt');
+ assert.ok(html.includes('26 OCT · USDA CROP PROGRESS RELEASED'));
+ assert.ok(html.includes('NEW / USDA CROP PROGRESS · 26 OCT 2026'));
+});
