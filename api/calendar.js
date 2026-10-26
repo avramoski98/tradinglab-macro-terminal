@@ -2,6 +2,15 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 26 Oct: actual is independently reported by Reuters and corroborated by FinancialJuice.
+ // Official ifo calendar lists 10:30 CET; the FJ wire timestamp is 09:00 UTC.
+ // Source-time discrepancy remains explicit (releaseTimeVerified:false). Do not invent consensus.
+ {day:'2026-10-26',time:'10:30',dateOverride:'2026-10-26T10:30:00+01:00',ccy:'EUR',
+  match:/^(?:German\\s+)?(?:GE\\s+)?ifo Business Climate(?:\\s*·.*)?$/i,
+  event:'German Ifo Business Climate · Oct',actual:'90.2',previous:'89.9',forecast:'—',
+  importance:'HIGH',source:'Reuters reporting ifo Institute October 2026 release (secondary); ifo official schedule 10:30 CET',
+  url:'https://www.reuters.com/business/german-business-sentiment-grows-october-ifo-survey-finds-2026-10-26/',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-26',releaseTimeVerified:false,verifiedAt:'2026-10-26T09:37:00Z',force:true},
  // Remaining 5 Oct overdue events: official ANZ release and independently corroborated secondary releases.
  // Keep primary/secondary provenance distinct. No invented consensus figures.
  {day:'2026-10-05',time:'01:00',ccy:'NZD',match:/^ANZ Commodity Prices m\/m(?: ·.*)?$/i,event:'ANZ World Commodity Price Index m/m · Sep',actual:'+0.6%',previous:'-0.4%',forecast:'—',importance:'MED',source:'ANZ New Zealand · Commodity Price Index October 2026 (September reference)',url:'https://www.anz.co.nz/about-us/economic-markets-research/commodity-price-index/',status:'verified-primary',sourcePublishedAt:'2026-10-05',releaseTimeVerified:false,verifiedAt:'2026-10-25T06:05:00Z',force:true},
