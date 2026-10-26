@@ -792,6 +792,12 @@ test('geopolitical missile and critical-infrastructure reports are highlighted w
 });
 
 
+test('Macro Watch marks the Oct 26 Riyadh airport report as unconfirmed',()=>{
+ assert.ok(html.includes('NEW / UNCONFIRMED RIYADH AIRPORT REPORT · 26 ОКТ 2026'));
+ assert.ok(html.includes('нема непосредна потврда од саудиските власти'));
+ assert.ok(html.includes('3M G10 bias: UNCHANGED'));
+});
+
 test('calendar suppresses inherited duplicates but preserves distinct simultaneous releases',()=>{
  const input={mode:'schedule-fallback',events:[
   {date:'2026-10-05T09:30:00+02:00',currency:'GBP',event:'UK Final Services PMI · Sep',actual:'52.1',verificationStatus:'manual-archive',releaseState:'released'},
