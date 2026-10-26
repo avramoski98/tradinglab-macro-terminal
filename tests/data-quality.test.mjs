@@ -994,3 +994,14 @@ test('Oct 26 Dallas Fed primary release is deduplicated and published in Weekly 
  assert.ok(html.includes('DALLAS FED MANUFACTURING · 26 OCT 2026'));
  assert.ok(html.includes('26 OCT · DALLAS FED MANUFACTURING (USD / GROWTH)'));
 });
+
+
+test('UKMTO fire report near Al-Faw is high-impact maritime risk, not a confirmed attack or supply outage',()=>{
+ const headline='FinancialJuice: UKMTO receives multiple reports of vessel on fire near Iraq';
+ assert.equal(regimeHighImpact(headline),true,'UKMTO vessel fire must surface as high-impact');
+ assert.equal(regimeHighImpact('UKMTO advises ships to transit with caution'),false,'generic maritime advisory should not be high-impact');
+ assert.ok(html.includes('UKMTO REPORTED VESSEL FIRE OFF IRAQ'));
+ assert.ok(html.includes('26 OCT · UKMTO VESSEL FIRE REPORT OFF IRAQ'));
+ assert.ok(html.includes('63 nautical miles southeast of Al-Faw'));
+ assert.ok(html.includes('not confirmation of an attack'));
+});
