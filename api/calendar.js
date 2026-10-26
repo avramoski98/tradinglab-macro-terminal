@@ -2,6 +2,18 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 26 Oct: Reuters confirms publication of the CBI October distributive-trades survey at 11:02 UTC.
+ // IMPORTANT: Reuters says November *expectations* are -10; it also uses ambiguous month
+ // wording for the headline balance. Do NOT treat -10 as the October numeric actual.
+ // Preserve RELEASED status, but leave the numeric Actual missing until CBI confirms it.
+ {day:'2026-10-26',time:'12:00',dateOverride:'2026-10-26T12:00:00+01:00',ccy:'GBP',
+  match:/^(?:CBI Realized Sales|CBI Distributive Trades(?: Survey)?|CBI Retail Sales)(?:\\s*·.*)?$/i,
+  event:'CBI Distributive Trades · Oct (numeric actual unverified)',actual:'—',previous:'-55',forecast:'—',
+  label:'RELEASED · actual unverified',importance:'MED',
+  source:'Reuters reporting CBI October 2026 Distributive Trades Survey (publication verified; numeric headline ambiguous)',
+  url:'https://www.reuters.com/markets/us/strong-cbi-retail-sales-buck-downbeat-uk-consumer-trend-2026-10-26/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-26',releaseTimeVerified:false,
+  numericActualVerified:false,verifiedAt:'2026-10-26T11:20:00Z',force:true},
  // 26 Oct: actual is independently reported by Reuters and corroborated by FinancialJuice.
  // Official ifo calendar lists 10:30 CET; the FJ wire timestamp is 09:00 UTC.
  // Source-time discrepancy remains explicit (releaseTimeVerified:false). Do not invent consensus.
@@ -173,7 +185,8 @@ export function applyVerifiedReleaseOverlay(payload){
    importance:rank[base?.importance]>rank[o.importance]?base.importance:o.importance,
    label:o.label||'Verified actual',impact:'Neutral',releaseState:'released',
    source:o.source,sourceUrl:o.url,verificationStatus:o.status,
-   actualVerifiedAt:o.verifiedAt||VERIFIED_AT,lastUpdate:o.sourcePublishedAt||o.verifiedAt||VERIFIED_AT,
+   actualVerifiedAt:o.numericActualVerified===false?null:(o.verifiedAt||VERIFIED_AT),lastUpdate:o.sourcePublishedAt||o.verifiedAt||VERIFIED_AT,
+   ...(o.numericActualVerified===false?{numericActualVerified:false}:{}),
    releaseTimeVerified:o.releaseTimeVerified??base?.releaseTimeVerified??null,
    forecastVerificationStatus:'provider-unverified'
   };
