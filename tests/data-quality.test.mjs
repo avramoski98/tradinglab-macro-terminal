@@ -728,7 +728,7 @@ test('Weekly Focus policy matcher includes official fallback decision names with
   'Core PCE Price Index m/m · Sep (BEA)',
   'ECB Rate Decision',
   'ECB Press Conference',
-  'BOJ Governor Ueda Press Conference (policy statement time TBA)',
+  'BOJ Governor Ueda Press Conference (rate decision & Outlook Report time TBA)',
   'Employment Cost Index · Q3',
   'German Ifo Business Climate · Oct',
   'Durable Goods Orders m/m · Sep',
@@ -744,6 +744,8 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
  const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  const expected=[
   ['AUD','CPI y/y · Sep','2026-10-28T01:30:00+01:00','abs.gov.au'],
+  ['AUD','International Trade Price Indexes · Sep quarter','2026-10-29T01:30:00+01:00','abs.gov.au'],
+  ['AUD','Producer Price Indexes · Sep quarter','2026-10-30T01:30:00+01:00','abs.gov.au'],
   ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov']
  ];
@@ -759,10 +761,14 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
  const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
   existing,
+  {date:'2026-10-29T01:30:00+01:00',currency:'AUD',event:'Import Price Index',actual:'—',releaseState:'scheduled'},
+  {date:'2026-10-30T01:30:00+01:00',currency:'AUD',event:'PPI q/q',actual:'—',releaseState:'scheduled'},
   {date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Core PCE Price Index m/m',actual:'—',releaseState:'scheduled'},
   {date:'2026-10-30T06:30:00+01:00',currency:'JPY',event:'BOJ Press Conference',actual:'—',releaseState:'scheduled'}
  ]});
  assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&x.event.includes('CPI y/y')).length,1);
+ assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-29')&&/Trade Price Indexes|Import Price Index/.test(x.event)).length,1);
+ assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-30')&&/Producer Price Indexes|PPI q\/q/.test(x.event)).length,1);
  assert.equal(merged.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-29')&&x.event.includes('Core PCE')).length,1);
  const boj=merged.events.filter(x=>x.currency==='JPY'&&x.date.startsWith('2026-10-30')&&x.event.includes('Press Conference'));
  assert.equal(boj.length,1);
