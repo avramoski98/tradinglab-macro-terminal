@@ -4,6 +4,28 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+test('RBA Brad Jones Oct 26 panel clears past speech pending with official source and no fabricated numeric actual',()=>{
+ const cases=[
+  {mode:'live',events:[{date:'2026-10-25T22:10:00+01:00',currency:'AUD',event:'RBA Assist Gov Jones Speaks',actual:'—',releaseState:'awaiting-confirmation',importance:'MED'}]},
+  {mode:'schedule-fallback',events:[]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload);
+  const matches=out.events.filter(x=>x.currency==='AUD'&&/RBA Assistant Governor Brad Jones/.test(x.event));
+  assert.equal(matches.length,1,'single verified speech row in '+payload.mode);
+  const e=matches[0];
+  assert.equal(e.date,'2026-10-25T22:10:00+01:00');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'Published');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.numericActualVerified,false);
+  assert.equal(e.actualVerifiedAt,null);
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,true);
+  assert.ok(e.sourceUrl.includes('rba.gov.au/speeches/2026/sp-ag-2026-10-26.html'));
+  assert.equal(out.overdue,0);
+ }
+});
 test('October 26 CBI survey publication clears live overdue without inventing October numeric actual',()=>{
  const cases=[
   {mode:'live',events:[{date:'2026-10-26T12:00:00+01:00',currency:'GBP',event:'CBI Realized Sales',releaseState:'overdue',actual:'—',previous:'-55',forecast:'-50'}]},
