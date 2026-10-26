@@ -2,6 +2,17 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 26 Oct 2026 Dallas Fed October Texas Manufacturing Outlook Survey: primary publication.
+ // The Dallas Fed specifies 9:30 CT as the start of publication, not a guaranteed
+ // exact online timestamp; calendar time is indicative, and releaseTimeVerified is false.
+ {day:'2026-10-26',time:'15:30',dateOverride:'2026-10-26T15:30:00+01:00',ccy:'USD',
+  match:/Dallas Fed.*(?:Manufactur|Mfg)|Texas Manufacturing Outlook Survey/i,
+  event:'Dallas Fed Manufacturing Business Activity · Oct',actual:'13.4',previous:'9.8',forecast:'—',
+  label:'Official release · verified primary',importance:'MED',
+  source:'Federal Reserve Bank of Dallas · Texas Manufacturing Outlook Survey, 26 Oct 2026',
+  url:'https://www.dallasfed.org/research/surveys/tmos/2026/2610',
+  status:'verified-primary',sourcePublishedAt:'2026-10-26',releaseTimeVerified:false,
+  verifiedAt:'2026-10-26T16:34:00Z',force:true},
  // 26 Oct 08:10 AEDT = 25 Oct 21:10 UTC = 25 Oct 22:10 CET.
  // RBA primary speech transcript and audio confirm the event happened; this is
  // qualitative panel participation, NOT a numeric macro release or policy decision.
