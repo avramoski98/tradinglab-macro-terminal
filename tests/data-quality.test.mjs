@@ -782,6 +782,13 @@ test('geopolitical missile and critical-infrastructure reports are highlighted w
  assert.equal(regimeHighImpact('Houthis targeted Riyadh airport'),true);
  assert.equal(regimeHighImpact('Yemen-based Houthis: attack on King Khalid International Airport in Riyadh; no immediate Saudi confirmation'),true);
  assert.equal(regimeHighImpact('Houthis attack oil refinery near Riyadh'),true);
+ assert.equal(regimeHighImpact('Saudi-led coalition: military operation targets Houthi sites in Yemen to neutralize threats - statement'),true);
+ assert.equal(regimeHighImpact('Saudi-led coalition: two missile launchers destroyed in Yemen\'s Sanaa, one targeted Riyadh'),true);
+ assert.equal(regimeHighImpact('Houthis say they targeted Saudi Arabia’s east-west crude oil pumping stations with drones; no immediate confirmation from Saudi'),true);
+ assert.equal(regimeHighImpact('Saudi-led coalition: operation demolished five ballistic missile storage sites and four launch platforms in Houthi-controlled areas'),true);
+ assert.equal(regimeHighImpact('Saudi-led coalition: regular training drill concludes'),false);
+ assert.equal(regimeHighImpact('Saudi pumping stations publish monthly efficiency report'),false);
+
  assert.equal(regimeHighImpact('Drone strike against oil facilities'),true);
  assert.equal(regimeHighImpact('Airport announces summer flights'),false);
  assert.equal(regimeHighImpact('Algerian parliament approves resolution to deploy troops to Niger'),true);
@@ -794,6 +801,10 @@ test('geopolitical missile and critical-infrastructure reports are highlighted w
 
 test('Macro Watch marks the Oct 26 Riyadh airport report as unconfirmed',()=>{
  assert.ok(html.includes('NEW / UNCONFIRMED RIYADH AIRPORT REPORT · 26 ОКТ 2026'));
+ assert.ok(html.includes('NEW / COALITION OPERATIONS IN YEMEN · 26 ОКТ 2026'));
+ assert.ok(html.includes('26 OCT · SAUDI / YEMEN ESCALATION WATCH'));
+ assert.ok(html.includes('https://www.spa.gov.sa/N2710294'));
+
  assert.ok(html.includes('нема непосредна потврда од саудиските власти'));
  assert.ok(html.includes('3M G10 bias: UNCHANGED'));
 });
