@@ -780,6 +780,10 @@ test('geopolitical missile and critical-infrastructure reports are highlighted w
  assert.equal(regimeHighImpact('One killed in Ukrainian missile strike on industrial site'),true);
  assert.equal(regimeHighImpact('Houthis say they struck Saudi Aramco site in Yanbu'),true);
  assert.equal(regimeHighImpact('Houthis targeted Riyadh airport'),true);
+ assert.equal(regimeHighImpact('Yemen-based Houthis: attack on King Khalid International Airport in Riyadh; no immediate Saudi confirmation'),true);
+ assert.equal(regimeHighImpact('Houthis attack oil refinery near Riyadh'),true);
+ assert.equal(regimeHighImpact('Drone strike against oil facilities'),true);
+ assert.equal(regimeHighImpact('Airport announces summer flights'),false);
  assert.equal(regimeHighImpact('Algerian parliament approves resolution to deploy troops to Niger'),true);
  assert.equal(regimeHighImpact('Parliament authorizes deployment of military units abroad'),true);
  assert.equal(regimeHighImpact('Troops complete routine training exercise'),false);
