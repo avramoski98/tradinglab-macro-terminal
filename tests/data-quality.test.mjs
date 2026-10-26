@@ -957,7 +957,8 @@ test('Oct 26 German ifo is RELEASED with secondary provenance and no duplicated 
 
 test('FinancialJuice ifo headline maps to EUR and high-impact macro, components remain separate',()=>{
  const source=fs.readFileSync('api/news.js','utf8')
-  .replace('export function regimeHighImpact','function regimeHighImpact')
+  .replace('export function categories','function categories')
+   .replace('export function regimeHighImpact','function regimeHighImpact')
   .replace('export default async function handler','async function handler');
  const c={Date};vm.createContext(c);vm.runInContext(source,c);
  const xml='<rss><channel><item><title>FinancialJuice: German IFO Business Climate Actual 90.2 (Forecast 89.9, Previous 89.9)</title><pubDate>Mon, 26 Oct 2026 09:00:13 GMT</pubDate></item><item><title>FinancialJuice: German IFO Current Conditions Actual 88.8 (Forecast 89.8, Previous 89.5)</title><pubDate>Mon, 26 Oct 2026 09:00:22 GMT</pubDate></item></channel></rss>';
