@@ -843,7 +843,6 @@ test('past qualitative speeches await confirmation instead of false OVERDUE or P
 
 test('verified Oct 26–28 G10 activity calendar is present in fallback without invented actuals',()=>{
  const expected=[
-  ['EUR','German Ifo Business Climate · Oct','2026-10-26T10:30:00+01:00','ifo.de'],
   ['USD','Durable Goods Orders m/m · Sep','2026-10-27T13:30:00+01:00','census.gov'],
   ['USD','New Home Sales · Sep','2026-10-27T15:00:00+01:00','census.gov'],
   ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov'],
@@ -877,4 +876,44 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
  const budgetLive=merged.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
  assert.equal(budgetLive.date,'2026-10-28T13:30:00+01:00');
  assert.equal(budgetLive.releaseTimeVerified,false);
+});
+
+test('Oct 26 German ifo is RELEASED with secondary provenance and no duplicated live/fallback overdue',()=>{
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
+ const live=applyVerifiedReleaseOverlay({mode:'live',events:[
+  {date:'2026-10-26T10:00:00+01:00',currency:'EUR',event:'German ifo Business Climate',actual:'—',forecast:'89.9',releaseState:'overdue',importance:'HIGH'}
+ ]});
+ for(const data of [fallback,live]){
+  const matches=data.events.filter(x=>x.currency==='EUR'&&/ifo Business Climate/i.test(x.event));
+  assert.equal(matches.length,1,'single ifo row in '+data.mode);
+  const e=matches[0];
+  assert.equal(e.date,'2026-10-26T10:30:00+01:00');
+  assert.equal(e.actual,'90.2');
+  assert.equal(e.previous,'89.9');
+  assert.equal(e.forecast,'—','conflicting secondary forecasts must not become verified consensus');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.verificationStatus,'verified-secondary');
+  assert.equal(e.releaseTimeVerified,false,'official schedule and wire timestamps differ');
+  assert.ok(e.sourceUrl.includes('reuters.com'));
+  assert.equal(data.overdue,0);
+ }
+ assert.ok(html.includes('26 OCT · GERMAN IFO RELEASE (EUR / GROWTH)'));
+ assert.ok(html.includes('GERMAN IFO OCTOBER RELEASE'));
+});
+
+test('FinancialJuice ifo headline maps to EUR and high-impact macro, components remain separate',()=>{
+ const source=fs.readFileSync('api/news.js','utf8')
+  .replace('export function regimeHighImpact','function regimeHighImpact')
+  .replace('export default async function handler','async function handler');
+ const c={Date};vm.createContext(c);vm.runInContext(source,c);
+ const xml='<rss><channel><item><title>FinancialJuice: German IFO Business Climate Actual 90.2 (Forecast 89.9, Previous 89.9)</title><pubDate>Mon, 26 Oct 2026 09:00:13 GMT</pubDate></item><item><title>FinancialJuice: German IFO Current Conditions Actual 88.8 (Forecast 89.8, Previous 89.5)</title><pubDate>Mon, 26 Oct 2026 09:00:22 GMT</pubDate></item></channel></rss>';
+ const rows=c.parseRSS(xml);
+ assert.equal(rows.length,2);
+ assert.equal(rows[0].macro.ccy,'EUR');
+ assert.equal(rows[0].macro.kind,'IFO BUSINESS SENTIMENT');
+ assert.equal(rows[0].macro.result,'BEAT');
+ assert.equal(rows[0].highImpact,true);
+ assert.ok(rows[0].categories.includes('MACRO'));
+ assert.equal(rows[1].macro.ccy,'EUR');
+ assert.equal(rows[1].highImpact,false);
 });
