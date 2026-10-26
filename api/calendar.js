@@ -2,6 +2,17 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 26 Oct 08:10 AEDT = 25 Oct 21:10 UTC = 25 Oct 22:10 CET.
+ // RBA primary speech transcript and audio confirm the event happened; this is
+ // qualitative panel participation, NOT a numeric macro release or policy decision.
+ {day:'2026-10-25',time:'22:10',dateOverride:'2026-10-25T22:10:00+01:00',ccy:'AUD',
+  match:/^RBA (?:Assist(?:ant)? Gov(?:ernor)? )?(?:Brad )?Jones Speaks(?: ·.*)?$/i,
+  event:'RBA Assistant Governor Brad Jones · AFR Super and Wealth Summit',
+  actual:'Published',previous:'—',forecast:'—',label:'Official publication · qualitative remarks',
+  importance:'MED',source:'Reserve Bank of Australia · Brad Jones panel transcript and audio, 26 Oct 2026 08:10 AEDT',
+  url:'https://www.rba.gov.au/speeches/2026/sp-ag-2026-10-26.html',
+  status:'verified-primary',sourcePublishedAt:'2026-10-26',releaseTimeVerified:true,
+  numericActualVerified:false,verifiedAt:'2026-10-26T13:54:00Z',force:true},
  // 26 Oct: Reuters confirms publication of the CBI October distributive-trades survey at 11:02 UTC.
  // IMPORTANT: Reuters says November *expectations* are -10; it also uses ambiguous month
  // wording for the headline balance. Do NOT treat -10 as the October numeric actual.
