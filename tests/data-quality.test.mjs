@@ -971,3 +971,26 @@ test('FinancialJuice ifo headline maps to EUR and high-impact macro, components 
  assert.equal(rows[1].macro.ccy,'EUR');
  assert.equal(rows[1].highImpact,false);
 });
+
+
+test('Oct 26 Dallas Fed primary release is deduplicated and published in Weekly Focus',()=>{
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
+ const live=applyVerifiedReleaseOverlay({mode:'live',events:[
+  {date:'2026-10-26T15:30:00+01:00',currency:'USD',event:'Dallas Fed Manufacturing Index',actual:'—',releaseState:'overdue',importance:'MED'}
+ ]});
+ for(const data of [fallback,live]){
+  const matches=data.events.filter(x=>x.currency==='USD'&&/Dallas Fed Manufacturing/i.test(x.event));
+  assert.equal(matches.length,1,'one Dallas Fed release in '+data.mode);
+  const e=matches[0];
+  assert.equal(e.actual,'13.4');
+  assert.equal(e.previous,'9.8');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,false);
+  assert.match(e.sourceUrl,/dallasfed.org\/research\/surveys\/tmos\/2026\/2610/);
+  assert.equal(data.overdue,0);
+ }
+ assert.ok(html.includes('DALLAS FED MANUFACTURING · 26 OCT 2026'));
+ assert.ok(html.includes('26 OCT · DALLAS FED MANUFACTURING (USD / GROWTH)'));
+});
