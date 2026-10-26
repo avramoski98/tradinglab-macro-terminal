@@ -4,6 +4,27 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+test('October 26 CBI survey publication clears live overdue without inventing October numeric actual',()=>{
+ const cases=[
+  {mode:'live',events:[{date:'2026-10-26T12:00:00+01:00',currency:'GBP',event:'CBI Realized Sales',releaseState:'overdue',actual:'—',previous:'-55',forecast:'-50'}]},
+  {mode:'schedule-fallback',events:[]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload);
+  const rows=out.events.filter(x=>x.currency==='GBP'&&/CBI Distributive Trades/.test(x.event));
+  assert.equal(rows.length,1,payload.mode);
+  const e=rows[0];
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'—');
+  assert.equal(e.previous,'-55');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.numericActualVerified,false);
+  assert.equal(e.actualVerifiedAt,null);
+  assert.equal(e.verificationStatus,'verified-secondary-publication');
+  assert.ok(e.sourceUrl.includes('reuters.com'));
+  assert.equal(out.overdue,0);
+ }
+});
 test('numeric values preserve missing versus zero and magnitude',()=>{assert.equal(numeric('0.0%'),0);assert.equal(numeric('—'),null);assert.equal(numeric(null),null);assert.equal(numeric('1.2M'),1200000);assert.equal(numeric('-200K'),-200000);assert.equal(numeric('inflation rose 3%'),null);});
 test('release dates are UTC; previous revision is not current actual',()=>{const e=normalizeRelease({Date:'2026-10-02T12:30:00',Actual:'178K',Forecast:'175K',Previous:'142K',Revised:'161K',Reference:'Sep',ReferenceDate:'2026-09-01T00:00:00',LastUpdate:'2026-10-02T12:31:00'});assert.equal(e.releaseDate,'2026-10-02T12:30:00.000Z');assert.equal(e.actual,178000);assert.equal(e.previous,142000);assert.equal(e.priorBeforeRevision,161000);assert.equal(e.surprise,3000);assert.equal(e.reference,'Sep');assert.equal(normalizeRelease({Date:'invalid'}),null);});
 test('missing configured provider returns explicit unavailable response',async()=>{const key=process.env.TRADING_ECONOMICS_KEY;delete process.env.TRADING_ECONOMICS_KEY;try{const res=response();await economic({query:{currency:'USD',months:'6'}},res);assert.equal(res.code,503);assert.equal(res.data.mode,'not-configured');assert.deepEqual(res.data.events,[]);assert.equal(res.data.sourceUpdatedAt,null);}finally{if(key)process.env.TRADING_ECONOMICS_KEY=key;}});
