@@ -55,7 +55,8 @@ const OFFICIAL_REPORTS={
  '2026-10-09|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings/2026-10-09',
  '2026-10-13|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-13',
  '2026-10-19|Crop Progress':'https://esmis.nal.usda.gov/publication/crop-progress/2026-10-19',
- '2026-10-22|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings'
+ '2026-10-22|Cotton Ginnings':'https://esmis.nal.usda.gov/publication/cotton-ginnings',
+ '2026-10-26|Crop Progress':'https://esmis.nal.usda.gov/sites/default/release-files/796124/prog4326.txt'
 };
 
 function num(v){if(v==null)return NaN;return Number(String(v).replace(/,/g,'').replace(/[^0-9+-.]/g,''));}
