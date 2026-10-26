@@ -127,6 +127,10 @@ const OFFICIAL_UPCOMING=[
  // ABS and BEA official release schedules verified on 25 Oct 2026; do not invent forecasts or actuals.
  // 28 Oct 11:30 AEDT = 28 Oct 01:30 CET.
  {date:'2026-10-28T01:30:00+01:00',ccy:'AUD',event:'CPI y/y · Sep (ABS Australia)',match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,importance:'HIGH',source:'Australian Bureau of Statistics · CPI 28 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia'},
+ // ABS official calendar: September-quarter import/export prices (29 Oct) and producer prices (30 Oct), both 11:30 AEDT = 01:30 CET.
+ // These are scheduled publications only: never infer actuals, forecasts, or a policy surprise.
+ {date:'2026-10-29T01:30:00+01:00',ccy:'AUD',event:'International Trade Price Indexes · Sep quarter (ABS Australia)',match:/International Trade Price Indexes|Import Price Index|Export Price Index/i,importance:'MED',source:'Australian Bureau of Statistics · release calendar 29 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/release-calendar/future-releases/202610/rcc_economy'},
+ {date:'2026-10-30T01:30:00+01:00',ccy:'AUD',event:'Producer Price Indexes · Sep quarter (ABS Australia)',match:/Producer Price Indexes|Producer Price Index|PPI q\/q/i,importance:'MED',source:'Australian Bureau of Statistics · release calendar 30 Oct 2026 11:30 AEDT',url:'https://www.abs.gov.au/release-calendar/future-releases/202610/rcc_economy'},
  // 29 Oct 08:30 EDT = 29 Oct 13:30 CET.
  {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Advance GDP q/q · Q3 (annualized, BEA)',match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Q3 GDP advance 29 Oct 2026 08:30 ET',url:'https://www.bea.gov/news/schedule'},
  {date:'2026-10-29T13:30:00+01:00',ccy:'USD',event:'Core PCE Price Index m/m · Sep (BEA)',match:/^(?:Core PCE Price Index m\/m|Core PCE|PCE Price Index excluding food and energy)(?: ·.*)?$/i,importance:'HIGH',source:'U.S. Bureau of Economic Analysis · Personal Income and Outlays Sep 2026, 29 Oct 08:30 ET',url:'https://www.bea.gov/news/schedule'},
@@ -136,7 +140,7 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-28T19:30:00+01:00',ccy:'USD',event:'FOMC Chair Press Conference',match:/Fed.*Press Conference|FOMC.*Press Conference/i,importance:'HIGH',source:'Federal Reserve',url:'https://www.federalreserve.gov/newsevents/2026-october.htm'},
  {date:'2026-10-29T14:15:00+01:00',ccy:'EUR',event:'ECB Rate Decision',match:/ECB.*Rate|Main Refinancing Rate|Deposit Facility Rate/i,importance:'EXTREME',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
  {date:'2026-10-29T14:45:00+01:00',ccy:'EUR',event:'ECB Press Conference',match:/ECB.*Press Conference|Lagarde.*Press Conference/i,importance:'HIGH',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
- {date:'2026-10-30T07:30:00+01:00',ccy:'JPY',event:'BoJ Governor Ueda Press Conference (policy statement time TBA)',match:/BoJ.*Press Conference|Ueda.*Press Conference/i,importance:'HIGH',source:'Bank of Japan official calendar',url:'https://www.boj.or.jp/about/calendar/index.htm'},
+ {date:'2026-10-30T07:30:00+01:00',ccy:'JPY',event:'BoJ Governor Ueda Press Conference (rate decision & Outlook Report time TBA)',match:/BoJ.*Press Conference|Ueda.*Press Conference/i,importance:'HIGH',source:'Bank of Japan official calendar',url:'https://www.boj.or.jp/about/calendar/index.htm'},
  {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'}
 ];
 const rank={LOW:1,MED:2,HIGH:3,EXTREME:4};
