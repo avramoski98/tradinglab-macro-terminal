@@ -6,7 +6,7 @@ const VERIFIED=[
  // Official ifo calendar lists 10:30 CET; the FJ wire timestamp is 09:00 UTC.
  // Source-time discrepancy remains explicit (releaseTimeVerified:false). Do not invent consensus.
  {day:'2026-10-26',time:'10:30',dateOverride:'2026-10-26T10:30:00+01:00',ccy:'EUR',
-  match:/^(?:German\\s+)?(?:GE\\s+)?ifo Business Climate(?:\\s*·.*)?$/i,
+  match:/^(?:German\s+)?(?:GE\s+)?ifo Business Climate(?:\s*·.*)?$/i,
   event:'German Ifo Business Climate · Oct',actual:'90.2',previous:'89.9',forecast:'—',
   importance:'HIGH',source:'Reuters reporting ifo Institute October 2026 release (secondary); ifo official schedule 10:30 CET',
   url:'https://www.reuters.com/business/german-business-sentiment-grows-october-ifo-survey-finds-2026-10-26/',
