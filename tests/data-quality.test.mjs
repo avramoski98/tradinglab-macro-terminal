@@ -1116,6 +1116,7 @@ test('ECB Bank Lending Survey is included from primary ECB schedule without fabr
   assert.equal(rows[0].date,'2026-10-27T10:00:00+01:00');
   assert.equal(rows[0].actual,'—','no pre-release invented numeric Actual');
   assert.equal(rows[0].sourceUrl,'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html');
+  assert.equal(rows[0].releaseTimeVerified,true,'ECB official release time is verified');
  }
  const h=fs.readFileSync('index.html','utf8');
  assert.ok(h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'));
