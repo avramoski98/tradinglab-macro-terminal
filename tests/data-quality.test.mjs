@@ -990,7 +990,7 @@ test('past qualitative speeches await confirmation instead of false OVERDUE or P
 test('verified Oct 26–28 G10 activity calendar is present in fallback without invented actuals',()=>{
  const expected=[
   ['USD','Durable Goods Orders m/m · Sep','2026-10-27T13:30:00+01:00','census.gov'],
-  ['USD','New Home Sales · Sep','2026-10-27T15:00:00+01:00','census.gov'],
+  ['USD','New Home Sales · Sep (Census/HUD, SAAR)','2026-10-27T15:00:00+01:00','census.gov'],
   ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov'],
   ['GBP','UK Budget Statement & OBR Forecast · 2026','2026-10-28T13:30:00+01:00','parliament.uk']
  ];
@@ -999,10 +999,10 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   const rows=out.events.filter(x=>x.currency===currency&&x.event===name);
   assert.equal(rows.length,1,name+' should appear exactly once');
   assert.equal(rows[0].date,date);
-  if(name==='Durable Goods Orders m/m · Sep'){
+  if(name==='Durable Goods Orders m/m · Sep'||name.startsWith('New Home Sales')){
    // The Census report is now released and primary-verified.
    assert.equal(rows[0].verificationStatus,'verified-primary');
-   assert.equal(rows[0].actual,'+1.8%');
+   assert.equal(rows[0].actual,name.startsWith('New Home Sales')?'676K':'+1.8%');
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
@@ -1058,6 +1058,24 @@ test('Oct 27 ADP and FHFA primary releases resolve overdue in both calendar mode
  assert.equal(cs[0].verificationStatus,'official-schedule');
  assert.equal(cs[0].forecast,'—');
  assert.ok(['overdue','scheduled'].includes(cs[0].releaseState));
+});
+
+test('Oct 27 Census/HUD September new home sales is released with revised August and no invented consensus',()=>{
+ for(const mode of ['live','schedule-fallback']){
+  const out=applyVerifiedReleaseOverlay({mode,events:[
+   {date:'2026-10-27T15:00:00+01:00',currency:'USD',event:'New Home Sales',actual:'—',previous:'684K',releaseState:'overdue'}
+  ]});
+  const rows=out.events.filter(e=>e.currency==='USD'&&e.event.startsWith('New Home Sales · Sep'));
+  assert.equal(rows.length,1);
+  assert.equal(rows[0].actual,'676K');
+  assert.equal(rows[0].previous,'680K revised');
+  assert.equal(rows[0].forecast,'—');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
+  assert.match(rows[0].sourceUrl,/census.gov/);
+ }
+ assert.ok(html.includes('US NEW HOME SALES (USD / HOUSING)'));
+ assert.ok(html.includes('US NEW HOME SALES (CENSUS/HUD PRIMARY / USD)'));
 });
 
 test('Oct 27 Conference Board and Richmond Fed primary actuals supersede overdue without fabricating consensus',()=>{
