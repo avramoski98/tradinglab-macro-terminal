@@ -237,6 +237,19 @@ const OFFICIAL_UPCOMING=[
  // This is a multi-metric quarterly survey; never invent a single numeric Actual.
  // Do not confuse with the separate ECB SAFE survey released on 26 Oct.
  {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'ECB Bank Lending Survey · Q3 2026',match:/ECB.*Bank Lending Survey|Euro Area Bank Lending Survey|Bank Lending Survey/i,importance:'HIGH',source:'European Central Bank · official Bank Lending Survey publication schedule, 27 Oct 2026 10:00 CET',url:'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html'},
+ // ECB official weekly schedule (updated 26 Oct) confirms 27 Oct 10:00 CET
+ // monetary developments. The LIVE feed lists two numeric series but the
+ // FALLBACK previously omitted them, falsely reporting zero overdue releases.
+ // Preserve them as OVERDUE in fallback until the exact September actuals
+ // are independently verified. Do not invent actuals, forecasts or revisions.
+ {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'M3 Money Supply y/y · Sep',
+  match:/^(?:M3 Money Supply|Money Supply M3|Euro Area M3)(?:.*)?$/i,importance:'MED',
+  source:'European Central Bank · monetary developments official schedule 27 Oct 2026 10:00 CET',
+  url:'https://www.ecb.europa.eu/press/calendars/weekly/html/index.en.html'},
+ {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'Private Loans y/y · Sep',
+  match:/^(?:Private Loans|Loans to Private Sector|EZ Private Loans)(?:.*)?$/i,importance:'MED',
+  source:'European Central Bank · monetary developments official schedule 27 Oct 2026 10:00 CET',
+  url:'https://www.ecb.europa.eu/press/calendars/weekly/html/index.en.html'},
  // 27 Oct 08:30 EDT = 13:30 CET; 10:00 EDT = 15:00 CET.
  {date:'2026-10-27T13:30:00+01:00',ccy:'USD',event:'Durable Goods Orders m/m · Sep',match:/Durable Goods(?: Orders)?|Core Durable Goods/i,importance:'HIGH',source:'U.S. Census Bureau · advance durable goods 27 Oct 2026 08:30 EDT',url:'https://www.census.gov/economic-indicators/calendar-listview.html'},
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
