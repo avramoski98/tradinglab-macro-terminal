@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // ECB Q3 2026 BLS published 27 Oct 10:00 CET. Reuters reported 09:04 UTC.
+ // Net -27% banks seeing lower mortgage demand vs -15% Q2 and -12% expected;
+ // these are net response balances, NOT mortgage loan volume declines.
+ // Multi-metric survey: do not invent a single numeric headline actual or forecast.
+ // ECB Q3 primary full table has not been independently retrieved.
+ {day:'2026-10-27',time:'10:00',dateOverride:'2026-10-27T10:00:00+01:00',ccy:'EUR',
+  match:/ECB.*Bank Lending Survey|Euro Area Bank Lending Survey|Bank Lending Survey/i,
+  event:'ECB Bank Lending Survey · Q3 2026 (released)',actual:'Published',previous:'—',forecast:'—',
+  importance:'HIGH',label:'RELEASED · multi-metric survey; Reuters-verified secondary',
+  source:'Reuters 27 Oct 2026 09:04 UTC reporting ECB Q3 Bank Lending Survey; net mortgage-demand balance -27% vs -15% Q2; Q3 ECB primary table pending',
+  url:'https://www.reuters.com/business/finance/euro-zone-mortgage-demand-falls-rates-rise-ecb-survey-shows-2026-10-27/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  numericActualVerified:false,verifiedAt:'2026-10-27T09:04:11Z',force:true},
  // 27 Oct Q3 2026 Spain EPA unemployment rate: 10.18% vs 9.87% Q2.
  // Two independent reports citing Spain's INE confirm the published figure.
  // The INE Q3 primary table is not yet directly retrievable: SECONDARY only.
