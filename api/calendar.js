@@ -7,7 +7,7 @@ const VERIFIED=[
  // This is NOT the national Case-Shiller (+2.1%) or FHFA (+2.4%) index.
  // Consensus is not independently verified; leave forecast blank.
  {day:'2026-10-27',time:'14:00',dateOverride:'2026-10-27T14:00:00+01:00',ccy:'USD',
-  match:/S&P\\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,
+  match:/S&P\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,
   event:'S&P/CS Composite-20 HPI y/y · Aug',actual:'2.7%',previous:'2.5%',forecast:'—',
   importance:'MED',label:'Released · S&P DJI verified primary · 20-city NSA y/y',
   source:'S&P Dow Jones Indices · S&P Cotality Case-Shiller August 2026 report, 27 Oct 09:00 EDT',
