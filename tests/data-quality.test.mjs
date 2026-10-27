@@ -837,7 +837,7 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
   assert.equal(rows[0].verificationStatus,'official-schedule');
   assert.equal(rows[0].actual,'—');
   assert.equal(rows[0].forecast,'—');
-  assert.ok(rows[0].sourceUrl.includes(domain));
+  assert.equal(rows[0].sourceUrl,'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html');
  }
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
  const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
