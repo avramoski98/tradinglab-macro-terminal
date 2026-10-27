@@ -7,7 +7,7 @@ const VERIFIED=[
  // The INE Q3 primary table is not yet directly retrievable: SECONDARY only.
  // Keep provider market forecast blank and avoid calling the 09:00 CET time primary-verified.
  {day:'2026-10-27',time:'09:00',dateOverride:'2026-10-27T09:00:00+01:00',ccy:'EUR',
-  match:/^(?:Spanish|Spain) Unemployment Rate(?:\\b|\\s|$)/i,
+  match:/^(?:Spanish|Spain) Unemployment Rate/i,
   event:'Spanish Unemployment Rate · Q3 2026 (INE EPA)',actual:'10.18%',previous:'9.87%',forecast:'—',
   importance:'MED',label:'Released · numeric secondary-verified',
   source:'El País and HuffPost España reporting INE Q3 2026 Labour Force Survey, 27 Oct',
@@ -18,7 +18,7 @@ const VERIFIED=[
  // September previous is disputed (85 revised in WSJ vs 86 in September INSEE page);
  // do not carry an unverified previous into the calendar.
  {day:'2026-10-27',time:'08:45',dateOverride:'2026-10-27T08:45:00+01:00',ccy:'EUR',
-  match:/^(?:French|France) Consumer Confidence(?:\\b|\\s|$)/i,
+  match:/^(?:French|France) Consumer Confidence/i,
   event:'French Consumer Confidence · Oct 2026 (INSEE)',actual:'80',previous:'—',forecast:'—',
   importance:'MED',label:'Released · numeric secondary-verified; prior revised value unresolved',
   source:'WSJ and AFP reporting INSEE October 2026 household confidence, 27 Oct; previous value revision unresolved',
