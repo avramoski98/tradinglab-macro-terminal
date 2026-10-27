@@ -2,6 +2,27 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // ECB September 2026 monetary developments: official primary release, 27 Oct.
+ // IMPORTANT: ForexFactory 'Private Loans y/y' tracks the household-lending
+ // headline (3.1%); do not confuse it with adjusted loans to ALL private
+ // sector borrowers (4.3%). The ECB publishes both measures.
+ // Market consensus is not independently verified; leave forecast blank.
+ {day:'2026-10-27',time:'10:00',dateOverride:'2026-10-27T10:00:00+01:00',ccy:'EUR',
+  match:/^(?:M3 Money Supply|Money Supply M3|Euro Area M3)(?:.*)?$/i,
+  event:'M3 Money Supply y/y · Sep',actual:'3.5%',previous:'3.5%',forecast:'—',
+  importance:'MED',label:'Released · ECB verified primary · unchanged m/m in annual rate',
+  source:'European Central Bank · Monetary developments in the euro area: September 2026, 27 Oct',
+  url:'https://www.ecb.europa.eu/press/stats/md/html/ecb.md2609~dd1bf1b2e4.it.html',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T12:15:00Z',force:true},
+ {day:'2026-10-27',time:'10:00',dateOverride:'2026-10-27T10:00:00+01:00',ccy:'EUR',
+  match:/^(?:Private Loans|Loans to Private Sector|EZ Private Loans)(?:.*)?$/i,
+  event:'Private Loans y/y · Sep (ECB household loans)',actual:'3.1%',previous:'3.1%',forecast:'—',
+  importance:'MED',label:'Released · ECB verified primary · household loans; all-private-sector adjusted 4.3%',
+  source:'European Central Bank · September 2026 adjusted loans to households 3.1% y/y; adjusted loans to all private-sector borrowers 4.3% y/y (distinct series)',
+  url:'https://www.ecb.europa.eu/press/stats/md/html/ecb.md2609~dd1bf1b2e4.it.html',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T12:15:00Z',force:true},
  // ECB Q3 2026 BLS published 27 Oct 10:00 CET. Reuters reported 09:04 UTC.
  // Net -27% banks seeing lower mortgage demand vs -15% Q2 and -12% expected;
  // these are net response balances, NOT mortgage loan volume declines.
