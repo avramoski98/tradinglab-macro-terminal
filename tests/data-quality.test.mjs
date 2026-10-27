@@ -26,7 +26,7 @@ test('API WSB publication clears overdue in live and fallback without inventing 
   assert.equal(e.numericActualVerified,false);
   assert.equal(e.actualVerifiedAt,null);
   assert.equal(e.verificationStatus,'verified-secondary-publication');
-  assert.match(e.label,/crude stocks -2\\.031M/);
+  assert.match(e.label,/crude stocks -2\.031M/);
   assert.match(e.source,/subscription-only/);
   assert.equal(e.forecast,'—');
   assert.equal(out.events.filter(x=>x.releaseState==='overdue'&&/API Weekly Statistical Bulletin/.test(x.event)).length,0);
