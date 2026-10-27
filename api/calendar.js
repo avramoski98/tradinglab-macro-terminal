@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // S&P Dow Jones Indices primary release, 27 Oct 2026 09:00 EDT / 14:00 CET.
+ // August 20-city NSA annual change +2.7% vs July +2.5%.
+ // This is NOT the national Case-Shiller (+2.1%) or FHFA (+2.4%) index.
+ // Consensus is not independently verified; leave forecast blank.
+ {day:'2026-10-27',time:'14:00',dateOverride:'2026-10-27T14:00:00+01:00',ccy:'USD',
+  match:/S&P\\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,
+  event:'S&P/CS Composite-20 HPI y/y · Aug',actual:'2.7%',previous:'2.5%',forecast:'—',
+  importance:'MED',label:'Released · S&P DJI verified primary · 20-city NSA y/y',
+  source:'S&P Dow Jones Indices · S&P Cotality Case-Shiller August 2026 report, 27 Oct 09:00 EDT',
+  url:'https://www.spglobal.com/spdji/en/index-announcements/article/sp-cotality-case-shiller-index-reports-annual-gain-in-august-2026/',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T15:27:00Z',force:true},
+
  // Census September 2026 durable goods: official 27 Oct 08:30 EDT / 13:30 CET.
  // Headline 1.8% includes a 28.4% rise in civilian aircraft orders;
  // business equipment proxy excluding aircraft eased to 0.5% from 1.6%.
@@ -357,7 +370,7 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-27T13:30:00+01:00',ccy:'USD',event:'Durable Goods Orders m/m · Sep',match:/Durable Goods(?: Orders)?|Core Durable Goods/i,importance:'HIGH',source:'U.S. Census Bureau · advance durable goods 27 Oct 2026 08:30 EDT',url:'https://www.census.gov/economic-indicators/calendar-listview.html'},
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
  // S&P Cotality Case-Shiller August 2026 20-city y/y, 27 Oct 09:00 EDT.
- // Preserve this release in FALLBACK while its August actual is unverified.
+ // Preserve this release in FALLBACK with its verified August actual via overlay.
  {date:'2026-10-27T14:00:00+01:00',ccy:'USD',event:'S&P/CS Composite-20 HPI y/y · Aug',match:/S&P\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,importance:'MED',source:'S&P Dow Jones Indices · Case-Shiller monthly release 27 Oct 2026 09:00 EDT',url:'https://www.spglobal.com/spdji/en/index-family/indicators/sp-cotality-case-shiller'},
  // Two further 27 Oct 10:00 EDT USD releases were absent in FALLBACK.
  // Do not suppress them just because ForexFactory temporarily fails.
