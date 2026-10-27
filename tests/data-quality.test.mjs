@@ -1060,6 +1060,32 @@ test('Oct 27 ADP and FHFA primary releases resolve overdue in both calendar mode
  assert.ok(['overdue','scheduled'].includes(cs[0].releaseState));
 });
 
+test('Oct 27 Conference Board and Richmond Fed primary actuals supersede overdue without fabricating consensus',()=>{
+ for(const mode of ['live','schedule-fallback']){
+  const out=applyVerifiedReleaseOverlay({mode,events:[
+   {date:'2026-10-27T15:00:00+01:00',currency:'USD',event:'CB Consumer Confidence',actual:'—',previous:'81.9',releaseState:'overdue'},
+   {date:'2026-10-27T15:00:00+01:00',currency:'USD',event:'Richmond Manufacturing Index',actual:'—',releaseState:'overdue'}
+  ]});
+  const cb=out.events.filter(e=>e.event==='Conference Board Consumer Confidence · Oct');
+  const rich=out.events.filter(e=>e.event==='Richmond Fed Manufacturing Index · Oct');
+  assert.equal(cb.length,1);
+  assert.equal(rich.length,1);
+  assert.equal(cb[0].actual,'91.7');
+  assert.equal(cb[0].previous,'84.2 revised');
+  assert.equal(rich[0].actual,'-2');
+  assert.equal(rich[0].previous,'-2');
+  for(const e of [...cb,...rich]){
+   assert.equal(e.releaseState,'released');
+   assert.equal(e.verificationStatus,'verified-primary');
+   assert.equal(e.forecast,'—');
+   assert.ok(e.sourceUrl.startsWith('https://'));
+  }
+ }
+ assert.ok(html.includes('US CONSUMER CONFIDENCE (USD / GROWTH)'));
+ assert.ok(html.includes('RICHMOND FED MANUFACTURING (USD / GROWTH)'));
+ assert.ok(html.includes('CONFERENCE BOARD CONSUMER CONFIDENCE (USD / PRIMARY)'));
+});
+
 test('Oct 26 German ifo is RELEASED with secondary provenance and no duplicated live/fallback overdue',()=>{
  const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  const live=applyVerifiedReleaseOverlay({mode:'live',events:[
