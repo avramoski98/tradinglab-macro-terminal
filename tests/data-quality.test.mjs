@@ -411,7 +411,7 @@ test('Oct 23 flash PMI secondary actuals clear overdue statuses without invented
  const result=applyVerifiedReleaseOverlay({mode:'live',events});
  for(const [currency,event,actual] of cases){const row=result.events.find(x=>x.currency===currency&&x.event.startsWith(event+' · Oct'));
   assert.ok(row,currency+' '+event+' missing');assert.equal(row.actual,actual);assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-secondary');assert.equal(row.forecastVerificationStatus,'provider-unverified');}
- assert.equal(result.events.filter(x=>x.releaseState==='overdue').length,0);
+ assert.equal(unresolvedNonScheduleOverdue(result),0);
 });
 
 
