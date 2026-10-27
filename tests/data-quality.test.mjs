@@ -991,8 +991,14 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   const rows=out.events.filter(x=>x.currency===currency&&x.event===name);
   assert.equal(rows.length,1,name+' should appear exactly once');
   assert.equal(rows[0].date,date);
-  assert.equal(rows[0].verificationStatus,'official-schedule');
-  assert.equal(rows[0].actual,'—');
+  if(name==='Durable Goods Orders m/m · Sep'){
+   // The Census report is now released and primary-verified.
+   assert.equal(rows[0].verificationStatus,'verified-primary');
+   assert.equal(rows[0].actual,'+1.8%');
+  }else{
+   assert.equal(rows[0].verificationStatus,'official-schedule');
+   assert.equal(rows[0].actual,'—');
+  }
   assert.equal(rows[0].forecast,'—');
   assert.ok(rows[0].sourceUrl.includes(domain));
  }
@@ -1014,6 +1020,36 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
  const budgetLive=merged.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
  assert.equal(budgetLive.date,'2026-10-28T13:30:00+01:00');
  assert.equal(budgetLive.releaseTimeVerified,false);
+});
+
+test('Oct 27 ADP and FHFA primary releases resolve overdue in both calendar modes without fabricating consensus',()=>{
+ for(const mode of ['live','schedule-fallback']){
+  const out=applyVerifiedReleaseOverlay({mode,events:[
+   {date:'2026-10-27T13:15:00+01:00',currency:'USD',event:'ADP Weekly Employment Change',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-27T14:00:00+01:00',currency:'USD',event:'HPI m/m',actual:'—',releaseState:'overdue'}
+  ]});
+  const adp=out.events.filter(x=>x.event.startsWith('ADP NER Pulse'));
+  const fhfa=out.events.filter(x=>x.event.startsWith('FHFA House Price Index'));
+  assert.equal(adp.length,1);
+  assert.equal(fhfa.length,1);
+  assert.equal(adp[0].actual,'+16.75K/week');
+  assert.equal(adp[0].previous,'+17.50K/week (revised)');
+  assert.equal(fhfa[0].actual,'+0.3%');
+  assert.equal(fhfa[0].previous,'+0.2% revised');
+  for(const row of [...adp,...fhfa]){
+   assert.equal(row.releaseState,'released');
+   assert.equal(row.verificationStatus,'verified-primary');
+   assert.equal(row.forecast,'—');
+   assert.ok(row.sourceUrl.startsWith('https://'));
+  }
+ }
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
+ const cs=fallback.events.filter(x=>x.event==='S&P/CS Composite-20 HPI y/y · Aug');
+ assert.equal(cs.length,1);
+ assert.equal(cs[0].actual,'—');
+ assert.equal(cs[0].verificationStatus,'official-schedule');
+ assert.equal(cs[0].forecast,'—');
+ assert.ok(['overdue','scheduled'].includes(cs[0].releaseState));
 });
 
 test('Oct 26 German ifo is RELEASED with secondary provenance and no duplicated live/fallback overdue',()=>{
