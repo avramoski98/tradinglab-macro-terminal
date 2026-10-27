@@ -1072,3 +1072,22 @@ test('October 26 ECB SAFE and Carney qualification are present in both Macro Wat
  assert.match(html,/NOT an ECB policy decision or live rate probability/);
  assert.match(html,/not a signed agreement, confirmed tariff reduction or independently verified full transcript/);
 });
+
+test('China industrial profits are macro data, not geopolitics solely because country is China',()=>{
+ const headline='FinancialJuice: China Jan-Sept industrial profits rise 15.5% yr/yr: stats bureau';
+ assert.ok(categories(headline).includes('MACRO'));
+ assert.ok(!categories(headline).includes('GEOPOLITICS'));
+});
+test('China central bank liquidity injections are CENTRAL BANK, not geopolitics',()=>{
+ const headlines=[
+  'FinancialJuice: China cbank injects 1 trillion yuan through overnight reverse repos: statement',
+  'FinancialJuice: China c.bank injects 412 bln yuan via 7-day reverse repos',
+  'FinancialJuice: PBOC conducts reverse repos'
+ ];
+ for(const headline of headlines){
+  assert.ok(categories(headline).includes('CENTRAL BANK'),headline);
+  assert.ok(!categories(headline).includes('GEOPOLITICS'),headline);
+ }
+ assert.ok(categories('US announces new tariffs on China imports').includes('GEOPOLITICS'));
+ assert.ok(categories('South China Sea military confrontation').includes('GEOPOLITICS'));
+});
