@@ -30,6 +30,28 @@ const VERIFIED=[
   url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
   status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
   verifiedAt:'2026-10-27T13:07:00Z',force:true},
+ // 27 Oct ADP NER Pulse: company-issued release, 08:15 EDT / 13:15 CET.
+ // 16,750 is the four-week moving average of estimated weekly private job gains
+ // for the four weeks ending 10 Oct, NOT the change in one isolated week.
+ // The current release revises the 3 Oct comparison row to 17,500.
+ {day:'2026-10-27',time:'13:15',dateOverride:'2026-10-27T13:15:00+01:00',ccy:'USD',
+  match:/^ADP Weekly Employment Change(?: ·.*)?$/i,
+  event:'ADP NER Pulse · 4-week avg weekly private job gains (through 10 Oct)',actual:'+16.75K/week',previous:'+17.50K/week (revised)',forecast:'—',
+  importance:'MED',label:'Released · ADP verified primary · preliminary 4-week moving average',
+  source:'ADP Inc. · NER Pulse preliminary estimate issued 27 Oct 2026 08:15 EDT',
+  url:'https://www.prnewswire.com/news-releases/adp-national-employment-report-preliminary-estimate-for-october-10-2026-302920098.html',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T12:15:00Z',force:true},
+ // FHFA August 2026 purchase-only seasonally adjusted HPI, 27 Oct 09:00 EDT.
+ // Monthly +0.3%, prior July revised from +0.3% to +0.2%; 12-month +2.4%.
+ {day:'2026-10-27',time:'14:00',dateOverride:'2026-10-27T14:00:00+01:00',ccy:'USD',
+  match:/^(?:HPI m\/m|FHFA.*(?:House Price|HPI)|House Price Index m\/m)(?: ·.*)?$/i,
+  event:'FHFA House Price Index m/m · Aug (SA purchase-only)',actual:'+0.3%',previous:'+0.2% revised',forecast:'—',
+  importance:'MED',label:'Released · FHFA verified primary · +2.4% y/y',
+  source:'Federal Housing Finance Agency · August 2026 Monthly HPI, released 27 Oct 2026',
+  url:'https://www.fhfa.gov/document/d/hpi/fhfa-hpi-monthly-october-2026',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T13:00:00Z',force:true},
  // ECB September 2026 monetary developments: official primary release, 27 Oct.
  // IMPORTANT: ForexFactory 'Private Loans y/y' tracks the household-lending
  // headline (3.1%); do not confuse it with adjusted loans to ALL private
@@ -302,6 +324,9 @@ const OFFICIAL_UPCOMING=[
  // 27 Oct 08:30 EDT = 13:30 CET; 10:00 EDT = 15:00 CET.
  {date:'2026-10-27T13:30:00+01:00',ccy:'USD',event:'Durable Goods Orders m/m · Sep',match:/Durable Goods(?: Orders)?|Core Durable Goods/i,importance:'HIGH',source:'U.S. Census Bureau · advance durable goods 27 Oct 2026 08:30 EDT',url:'https://www.census.gov/economic-indicators/calendar-listview.html'},
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
+ // S&P Cotality Case-Shiller August 2026 20-city y/y, 27 Oct 09:00 EDT.
+ // Preserve this release in FALLBACK while its August actual is unverified.
+ {date:'2026-10-27T14:00:00+01:00',ccy:'USD',event:'S&P/CS Composite-20 HPI y/y · Aug',match:/S&P\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,importance:'MED',source:'S&P Dow Jones Indices · Case-Shiller monthly release 27 Oct 2026 09:00 EDT',url:'https://www.spglobal.com/spdji/en/index-family/indicators/sp-cotality-case-shiller'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
