@@ -2,6 +2,21 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 27 Oct 2026 API WSB: a 20:46:32 UTC FinancialJuice wire reports
+ // the API crude-stock component at -2.031M (prior -4.930M).
+ // This is SECONDARY evidence of publication, not primary access to the
+ // subscription-only multi-metric WSB. Do not imply all product stocks are
+ // verified or substitute the crude component for the whole report.
+ {day:'2026-10-27',time:'21:30',dateOverride:'2026-10-27T21:30:00+01:00',ccy:'USD',
+  match:/^API Weekly Statistical Bulletin(?: ·.*)?$/i,
+  event:'API Weekly Statistical Bulletin · Oct 27 (crude highlight secondary)',
+  actual:'Published',previous:'—',forecast:'—',importance:'LOW',
+  label:'RELEASED · crude stocks -2.031M (FinancialJuice secondary)',
+  source:'FinancialJuice 27 Oct 2026 20:46:32 UTC: API crude stock change -2.031M vs previous -4.930M; full WSB subscription-only, other products not verified',
+  url:'https://www.financialjuice.com/News/9823764/US-API-Crude-Stock-Change-Actual--2031M-Forecast-08M-Previous--493M.aspx?xy=rss',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  numericActualVerified:false,verifiedAt:'2026-10-27T20:46:32Z',force:true},
+
  // S&P Dow Jones Indices primary release, 27 Oct 2026 09:00 EDT / 14:00 CET.
  // August 20-city NSA annual change +2.7% vs July +2.5%.
  // This is NOT the national Case-Shiller (+2.1%) or FHFA (+2.4%) index.
