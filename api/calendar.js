@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 27 Oct 2026, 14:00 JST = 06:00 CET: BOJ published its core CPI indicators.
+ // ForexFactory records the BOJ-specific core CPI actual at 2.4% y/y versus 1.8% previous.
+ // The BOJ publication date/time is primary-confirmed, but the exact numeric figure
+ // is SECONDARY-verified until the BOJ underlying-indicators workbook is checked.
+ // Do not conflate this with national CPI ex fresh food (2.1%).
+ {day:'2026-10-27',time:'06:00',dateOverride:'2026-10-27T06:00:00+01:00',ccy:'JPY',
+  match:/^BOJ Core CPI y\/y(?: ·.*)?$/i,
+  event:'BOJ Core CPI y/y · Sep (underlying, institutional-factor adjusted)',actual:'2.4%',previous:'1.8%',forecast:'—',
+  importance:'MED',label:'Released · numeric secondary-verified',
+  source:'ForexFactory reporting Bank of Japan October 27 underlying CPI release; BOJ official publication confirms release',
+  url:'https://www.forexfactory.com/calendar/631-jn-boj-core-cpi-yy',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T05:51:00Z',force:true},
  // 27 Oct: Reuters confirms September Japan services producer prices +3.7% y/y;
  // August revised to +3.5%. BOJ official September report not yet retrieved,
  // so provenance is SECONDARY, never label this as primary-verified.
