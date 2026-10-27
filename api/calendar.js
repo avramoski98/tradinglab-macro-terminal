@@ -30,6 +30,17 @@ const VERIFIED=[
   url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
   status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
   verifiedAt:'2026-10-27T13:07:00Z',force:true},
+ // Census/HUD September 2026 new residential sales, 27 Oct 10:00 EDT.
+ // 676K SAAR vs revised August 680K; -0.6% m/m is NOT statistically
+ // significant (90% CI ±13.8 percentage points). September 2025 714K.
+ {day:'2026-10-27',time:'15:00',dateOverride:'2026-10-27T15:00:00+01:00',ccy:'USD',
+  match:/^(?:New Home Sales|New Residential Sales)(?: ·.*)?$/i,
+  event:'New Home Sales · Sep (Census/HUD, SAAR)',actual:'676K',previous:'680K revised',forecast:'—',
+  importance:'HIGH',label:'Released · Census verified primary · -0.6% m/m statistically insignificant',
+  source:'U.S. Census Bureau and HUD · New Residential Sales September 2026, 27 Oct, CB26-174',
+  url:'https://www.census.gov/construction/nrs/current/index.html',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T14:00:00Z',force:true},
  // 27 Oct 10:00 EDT / 15:00 CET: October US consumer confidence.
  // The Conference Board original report revises September to 84.2;
  // the ForexFactory pre-release prior of 81.9 is not the current vintage.
