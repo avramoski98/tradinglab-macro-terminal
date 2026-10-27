@@ -184,6 +184,10 @@ const OFFICIAL_UPCOMING=[
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
  // 26 Oct 10:30 CET = 10:30 Europe/Skopje.
  {date:'2026-10-26T10:30:00+01:00',ccy:'EUR',event:'German Ifo Business Climate · Oct',match:/Ifo Business Climate|German Ifo|GE Ifo/i,importance:'HIGH',source:'ifo Institute · official release schedule 26 Oct 2026 10:30 CET',url:'https://www.ifo.de/umfrage/ifo-geschaeftsklima-deutschland'},
+ // ECB official Bank Lending Survey release calendar: 27 Oct 2026, 10:00 CET.
+ // This is a multi-metric quarterly survey; never invent a single numeric Actual.
+ // Do not confuse with the separate ECB SAFE survey released on 26 Oct.
+ {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'ECB Bank Lending Survey · Q3 2026',match:/ECB.*Bank Lending Survey|Euro Area Bank Lending Survey|Bank Lending Survey/i,importance:'HIGH',source:'European Central Bank · official Bank Lending Survey publication schedule, 27 Oct 2026 10:00 CET',url:'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html'},
  // 27 Oct 08:30 EDT = 13:30 CET; 10:00 EDT = 15:00 CET.
  {date:'2026-10-27T13:30:00+01:00',ccy:'USD',event:'Durable Goods Orders m/m · Sep',match:/Durable Goods(?: Orders)?|Core Durable Goods/i,importance:'HIGH',source:'U.S. Census Bureau · advance durable goods 27 Oct 2026 08:30 EDT',url:'https://www.census.gov/economic-indicators/calendar-listview.html'},
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'New Home Sales · Sep',match:/New Home Sales|New Residential Sales/i,importance:'HIGH',source:'U.S. Census Bureau · new residential sales 27 Oct 2026 10:00 EDT',url:'https://www.census.gov/construction/soc/schedule.html'},
