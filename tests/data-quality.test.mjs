@@ -1132,7 +1132,7 @@ test('Oct 27 Saudi-Houthi interceptions are attributed in Macro Watch and Weekly
  assert.ok(html.includes('3M G10 bias unchanged'));
 });
 
-test('ECB Bank Lending Survey is included from primary ECB schedule without fabricated results',()=>{
+test('ECB Bank Lending Survey is released with verified publication provenance and no invented numeric actual',()=>{
  const cases=[
   {mode:'schedule-fallback',events:[]},
   {mode:'live',events:[{date:'2026-10-27T10:00:00+01:00',currency:'EUR',event:'ECB Bank Lending Survey',releaseState:'scheduled',importance:'MED',actual:'—'}]}
@@ -1142,15 +1142,20 @@ test('ECB Bank Lending Survey is included from primary ECB schedule without fabr
   const rows=out.events.filter(x=>x.currency==='EUR'&&/Bank Lending Survey/i.test(x.event));
   assert.equal(rows.length,1,'ECB BLS must appear once in '+payload.mode);
   assert.equal(rows[0].date,'2026-10-27T10:00:00+01:00');
-  assert.equal(rows[0].actual,'—','no pre-release invented numeric Actual');
-  assert.equal(rows[0].sourceUrl,'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html');
-  assert.equal(rows[0].releaseTimeVerified,true,'ECB official release time is verified');
+  assert.equal(rows[0].releaseState,'released','verified publication must clear overdue');
+  assert.equal(rows[0].actual,'Published','multi-metric survey is not a single numeric actual');
+  assert.equal(rows[0].forecast,'—','no fabricated market forecast');
+  assert.equal(rows[0].numericActualVerified,false,'no fabricated numeric actual');
+  assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+  assert.equal(rows[0].sourceUrl,'https://www.reuters.com/business/finance/euro-zone-mortgage-demand-falls-rates-rise-ecb-survey-shows-2026-10-27/');
+  assert.equal(rows[0].releaseTimeVerified,true);
  }
  const h=fs.readFileSync('index.html','utf8');
- assert.ok(h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'));
+ assert.ok(h.includes('RELEASED / ECB BANK LENDING SURVEY · 27 OCT 2026'));
+ assert.ok(!h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'),'no stale upcoming status after release');
  assert.ok(h.includes('27 OCT 10:00 CET · ECB BANK LENDING SURVEY'));
  assert.ok(h.includes('ECB Bank Lending Survey|Durable Goods Orders'),'weekly event matcher includes ECB BLS');
- assert.equal(h.split('https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html').length-1,2,'official source linked in both narrative sections');
+ assert.ok(h.includes('September M3 Money Supply и Private Loans Actual остануваат непотврдени'));
 });
 
 test('Oct 27 BoJ underlying CPI clears live/fallback overdue and is shown in both research views',()=>{
