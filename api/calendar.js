@@ -30,6 +30,27 @@ const VERIFIED=[
   url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
   status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
   verifiedAt:'2026-10-27T13:07:00Z',force:true},
+ // 27 Oct 10:00 EDT / 15:00 CET: October US consumer confidence.
+ // The Conference Board original report revises September to 84.2;
+ // the ForexFactory pre-release prior of 81.9 is not the current vintage.
+ {day:'2026-10-27',time:'15:00',dateOverride:'2026-10-27T15:00:00+01:00',ccy:'USD',
+  match:/^(?:CB Consumer Confidence|Conference Board.*Consumer Confidence)(?: ·.*)?$/i,
+  event:'Conference Board Consumer Confidence · Oct',actual:'91.7',previous:'84.2 revised',forecast:'—',
+  importance:'HIGH',label:'Released · Conference Board verified primary · +7.5 points',
+  source:'The Conference Board · U.S. Consumer Confidence October 2026, released 27 Oct 10:00 EDT',
+  url:'https://www.conference-board.org/topics/consumer-confidence/',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T14:00:00Z',force:true},
+ // Richmond Fed October manufacturing survey: composite -2 unchanged.
+ // New orders -8 (Sep -6), employment 3 (Sep 7), shipments 0 (Sep -5).
+ {day:'2026-10-27',time:'15:00',dateOverride:'2026-10-27T15:00:00+01:00',ccy:'USD',
+  match:/^(?:Richmond Manufacturing Index|Richmond Fed Manufacturing(?: Index)?)(?: ·.*)?$/i,
+  event:'Richmond Fed Manufacturing Index · Oct',actual:'-2',previous:'-2',forecast:'—',
+  importance:'MED',label:'Released · Richmond Fed verified primary · unchanged',
+  source:'Federal Reserve Bank of Richmond · October 2026 Fifth District Manufacturing Survey, 27 Oct',
+  url:'https://www.richmondfed.org/region_communities/regional_data_analysis/business_surveys/manufacturing',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T14:00:00Z',force:true},
  // 27 Oct ADP NER Pulse: company-issued release, 08:15 EDT / 13:15 CET.
  // 16,750 is the four-week moving average of estimated weekly private job gains
  // for the four weeks ending 10 Oct, NOT the change in one isolated week.
