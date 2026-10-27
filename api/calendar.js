@@ -2,6 +2,28 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 27 Oct: Reuters confirms September Japan services producer prices +3.7% y/y;
+ // August revised to +3.5%. BOJ official September report not yet retrieved,
+ // so provenance is SECONDARY, never label this as primary-verified.
+ {day:'2026-10-27',time:'00:50',dateOverride:'2026-10-27T00:50:00+01:00',ccy:'JPY',
+  match:/SPPI|Services Producer Price Index|Corporate Services Price Index/i,
+  event:'SPPI y/y · Sep (Japan services producer prices)',actual:'3.7%',previous:'3.5%',forecast:'—',
+  importance:'MED',label:'Released · Reuters-verified secondary',
+  source:'Reuters reporting Bank of Japan September 2026 Services Producer Price Index, 27 Oct 00:23 UTC',
+  url:'https://www.reuters.com/world/asia-pacific/japans-september-corporate-services-prices-rise-37-yryr-2026-10-27/',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:false,
+  verifiedAt:'2026-10-27T00:23:00Z',force:true},
+ // 27 Oct: Reuters confirms BRC October shop prices +2.1% y/y vs +1.4%
+ // in September. Forecast is provider-unverified; do not present it as fact.
+ {day:'2026-10-27',time:'01:01',dateOverride:'2026-10-27T01:01:00+01:00',ccy:'GBP',
+  match:/BRC Shop Price (?:Index|Inflation)|Shop Price Index/i,
+  event:'BRC Shop Price Index y/y · Oct',actual:'2.1%',previous:'1.4%',forecast:'—',
+  importance:'MED',label:'Released · Reuters-verified secondary',
+  source:'Reuters reporting British Retail Consortium October 2026 Shop Price Index, 27 Oct 00:02 UTC',
+  url:'https://www.reuters.com/world/uk/uk-retail-body-warns-dam-is-starting-break-price-rises-2026-10-27/',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:false,
+  verifiedAt:'2026-10-27T00:02:00Z',force:true},
+
  // 26 Oct 2026 Dallas Fed October Texas Manufacturing Outlook Survey: primary publication.
  // The Dallas Fed specifies 9:30 CT as the start of publication, not a guaranteed
  // exact online timestamp; calendar time is indicative, and releaseTimeVerified is false.
