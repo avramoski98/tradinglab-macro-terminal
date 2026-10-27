@@ -1183,7 +1183,7 @@ test('ECB Bank Lending Survey is released with verified publication provenance a
  const h=fs.readFileSync('index.html','utf8');
  assert.ok(h.includes('RELEASED / ECB BANK LENDING SURVEY · 27 OCT 2026'));
  assert.ok(!h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'),'no stale upcoming status after release');
- assert.ok(h.includes('27 OCT 10:00 CET · ECB BANK LENDING SURVEY'));
+ assert.ok(h.includes('27 OCT 10:00 CET · ECB Q3 BANK LENDING SURVEY'),'published BLS appears in Weekly Focus');
  assert.ok(h.includes('ECB Bank Lending Survey|Durable Goods Orders'),'weekly event matcher includes ECB BLS');
  assert.ok(h.includes('September M3 и household Private Loans се веќе'),'published ECB values replace old overdue warning');
  assert.ok(!h.includes('September M3 Money Supply и Private Loans Actual остануваат непотврдени'),'remove obsolete unverified claim');
