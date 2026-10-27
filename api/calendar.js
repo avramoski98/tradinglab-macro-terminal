@@ -2,6 +2,34 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // Census September 2026 durable goods: official 27 Oct 08:30 EDT / 13:30 CET.
+ // Headline 1.8% includes a 28.4% rise in civilian aircraft orders;
+ // business equipment proxy excluding aircraft eased to 0.5% from 1.6%.
+ // No independently verified uniform market consensus: keep forecast blank.
+ {day:'2026-10-27',time:'13:30',dateOverride:'2026-10-27T13:30:00+01:00',ccy:'USD',
+  match:/^(?:(?:US|U\\.S\\.)\\s+)?Durable Goods(?: Orders)?(?: m\\/m)?(?: \\u00b7.*)?$/i,
+  event:'Durable Goods Orders m/m · Sep',actual:'+1.8%',previous:'+0.1% rev.',forecast:'—',
+  importance:'HIGH',label:'Released · Census verified primary · aircraft-led; no structural repricing',
+  source:'U.S. Census Bureau · September 2026 advance durable goods orders, 27 Oct 2026 08:30 EDT',
+  url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T13:07:00Z',force:true},
+ {day:'2026-10-27',time:'13:30',dateOverride:'2026-10-27T13:30:00+01:00',ccy:'USD',
+  match:/^(?:Core Durable Goods(?: Orders)?|Durable Goods (?:Ex|Excluding) Transportation)(?: m\\/m)?(?: \\u00b7.*)?$/i,
+  event:'Core Durable Goods ex Transportation m/m · Sep',actual:'+0.5%',previous:'+0.3%',forecast:'—',
+  importance:'HIGH',label:'Released · Census verified primary · modest ex-transport growth',
+  source:'U.S. Census Bureau · September 2026 advance durable goods orders, 27 Oct 2026',
+  url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T13:07:00Z',force:true},
+ {day:'2026-10-27',time:'13:30',dateOverride:'2026-10-27T13:30:00+01:00',ccy:'USD',
+  match:/^(?:Core Capital Goods(?: Orders)?|Nondefense Capital Goods(?: Orders)? Excluding Aircraft)(?: m\\/m)?(?: \\u00b7.*)?$/i,
+  event:'Core Capital Goods Orders ex Aircraft m/m · Sep',actual:'+0.5%',previous:'+1.6%',forecast:'—',
+  importance:'HIGH',label:'Released · Census verified primary · capex proxy decelerated',
+  source:'U.S. Census Bureau · September 2026 nondefense capital goods excluding aircraft, 27 Oct',
+  url:'https://www.census.gov/manufacturing/m3/adv/pdf/durgd.pdf',
+  status:'verified-primary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:true,
+  verifiedAt:'2026-10-27T13:07:00Z',force:true},
  // ECB September 2026 monetary developments: official primary release, 27 Oct.
  // IMPORTANT: ForexFactory 'Private Loans y/y' tracks the household-lending
  // headline (3.1%); do not confuse it with adjusted loans to ALL private
