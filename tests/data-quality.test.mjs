@@ -1066,14 +1066,14 @@ test('Oct 27 S&P Case-Shiller August 20-city primary release resolves overdue wi
   const out=applyVerifiedReleaseOverlay({mode,events:[
    {date:'2026-10-27T14:00:00+01:00',currency:'USD',event:'S&P/CS Composite-20 HPI y/y',actual:'—',previous:'2.5%',forecast:'2.6%',releaseState:'overdue',importance:'MED'}
   ]});
-  const rows=out.events.filter(e=>e.currency==='USD'&&/S&P\\/CS Composite-20 HPI/.test(e.event));
+  const rows=out.events.filter(e=>e.currency==='USD'&&/S&P\/CS Composite-20 HPI/.test(e.event));
   assert.equal(rows.length,1,mode+' should contain exactly one 20-city release');
   assert.equal(rows[0].actual,'2.7%');
   assert.equal(rows[0].previous,'2.5%');
   assert.equal(rows[0].forecast,'—','do not invent or trust unverified consensus');
   assert.equal(rows[0].releaseState,'released');
   assert.equal(rows[0].verificationStatus,'verified-primary');
-  assert.match(rows[0].sourceUrl,/spglobal\\.com\\/spdji/);
+  assert.match(rows[0].sourceUrl,/spglobal\.com\/spdji/);
  }
  assert.ok(html.includes('US CASE-SHILLER 20-CITY'));
  assert.ok(!html.includes('Case-Shiller August 20-city y/y remains <b>OVERDUE'));
