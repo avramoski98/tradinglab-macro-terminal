@@ -4,6 +4,32 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+test('Oct 27 SPPI and BRC releases clear live overdue and fallback without fabricated forecasts',()=>{
+ const cases=[
+  {mode:'live',events:[
+   {date:'2026-10-27T00:50:00+01:00',currency:'JPY',event:'SPPI y/y',releaseState:'overdue',actual:'—',previous:'3.7%',forecast:'3.6%',importance:'MED'},
+   {date:'2026-10-27T01:01:00+01:00',currency:'GBP',event:'BRC Shop Price Index y/y',releaseState:'overdue',actual:'—',previous:'1.4%',forecast:'1.6%',importance:'LOW'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload);
+  const jpy=out.events.filter(e=>e.currency==='JPY'&&/SPPI y\/y · Sep/.test(e.event));
+  const gbp=out.events.filter(e=>e.currency==='GBP'&&/BRC Shop Price Index y\/y · Oct/.test(e.event));
+  assert.equal(jpy.length,1,'single JPY SPPI in '+payload.mode);
+  assert.equal(gbp.length,1,'single GBP BRC in '+payload.mode);
+  for(const [row,actual,previous] of [[jpy[0],'3.7%','3.5%'],[gbp[0],'2.1%','1.4%']]){
+   assert.equal(row.releaseState,'released');
+   assert.equal(row.actual,actual);
+   assert.equal(row.previous,previous);
+   assert.equal(row.forecast,'—');
+   assert.equal(row.verificationStatus,'verified-secondary');
+   assert.equal(row.releaseTimeVerified,false);
+   assert.ok(row.sourceUrl.includes('reuters.com'));
+  }
+  assert.equal(out.overdue,0);
+ }
+});
 test('RBA Brad Jones Oct 26 panel clears past speech pending with official source and no fabricated numeric actual',()=>{
  const cases=[
   {mode:'live',events:[{date:'2026-10-25T22:10:00+01:00',currency:'AUD',event:'RBA Assist Gov Jones Speaks',actual:'—',releaseState:'awaiting-confirmation',importance:'MED'}]},
