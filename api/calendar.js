@@ -272,7 +272,7 @@ export function applyVerifiedReleaseOverlay(payload){
   rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
    importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?(o.approximate?'Scheduled · approximate time':'Scheduled · official'):'OVERDUE · unverified',
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
-   verificationStatus:'official-schedule',releaseTimeVerified:o.approximate?false:null,lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+   verificationStatus:'official-schedule',releaseTimeVerified:o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
  // The fallback archive can contain the same release under a different title.
  // Prefer a source-verified overlay over the manually inherited duplicate.
