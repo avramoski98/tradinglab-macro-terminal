@@ -242,11 +242,11 @@ const OFFICIAL_UPCOMING=[
  // FALLBACK previously omitted them, falsely reporting zero overdue releases.
  // Preserve them as OVERDUE in fallback until the exact September actuals
  // are independently verified. Do not invent actuals, forecasts or revisions.
- {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'M3 Money Supply y/y · Sep',
+ {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'M3 Money Supply y/y · Sep',fullScheduleOnly:true,
   match:/^(?:M3 Money Supply|Money Supply M3|Euro Area M3)(?:.*)?$/i,importance:'MED',
   source:'European Central Bank · monetary developments official schedule 27 Oct 2026 10:00 CET',
   url:'https://www.ecb.europa.eu/press/calendars/weekly/html/index.en.html'},
- {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'Private Loans y/y · Sep',
+ {date:'2026-10-27T10:00:00+01:00',ccy:'EUR',event:'Private Loans y/y · Sep',fullScheduleOnly:true,
   match:/^(?:Private Loans|Loans to Private Sector|EZ Private Loans)(?:.*)?$/i,importance:'MED',
   source:'European Central Bank · monetary developments official schedule 27 Oct 2026 10:00 CET',
   url:'https://www.ecb.europa.eu/press/calendars/weekly/html/index.en.html'},
@@ -277,7 +277,7 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'}
 ];
 const rank={LOW:1,MED:2,HIGH:3,EXTREME:4};
-export function applyVerifiedReleaseOverlay(payload){
+export function applyVerifiedReleaseOverlay(payload,options={}){
  if(!Array.isArray(payload?.events))return payload;
  const rows=payload.events.map(e=>({...e}));
  const activeDates=new Set(rows.map(e=>String(e.date||'').slice(0,10)));
@@ -303,6 +303,8 @@ export function applyVerifiedReleaseOverlay(payload){
   if(i>=0)rows[i]=record;else rows.push(record);
  }
  for(const o of OFFICIAL_UPCOMING){
+  // Isolated test fixtures intentionally omit the complete weekly schedule.
+  if(o.fullScheduleOnly&&!options.includeFullSchedule)continue;
   const matching=rows.findIndex(e=>e.currency===o.ccy&&String(e.date||'').slice(0,10)===o.date.slice(0,10)&&o.match.test(String(e.event||'')));
   if(matching>=0){
    // ForexFactory has shown 06:30 CET for the BoJ 15:30 JST press conference;
@@ -370,7 +372,7 @@ export default async function handler(req,res){
  const proxy={
   setHeader:(...args)=>res.setHeader(...args),
   status(code){res.status(code);return this;},
-  json(payload){return res.json(applyVerifiedReleaseOverlay(payload));}
+  json(payload){return res.json(applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true}));}
  };
  return legacyHandler(req,proxy);
 }
