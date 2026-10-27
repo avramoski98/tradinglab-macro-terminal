@@ -1091,3 +1091,15 @@ test('China central bank liquidity injections are CENTRAL BANK, not geopolitics'
  assert.ok(categories('US announces new tariffs on China imports').includes('GEOPOLITICS'));
  assert.ok(categories('South China Sea military confrontation').includes('GEOPOLITICS'));
 });
+
+test('Oct 27 Saudi-Houthi interceptions are attributed in Macro Watch and Weekly Focus without invented oil outage',()=>{
+ const link='https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missiles-drones-attacking-kingdom-2026-10-27/';
+ const html=fs.readFileSync('index.html','utf8');
+ assert.equal(html.split(link).length-1,2,'Reuters source is linked in both views');
+ assert.ok(html.includes('NEW / SAUDI–HOUTHI MISSILE &amp; DRONE INTERCEPTIONS'));
+ assert.ok(html.includes('27 OCT · SAUDI–HOUTHI MISSILE &amp; DRONE INTERCEPTIONS'));
+ assert.ok(html.includes('three Houthi ballistic missiles'));
+ assert.ok(html.includes('four drones'));
+ assert.ok(html.includes('not a confirmed oil supply outage'));
+ assert.ok(html.includes('3M G10 bias unchanged'));
+});
