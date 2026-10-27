@@ -4,6 +4,33 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+test('ECB 27 Oct monetary developments remain visible as OVERDUE in full fallback, not falsely absent',()=>{
+ const cases=[
+  {mode:'schedule-fallback',events:[]},
+  {mode:'live',events:[
+   {date:'2026-10-27T10:00:00+01:00',currency:'EUR',event:'M3 Money Supply y/y',actual:'—',releaseState:'overdue',importance:'MED'},
+   {date:'2026-10-27T10:00:00+01:00',currency:'EUR',event:'Private Loans y/y',actual:'—',releaseState:'overdue',importance:'MED'}
+  ]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  for(const re of [/^M3 Money Supply/i,/^Private Loans/i]){
+   const matches=out.events.filter(e=>e.currency==='EUR'&&re.test(e.event));
+   assert.equal(matches.length,1,'one monetary event in '+payload.mode);
+   const e=matches[0];
+   assert.equal(e.date,'2026-10-27T10:00:00+01:00');
+   assert.equal(e.actual,'—','no fabricated actual');
+   assert.equal(e.releaseState,'overdue','unverified result cannot be released');
+  }
+  assert.equal(out.overdue,2,'both overdue events must be counted in '+payload.mode);
+ }
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ for(const e of fallback.events.filter(x=>/^(?:M3 Money Supply|Private Loans)/i.test(x.event))){
+  assert.equal(e.forecast,'—','fallback has no verified consensus');
+  assert.equal(e.verificationStatus,'official-schedule');
+  assert.ok(e.sourceUrl.includes('ecb.europa.eu'));
+ }
+});
 test('Oct 27 Spain EPA and France confidence clear live overdue and appear once in fallback with honest provenance',()=>{
  const cases=[
   {mode:'live',events:[
