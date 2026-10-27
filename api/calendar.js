@@ -2,6 +2,29 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 27 Oct Q3 2026 Spain EPA unemployment rate: 10.18% vs 9.87% Q2.
+ // Two independent reports citing Spain's INE confirm the published figure.
+ // The INE Q3 primary table is not yet directly retrievable: SECONDARY only.
+ // Keep provider market forecast blank and avoid calling the 09:00 CET time primary-verified.
+ {day:'2026-10-27',time:'09:00',dateOverride:'2026-10-27T09:00:00+01:00',ccy:'EUR',
+  match:/^(?:Spanish|Spain) Unemployment Rate(?:\\b|\\s|$)/i,
+  event:'Spanish Unemployment Rate · Q3 2026 (INE EPA)',actual:'10.18%',previous:'9.87%',forecast:'—',
+  importance:'MED',label:'Released · numeric secondary-verified',
+  source:'El País and HuffPost España reporting INE Q3 2026 Labour Force Survey, 27 Oct',
+  url:'https://elpais.com/economia/2026-10-27/el-paro-repunta-en-el-tercer-trimestre-hasta-el-1018.html',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:false,
+  verifiedAt:'2026-10-27T08:23:00Z',force:true},
+ // 27 Oct France household confidence: INSEE October publication reported by WSJ/AFP.
+ // September previous is disputed (85 revised in WSJ vs 86 in September INSEE page);
+ // do not carry an unverified previous into the calendar.
+ {day:'2026-10-27',time:'08:45',dateOverride:'2026-10-27T08:45:00+01:00',ccy:'EUR',
+  match:/^(?:French|France) Consumer Confidence(?:\\b|\\s|$)/i,
+  event:'French Consumer Confidence · Oct 2026 (INSEE)',actual:'80',previous:'—',forecast:'—',
+  importance:'MED',label:'Released · numeric secondary-verified; prior revised value unresolved',
+  source:'WSJ and AFP reporting INSEE October 2026 household confidence, 27 Oct; previous value revision unresolved',
+  url:'https://www.wsj.com/economy/central-banking/french-consumer-confidence-sinks-to-13-year-low-amid-protests-bond-selloff-d7002c30',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-27',releaseTimeVerified:false,
+  verifiedAt:'2026-10-27T08:23:00Z',force:true},
  // 27 Oct 2026, 14:00 JST = 06:00 CET: BOJ published its core CPI indicators.
  // ForexFactory records the BOJ-specific core CPI actual at 2.4% y/y versus 1.8% previous.
  // The BOJ publication date/time is primary-confirmed, but the exact numeric figure
