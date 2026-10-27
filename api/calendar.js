@@ -327,6 +327,10 @@ const OFFICIAL_UPCOMING=[
  // S&P Cotality Case-Shiller August 2026 20-city y/y, 27 Oct 09:00 EDT.
  // Preserve this release in FALLBACK while its August actual is unverified.
  {date:'2026-10-27T14:00:00+01:00',ccy:'USD',event:'S&P/CS Composite-20 HPI y/y · Aug',match:/S&P\/CS Composite-20 HPI|Case-Shiller.*(?:20|Composite)/i,importance:'MED',source:'S&P Dow Jones Indices · Case-Shiller monthly release 27 Oct 2026 09:00 EDT',url:'https://www.spglobal.com/spdji/en/index-family/indicators/sp-cotality-case-shiller'},
+ // Two further 27 Oct 10:00 EDT USD releases were absent in FALLBACK.
+ // Do not suppress them just because ForexFactory temporarily fails.
+ {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'CB Consumer Confidence · Oct',match:/CB Consumer Confidence|Conference Board.*Consumer Confidence/i,importance:'HIGH',source:'The Conference Board · Consumer Confidence October 2026 release 27 Oct 10:00 EDT',url:'https://www.conference-board.org/topics/consumer-confidence'},
+ {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'Richmond Manufacturing Index · Oct',match:/Richmond Manufacturing Index|Richmond Fed Manufacturing/i,importance:'MED',source:'Federal Reserve Bank of Richmond · October 2026 manufacturing survey release 27 Oct 10:00–10:10 EDT',url:'https://www.richmondfed.org/region_communities/regional_data_analysis/business_surveys/about'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
