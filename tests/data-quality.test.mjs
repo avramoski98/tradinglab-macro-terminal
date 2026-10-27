@@ -4,6 +4,14 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+// Regression fixtures may include real official-schedule events whose release
+// time has passed while their actual is still unverified. Those must remain
+// OVERDUE in production; tests of *other* verified releases should not force
+// the global calendar overdue counter to zero.
+const unresolvedNonScheduleOverdue=(data)=>data.events.filter(
+ e=>e.releaseState==='overdue'&&e.verificationStatus!=='official-schedule'
+).length;
+
 test('ECB 27 Oct M3 and household private loans are primary-verified and no longer overdue in live/fallback',()=>{
  const cases=[
   {mode:'schedule-fallback',events:[]},
@@ -27,7 +35,7 @@ test('ECB 27 Oct M3 and household private loans are primary-verified and no long
    assert.equal(e.verificationStatus,'verified-primary');
    assert.ok(e.sourceUrl.includes('ecb.europa.eu'));
   }
-  assert.equal(out.overdue,0,'no ECB overdue events in '+payload.mode);
+  assert.equal(unresolvedNonScheduleOverdue(out),0,'no ECB overdue events in '+payload.mode);
  }
  const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
  const household=fallback.events.find(e=>/^Private Loans/.test(e.event));
@@ -59,7 +67,7 @@ test('Oct 27 Spain EPA and France confidence clear live overdue and appear once 
    assert.equal(e.releaseTimeVerified,false);
    assert.ok(e.sourceUrl.startsWith('https://'));
   }
-  assert.equal(out.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(out),0);
  }
 });
 test('Oct 27 SPPI and BRC releases clear live overdue and fallback without fabricated forecasts',()=>{
@@ -85,7 +93,7 @@ test('Oct 27 SPPI and BRC releases clear live overdue and fallback without fabri
    assert.equal(row.releaseTimeVerified,false);
    assert.ok(row.sourceUrl.includes('reuters.com'));
   }
-  assert.equal(out.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(out),0);
  }
 });
 test('RBA Brad Jones Oct 26 panel clears past speech pending with official source and no fabricated numeric actual',()=>{
@@ -107,7 +115,7 @@ test('RBA Brad Jones Oct 26 panel clears past speech pending with official sourc
   assert.equal(e.verificationStatus,'verified-primary');
   assert.equal(e.releaseTimeVerified,true);
   assert.ok(e.sourceUrl.includes('rba.gov.au/speeches/2026/sp-ag-2026-10-26.html'));
-  assert.equal(out.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(out),0);
  }
 });
 test('October 26 CBI survey publication clears live overdue without inventing October numeric actual',()=>{
@@ -128,7 +136,7 @@ test('October 26 CBI survey publication clears live overdue without inventing Oc
   assert.equal(e.actualVerifiedAt,null);
   assert.equal(e.verificationStatus,'verified-secondary-publication');
   assert.ok(e.sourceUrl.includes('reuters.com'));
-  assert.equal(out.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(out),0);
  }
 });
 test('numeric values preserve missing versus zero and magnitude',()=>{assert.equal(numeric('0.0%'),0);assert.equal(numeric('—'),null);assert.equal(numeric(null),null);assert.equal(numeric('1.2M'),1200000);assert.equal(numeric('-200K'),-200000);assert.equal(numeric('inflation rose 3%'),null);});
@@ -184,7 +192,7 @@ test('official Oct 9 calendar overlay resolves CAD and USD releases without fabr
  const input={mode:'live',events:[{date:'2026-10-09T14:30:00+02:00',currency:'CAD',event:'Employment Change',actual:'—',forecast:'6.1K',releaseState:'overdue'},{date:'2026-10-09T16:00:00+02:00',currency:'USD',event:'Prelim UoM Consumer Sentiment',actual:'—',forecast:'47.5',releaseState:'overdue'}]};
  const out=applyVerifiedReleaseOverlay(input),cad=out.events.find(x=>x.currency==='CAD'&&/Employment Change/.test(x.event)),usd=out.events.find(x=>x.currency==='USD'&&/Consumer Sentiment/.test(x.event));
  assert.equal(cad.actual,'-68.3K');assert.equal(cad.forecast,'6.1K');assert.equal(cad.verificationStatus,'verified-primary');assert.equal(cad.releaseState,'released');
- assert.equal(usd.actual,'46.3');assert.equal(usd.forecast,'47.5');assert.equal(usd.releaseState,'released');assert.equal(out.overdue,0);
+ assert.equal(usd.actual,'46.3');assert.equal(usd.forecast,'47.5');assert.equal(usd.releaseState,'released');assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 // Freshness must respect quarterly frequency; API polling must not manufacture rate history.
@@ -277,7 +285,7 @@ test('October 23 CAD retail and Michigan final releases resolve overdue without 
  assert.deepEqual(targets.map(x=>x.verificationStatus),['verified-primary','verified-primary','verified-secondary','verified-secondary']);
  assert.ok(targets.slice(0,2).every(x=>x.sourceUrl==='https://www150.statcan.gc.ca/n1/daily-quotidien/261023/dq261023a-eng.htm'&&x.source.includes('Statistics Canada')));
  assert.deepEqual(targets.map(x=>x.forecast),['1.1%','1.3%','46.3','4.7%']);
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('weekly focus includes late October 23 verified-secondary catalysts and caveats',()=>{
@@ -383,7 +391,7 @@ test('ONS September GBP retail sales resolves overdue calendar event as official
  assert.equal(row?.previous,'+0.7%');
  assert.equal(row?.verificationStatus,'verified-primary');
  assert.ok(row?.sourceUrl.includes('ons.gov.uk'));
- assert.equal(d.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(d),0);
 });
 
 test('ONS revised GBP retail volume index has six consistent verified April-September observations',()=>{
@@ -688,7 +696,7 @@ test('official Oct 5–6 releases resolve overdue rows without inventing verifie
   assert.equal(e.forecastVerificationStatus,'provider-unverified');
   assert.ok(e.sourceUrl.startsWith('https://'));
  }
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primary provenance',()=>{
@@ -715,7 +723,7 @@ test('official Oct 6 and Oct 8 France/Japan releases resolve overdue with primar
   assert.ok(e.sourceUrl.startsWith('https://'));
   assert.equal(e.lastUpdate.slice(0,10),e.date.slice(0,10));
  }
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('Census August wholesale inventories final is released, distinct from the advance estimate',()=>{
@@ -733,7 +741,7 @@ test('Census August wholesale inventories final is released, distinct from the a
  assert.equal(row.lastUpdate,'2026-10-08');
  assert.equal(row.releaseTimeVerified,false);
  assert.equal(row.forecastVerificationStatus,'provider-unverified');
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('NZIER Q3 business confidence is primary-verified, SA-consistent, and on the actual October 6 release date',()=>{
@@ -751,7 +759,7 @@ test('RICS September house price balance is released with primary source and no 
  const row=out.events.find(x=>x.currency==='GBP'&&x.event.startsWith('RICS Housing Price Balance'));
  assert.equal(row.actual,'-32%');assert.equal(row.previous,'-28%');assert.equal(row.forecast,'—');
  assert.equal(row.releaseState,'released');assert.equal(row.verificationStatus,'verified-primary');
- assert.match(row.sourceUrl,/rics.org/);assert.equal(out.overdue,0);
+ assert.match(row.sourceUrl,/rics.org/);assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('official Japan Oct 6 Ueda speech and Oct 8 Economy Watchers are released with original-source provenance',()=>{
@@ -762,7 +770,7 @@ test('official Japan Oct 6 Ueda speech and Oct 8 Economy Watchers are released w
  const out=applyVerifiedReleaseOverlay(input);
  const speech=out.events.find(x=>x.event.includes('National Securities Convention'));
  const survey=out.events.find(x=>x.event.includes('Economy Watchers Survey'));
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
  assert.equal(out.events.filter(x=>/National Securities Convention|Economy Watchers Survey/.test(x.event)).length,2);
  assert.equal(speech.actual,'Published');
  assert.equal(speech.label,'Official publication');
@@ -800,7 +808,7 @@ test('Oct 7 CHF foreign currency reserves are released with secondary-only prove
  assert.equal(row.releaseTimeVerified,false);
  assert.match(row.sourceUrl,/metatrader.com/);
  assert.equal(out.events.filter(x=>x.currency==='CHF'&&/Foreign Currency Reserves/.test(x.event)).length,1);
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('ISM September 2026 Services PMI, prices and employment resolve overdue with primary report',()=>{
@@ -810,7 +818,7 @@ test('ISM September 2026 Services PMI, prices and employment resolve overdue wit
   {date:'2026-10-05T16:00:00+02:00',currency:'USD',event:'ISM Services Employment Index',actual:'—',previous:'47.8',forecast:'—',importance:'MED',releaseState:'overdue'}
  ]};
  const out=applyVerifiedReleaseOverlay(input);
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
  const ismRows=out.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-05')&&/^ISM Services (?:PMI|Prices Paid|Employment Index) · Sep$/.test(x.event));
  assert.equal(ismRows.length,3);
  const expected={'ISM Services PMI · Sep':['54.9','55.4'],'ISM Services Prices Paid · Sep':['74.0','72.6'],'ISM Services Employment Index · Sep':['50.1','47.8']};
@@ -964,7 +972,7 @@ test('calendar suppresses inherited duplicates but preserves distinct simultaneo
  assert.ok(out.events.some(x=>x.event==='Euro Area PPI m/m · Aug'));
  assert.ok(out.events.some(x=>x.event==='National CPI y/y · Sep (2025-base)'));
  assert.ok(out.events.some(x=>x.event==='National Core CPI ex fresh food y/y · Sep'));
- assert.equal(out.overdue,0);
+ assert.equal(unresolvedNonScheduleOverdue(out),0);
 });
 
 test('past qualitative speeches await confirmation instead of false OVERDUE or PENDING',()=>{
@@ -1069,7 +1077,7 @@ test('Oct 26 German ifo is RELEASED with secondary provenance and no duplicated 
   assert.equal(e.verificationStatus,'verified-secondary');
   assert.equal(e.releaseTimeVerified,false,'official schedule and wire timestamps differ');
   assert.ok(e.sourceUrl.includes('reuters.com'));
-  assert.equal(data.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(data),0);
  }
  assert.ok(html.includes('26 OCT · GERMAN IFO RELEASE (EUR / GROWTH)'));
  assert.ok(html.includes('GERMAN IFO OCTOBER RELEASE'));
@@ -1110,7 +1118,7 @@ test('Oct 26 Dallas Fed primary release is deduplicated and published in Weekly 
   assert.equal(e.verificationStatus,'verified-primary');
   assert.equal(e.releaseTimeVerified,false);
   assert.match(e.sourceUrl,/dallasfed.org\/research\/surveys\/tmos\/2026\/2610/);
-  assert.equal(data.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(data),0);
  }
  assert.ok(html.includes('DALLAS FED MANUFACTURING · 26 OCT 2026'));
  assert.ok(html.includes('26 OCT · DALLAS FED MANUFACTURING (USD / GROWTH)'));
@@ -1240,7 +1248,7 @@ test('Oct 27 BoJ underlying CPI clears live/fallback overdue and is shown in bot
   assert.equal(rows[0].forecast,'—','unverified forecast must not be presented as fact');
   assert.equal(rows[0].verificationStatus,'verified-secondary');
   assert.equal(rows[0].releaseTimeVerified,true);
-  assert.equal(out.overdue,0);
+  assert.equal(unresolvedNonScheduleOverdue(out),0);
  }
  const html=fs.readFileSync('index.html','utf8');
  assert.equal(html.split('https://www.forexfactory.com/calendar/631-jn-boj-core-cpi-yy').length-1,2);
