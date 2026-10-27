@@ -12,6 +12,27 @@ const unresolvedNonScheduleOverdue=(data)=>data.events.filter(
  e=>e.releaseState==='overdue'&&e.verificationStatus!=='official-schedule'
 ).length;
 
+test('API WSB publication clears overdue in live and fallback without inventing full-report actual',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-27T21:30:00+01:00',currency:'USD',event:'API Weekly Statistical Bulletin',actual:'—',releaseState:'overdue',importance:'LOW'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='USD'&&/^API Weekly Statistical Bulletin/.test(e.event));
+  assert.equal(rows.length,1,'one API WSB row in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'Published','WSB is multi-metric; crude highlight is not whole report');
+  assert.equal(e.numericActualVerified,false);
+  assert.equal(e.actualVerifiedAt,null);
+  assert.equal(e.verificationStatus,'verified-secondary-publication');
+  assert.match(e.label,/crude stocks -2\\.031M/);
+  assert.match(e.source,/subscription-only/);
+  assert.equal(e.forecast,'—');
+  assert.equal(out.events.filter(x=>x.releaseState==='overdue'&&/API Weekly Statistical Bulletin/.test(x.event)).length,0);
+ }
+});
+
 test('ECB 27 Oct M3 and household private loans are primary-verified and no longer overdue in live/fallback',()=>{
  const cases=[
   {mode:'schedule-fallback',events:[]},
