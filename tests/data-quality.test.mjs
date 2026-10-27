@@ -1124,3 +1124,27 @@ test('ECB Bank Lending Survey is included from primary ECB schedule without fabr
  assert.ok(h.includes('ECB Bank Lending Survey|Durable Goods Orders'),'weekly event matcher includes ECB BLS');
  assert.equal(h.split('https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html').length-1,2,'official source linked in both narrative sections');
 });
+
+test('Oct 27 BoJ underlying CPI clears live/fallback overdue and is shown in both research views',()=>{
+ const cases=[
+  {mode:'schedule-fallback',events:[]},
+  {mode:'live',events:[{date:'2026-10-27T06:00:00+01:00',currency:'JPY',event:'BOJ Core CPI y/y',actual:'—',previous:'1.8%',forecast:'1.9%',releaseState:'overdue',importance:'LOW'}]}
+ ];
+ for(const input of cases){
+  const out=applyVerifiedReleaseOverlay(input);
+  const rows=out.events.filter(x=>x.currency==='JPY'&&/BOJ Core CPI/i.test(x.event));
+  assert.equal(rows.length,1,'one BoJ CPI event in '+input.mode);
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].actual,'2.4%');
+  assert.equal(rows[0].previous,'1.8%');
+  assert.equal(rows[0].forecast,'—','unverified forecast must not be presented as fact');
+  assert.equal(rows[0].verificationStatus,'verified-secondary');
+  assert.equal(rows[0].releaseTimeVerified,true);
+  assert.equal(out.overdue,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.equal(html.split('https://www.forexfactory.com/calendar/631-jn-boj-core-cpi-yy').length-1,2);
+ assert.ok(html.includes('RELEASED / 27 OCT · BOJ UNDERLYING CORE CPI'));
+ assert.ok(html.includes('27 OCT · BOJ UNDERLYING CORE CPI y/y (JPY / INFLATION)'));
+ assert.ok(html.includes('Not the 2.1% national CPI'));
+});
