@@ -1103,3 +1103,23 @@ test('Oct 27 Saudi-Houthi interceptions are attributed in Macro Watch and Weekly
  assert.ok(html.includes('not a confirmed oil supply outage'));
  assert.ok(html.includes('3M G10 bias unchanged'));
 });
+
+test('ECB Bank Lending Survey is included from primary ECB schedule without fabricated results',()=>{
+ const cases=[
+  {mode:'schedule-fallback',events:[]},
+  {mode:'live',events:[{date:'2026-10-27T10:00:00+01:00',currency:'EUR',event:'ECB Bank Lending Survey',releaseState:'scheduled',importance:'MED',actual:'—'}]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload);
+  const rows=out.events.filter(x=>x.currency==='EUR'&&/Bank Lending Survey/i.test(x.event));
+  assert.equal(rows.length,1,'ECB BLS must appear once in '+payload.mode);
+  assert.equal(rows[0].date,'2026-10-27T10:00:00+01:00');
+  assert.equal(rows[0].actual,'—','no pre-release invented numeric Actual');
+  assert.match(rows[0].sourceUrl||'https://www.ecb.europa.eu/',/ecb\.europa\.eu/);
+ }
+ const h=fs.readFileSync('index.html','utf8');
+ assert.ok(h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'));
+ assert.ok(h.includes('27 OCT 10:00 CET · ECB BANK LENDING SURVEY'));
+ assert.ok(h.includes('ECB Bank Lending Survey|Durable Goods Orders'),'weekly event matcher includes ECB BLS');
+ assert.equal(h.split('https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html').length-1,2,'official source linked in both narrative sections');
+});
