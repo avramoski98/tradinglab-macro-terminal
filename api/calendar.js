@@ -252,6 +252,15 @@ export function applyVerifiedReleaseOverlay(payload){
      verificationStatus:'official-schedule',releaseTimeVerified:false,label:'Scheduled · approximate time',
      forecastVerificationStatus:'provider-unverified'};
    }
+   if(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)&&rows[matching].releaseState!=='released'){
+    // Prefer the official ECB time and schedule metadata over unverified provider fields.
+    const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
+    rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+     event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+     verificationStatus:'official-schedule',releaseTimeVerified:true,
+     actual:'—',forecast:'—',releaseState:state,label:state==='scheduled'?'Scheduled · official':'OVERDUE · unverified',
+     forecastVerificationStatus:'provider-unverified'};
+   }
    if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)){
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
      event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
