@@ -4,6 +4,34 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
+test('Oct 27 Spain EPA and France confidence clear live overdue and appear once in fallback with honest provenance',()=>{
+ const cases=[
+  {mode:'live',events:[
+   {date:'2026-10-27T09:00:00+01:00',currency:'EUR',event:'Spanish Unemployment Rate',actual:'—',previous:'9.9%',forecast:'9.9%',releaseState:'overdue',importance:'MED'},
+   {date:'2026-10-27T08:45:00+01:00',currency:'EUR',event:'French Consumer Confidence',actual:'—',previous:'86',forecast:'85',releaseState:'overdue',importance:'MED'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ];
+ for(const payload of cases){
+  const out=applyVerifiedReleaseOverlay(payload);
+  const es=out.events.filter(e=>e.currency==='EUR'&&/Spanish Unemployment Rate/.test(e.event));
+  const fr=out.events.filter(e=>e.currency==='EUR'&&/French Consumer Confidence/.test(e.event));
+  assert.equal(es.length,1,payload.mode+' Spanish unique');
+  assert.equal(fr.length,1,payload.mode+' French unique');
+  assert.equal(es[0].actual,'10.18%');
+  assert.equal(es[0].previous,'9.87%');
+  assert.equal(fr[0].actual,'80');
+  assert.equal(fr[0].previous,'—','unresolved INSEE revised previous not invented');
+  for(const e of [...es,...fr]){
+   assert.equal(e.releaseState,'released');
+   assert.equal(e.verificationStatus,'verified-secondary');
+   assert.equal(e.forecast,'—');
+   assert.equal(e.releaseTimeVerified,false);
+   assert.ok(e.sourceUrl.startsWith('https://'));
+  }
+  assert.equal(out.overdue,0);
+ }
+});
 test('Oct 27 SPPI and BRC releases clear live overdue and fallback without fabricated forecasts',()=>{
  const cases=[
   {mode:'live',events:[
