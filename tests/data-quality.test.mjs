@@ -837,7 +837,7 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
   assert.equal(rows[0].verificationStatus,'official-schedule');
   assert.equal(rows[0].actual,'—');
   assert.equal(rows[0].forecast,'—');
-  assert.equal(rows[0].sourceUrl,'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html');
+  assert.ok(rows[0].sourceUrl.includes(domain));
  }
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
  const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
@@ -1115,7 +1115,7 @@ test('ECB Bank Lending Survey is included from primary ECB schedule without fabr
   assert.equal(rows.length,1,'ECB BLS must appear once in '+payload.mode);
   assert.equal(rows[0].date,'2026-10-27T10:00:00+01:00');
   assert.equal(rows[0].actual,'—','no pre-release invented numeric Actual');
-  assert.match(rows[0].sourceUrl||'https://www.ecb.europa.eu/',/ecb\.europa\.eu/);
+  assert.equal(rows[0].sourceUrl,'https://www.ecb.europa.eu/press/calendars/statscal/mfm/html/stpbls.en.html');
  }
  const h=fs.readFileSync('index.html','utf8');
  assert.ok(h.includes('UPCOMING / ECB BANK LENDING SURVEY · 27 OCT 2026'));
