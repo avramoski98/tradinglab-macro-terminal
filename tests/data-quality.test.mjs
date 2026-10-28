@@ -4,6 +4,27 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('28 Oct Warsh presser secondary verification clears overdue without inventing numerical Actual',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T19:30:00+01:00',currency:'USD',event:'FOMC Chair Press Conference',actual:'—',releaseState:'overdue'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='USD'&&/^FOMC Chair Press Conference · 28 Oct 2026/.test(e.event));
+  assert.equal(rows.length,1,'one press conference release in '+payload.mode);
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].actual,'Held');
+  assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+  assert.equal(rows[0].numericActualVerified,false);
+  assert.equal(rows[0].actualVerifiedAt,null);
+  assert.equal(rows[0].forecast,'—');
+  assert.equal(out.events.filter(e=>e.currency==='USD'&&e.releaseState==='overdue'&&/FOMC Chair Press Conference/.test(e.event)).length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('WARSH PRESS CONFERENCE (USD / SECONDARY VERIFIED)'));
+ assert.ok(html.includes('WARSH FOMC PRESS CONFERENCE (USD / SECONDARY)'));
+});
+
 test('28 Oct Fed FOMC primary hold clears overdue in LIVE and FALLBACK and updates weekly context',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-28T19:00:00+01:00',currency:'USD',event:'Federal Funds Rate',actual:'—',releaseState:'overdue',forecast:'4.00%'}]},
