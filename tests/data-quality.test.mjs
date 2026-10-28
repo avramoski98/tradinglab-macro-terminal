@@ -921,10 +921,18 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
   const rows=out.events.filter(x=>x.currency===currency&&x.event.startsWith(prefix));
   assert.equal(rows.length,1,currency+' '+prefix+' missing or duplicated');
   assert.equal(rows[0].date,date);
-  assert.equal(rows[0].verificationStatus,'official-schedule');
-  assert.equal(rows[0].actual,'—');
+  if(currency==='AUD'&&prefix==='CPI y/y · Sep'){
+   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,'4.3%');
+   assert.equal(rows[0].previous,'4.0%');
+   assert.ok(rows[0].sourceUrl.includes('financialjuice.com'));
+  }else{
+   assert.equal(rows[0].verificationStatus,'official-schedule');
+   assert.equal(rows[0].actual,'—');
+   assert.ok(rows[0].sourceUrl.includes(domain));
+  }
   assert.equal(rows[0].forecast,'—');
-  assert.ok(rows[0].sourceUrl.includes(domain));
  }
  const existing={date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI y/y',actual:'—',releaseState:'scheduled'};
  const merged=applyVerifiedReleaseOverlay({mode:'live',events:[
