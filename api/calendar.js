@@ -1,7 +1,19 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-24T00:23:53.521Z';
+const VERIFIED_AT='2026-10-28T12:30:00.000Z';
 const VERIFIED=[
+ // 28 Oct 2026 08:30 EDT / 13:30 CET: Census advance September trade and inventories.
+ // Official CB26-177 reports a $134.9bn goods deficit versus $132.1bn revised in August.
+ // Provider prior -132.6B was superseded by the publisher's revised August figure.
+ // No independently verified market consensus; never invent forecast or rate repricing.
+ {day:'2026-10-28',time:'13:30',dateOverride:'2026-10-28T13:30:00+01:00',ccy:'USD',
+  match:/^(?:Advance )?(?:Goods )?Trade Balance(?: ·.*)?$|^Advance Economic Indicators/i,
+  event:'Advance Goods Trade Balance · Sep',actual:'-134.9B',previous:'-132.1B revised',forecast:'—',importance:'HIGH',
+  label:'RELEASED · Census CB26-177 PRIMARY · -134.9B goods deficit',
+  source:'U.S. Census Bureau Advance Economic Indicators September 2026, CB26-177, 28 Oct 2026: goods deficit $134.9bn, up $2.8bn from August revised $132.1bn; exports $209.2bn (+$5.3bn), imports $344.1bn (+$8.1bn). Pre-release provider previous $132.6bn superseded by Census revision. Market consensus not independently verified.',
+  url:'https://www.census.gov/econ/indicators/current/index.html',status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T12:30:00Z',force:true},
+
  // 28 Oct 2026 10-year Bund reopening DE000BU2Z072: Deutsche Finanzagentur
  // independently published the auction results: average yield 3.37%,
  // bid-to-cover 1.1; previous 30 Sep yield 3.58% and cover 1.2.
