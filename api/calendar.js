@@ -496,6 +496,15 @@ const OFFICIAL_UPCOMING=[
  // Do not suppress them just because ForexFactory temporarily fails.
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'CB Consumer Confidence · Oct',match:/CB Consumer Confidence|Conference Board.*Consumer Confidence/i,importance:'HIGH',source:'The Conference Board · Consumer Confidence October 2026 release 27 Oct 10:00 EDT',url:'https://www.conference-board.org/topics/consumer-confidence'},
  {date:'2026-10-27T15:00:00+01:00',ccy:'USD',event:'Richmond Manufacturing Index · Oct',match:/Richmond Manufacturing Index|Richmond Fed Manufacturing/i,importance:'MED',source:'Federal Reserve Bank of Richmond · October 2026 manufacturing survey release 27 Oct 10:00–10:10 EDT',url:'https://www.richmondfed.org/region_communities/regional_data_analysis/business_surveys/about'},
+ // UBS/CFA Switzerland October economic expectations: scheduled 28 Oct 09:00 UTC / 10:00 CET.
+ // ForexFactory LIVE and independent Myfxbook calendar agree on the slot.
+ // October actual is NOT yet confirmed: keep OVERDUE in fallback instead of hiding it.
+ // The schedule is secondary corroboration, NOT an official UBS publication.
+ {date:'2026-10-28T10:00:00+01:00',ccy:'CHF',event:'UBS Economic Expectations · Oct',
+  match:/UBS Economic Expectations|ZEW Expectations|Economic Sentiment Index/i,
+  importance:'LOW',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Myfxbook Swiss economic sentiment calendar · scheduled 28 Oct 2026 09:00 UTC',
+  url:'https://www.myfxbook.com/forex-economic-calendar/switzerland/economic-sentiment-index'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
@@ -579,7 +588,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
   rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
    importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?(o.approximate?'Scheduled · approximate time':'Scheduled · official'):'OVERDUE · unverified',
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
-   verificationStatus:'official-schedule',releaseTimeVerified:o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+   verificationStatus:o.scheduleVerificationStatus||'official-schedule',releaseTimeVerified:o.scheduleVerificationStatus?false:(o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null)),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
  // The fallback archive can contain the same release under a different title.
  // Prefer a source-verified overlay over the manually inherited duplicate.
