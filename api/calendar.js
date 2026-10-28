@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 28 Oct 2026 RBA Governor Bullock scheduled remarks: FinancialJuice
+ // carried contemporaneous remarks from 00:17-00:20 UTC. This verifies
+ // publication of comments, NOT an RBA decision or primary transcript.
+ {day:'2026-10-28',time:'01:15',dateOverride:'2026-10-28T01:15:00+01:00',ccy:'AUD',
+  match:/^RBA Gov(?:ernor)? Bullock Speaks(?: ·.*)?$/i,
+  event:'RBA Gov Bullock Speaks · Oct 28 (wire comments)',
+  actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+  label:'RELEASED · Bullock inflation outlook remarks · secondary publication',
+  source:'FinancialJuice 28 Oct 2026 00:19 UTC reporting Governor Bullock: inflation will likely exceed August base case; no primary RBA transcript independently retrieved',
+  url:'https://www.financialjuice.com/News/9823986/RBA-governor-Bullock-Inflation-will-likely-exceed-August-base-case.aspx?xy=rss',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',releaseTimeVerified:false,
+  numericActualVerified:false,verifiedAt:'2026-10-28T00:19:17Z',force:true},
+
  // ABS September 2026 monthly all-groups CPI +0.8% m/m, released
  // 28 Oct 00:30 UTC. FinancialJuice secondary wire; ABS primary pending.
  {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
