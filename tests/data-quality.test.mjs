@@ -1379,3 +1379,29 @@ test('28 Oct Bullock remarks are released as secondary publication without numer
  assert.equal(matches[0].numericActualVerified,false);
  assert.equal(matches[0].verificationStatus,'verified-secondary-publication');
 });
+
+test('28 Oct RBNZ rate statement and OCR decision are separate primary-verified releases',()=>{
+ const base=[
+  {date:'2026-10-28T02:00:00+01:00',currency:'NZD',event:'RBNZ Rate Statement',actual:'—',releaseState:'overdue',importance:'EXTREME'},
+  {date:'2026-10-28T02:00:00+01:00',currency:'NZD',event:'RBNZ Official Cash Rate',actual:'—',releaseState:'overdue',importance:'EXTREME'}
+ ];
+ for(const payload of [
+  {mode:'live',events:base},
+  {mode:'live',events:[...base].reverse()},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const nzd=out.events.filter(e=>e.currency==='NZD'&&e.date.startsWith('2026-10-28'));
+  const ocr=nzd.filter(e=>e.event.startsWith('RBNZ OCR ·'));
+  const statement=nzd.filter(e=>e.event.startsWith('RBNZ Rate Statement ·'));
+  assert.equal(ocr.length,1,'one OCR result in '+payload.mode);
+  assert.equal(statement.length,1,'one separate RBNZ statement in '+payload.mode);
+  assert.equal(ocr[0].actual,'2.75% HOLD (4–3)');
+  assert.equal(statement[0].actual,'Published','qualitative statement has no numeric Actual');
+  assert.equal(statement[0].numericActualVerified,false);
+  assert.equal(statement[0].actualVerifiedAt,null);
+  assert.equal(statement[0].verificationStatus,'verified-primary');
+  assert.equal(nzd.filter(e=>e.releaseState==='overdue'||e.releaseState==='pending').length,0);
+  assert.equal(ocr[0].sourceUrl,statement[0].sourceUrl);
+ }
+});
