@@ -2,6 +2,21 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-28T12:30:00.000Z';
 const VERIFIED=[
+ // 28 Oct 2026 UK Budget: contemporary Press Association reporting at 13:17 UTC
+ // confirms the Chancellor's statement and publication of the OBR forecasts.
+ // The original OBR tables were not independently retrieved. This is a
+ // qualitative RELEASED marker, NOT a verified numerical Actual or consensus.
+ // Parliament's 13:30 CET slot is approximate, not an issuer-confirmed time.
+ {day:'2026-10-28',time:'13:30',dateOverride:'2026-10-28T13:30:00+01:00',ccy:'GBP',
+  match:/^(?:Annual Budget Release|Budget Statement|Autumn Budget|UK Budget)(?:.*)$/i,
+  event:'UK Budget Statement & OBR Forecast · 2026',
+  actual:'Published',previous:'—',forecast:'—',importance:'EXTREME',
+  label:'RELEASED · UK Budget and OBR forecast · secondary publication',
+  source:'Press Association / Irish News, 28 Oct 2026 13:17 GMT, reports Chancellor John Healey delivered the Budget and OBR published the 2026 forecast; Reuters independently reports the Chancellor\'s £15bn fiscal headroom statement. Primary OBR tables not independently retrieved; numeric Actual intentionally omitted.',
+  url:'https://www.irishnews.com/news/uk/uk-growth-forecast-slashed-to-1-for-next-year-amid-iran-war-impact-ICBUG53KTFMZBIR7C3USD35V7E/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',
+  releaseTimeVerified:false,numericActualVerified:false,
+  verifiedAt:'2026-10-28T13:17:00Z',force:true},
  // 28 Oct 2026 08:30 EDT: official advance September wholesale inventories.
  // Census CB26-177: +0.6% m/m, August +0.5% unrevised; do not carry FF +0.7% previous.
  {day:'2026-10-28',time:'13:30',dateOverride:'2026-10-28T13:30:00+01:00',ccy:'USD',
@@ -619,8 +634,9 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
   if(matching>=0){
    // ForexFactory has shown 06:30 CET for the BoJ 15:30 JST press conference;
    // 15:30 JST is 07:30 CET after the 25 Oct DST change. Override the feed time.
-   if(o.approximate===true){
-    // Official day is confirmed; approximate UK Budget start must never appear as an exact release timestamp.
+   if(o.approximate===true&&rows[matching].releaseState!=='released'){
+    // An already-confirmed publication must not be reset to SCHEDULED/OVERDUE.
+    // Official day is confirmed; approximate UK Budget start is not an exact release timestamp.
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
      event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
      verificationStatus:'official-schedule',releaseTimeVerified:false,label:'Scheduled · approximate time',
@@ -670,10 +686,18 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    verifiedRows.some(v=>v.currency===currency&&v.date===e.date&&verified.test(String(v.event||'')))
   );
  });
- uniqueRows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
- return {...payload,events:uniqueRows,
-  overdue:uniqueRows.filter(e=>e.releaseState==='overdue').length,
-  checking:uniqueRows.filter(e=>e.releaseState==='checking').length,
+ // ForexFactory calls the same 28 Oct UK fiscal publication "Autumn Forecast
+ // Statement". Once the verified UK Budget/OBR record exists, do not show
+ // the alias as a separate overdue release.
+ const dedupedRows=uniqueRows.filter(e=>!(e.currency==='GBP'&&
+  String(e.date||'').slice(0,10)==='2026-10-28'&&
+  /^Autumn Forecast Statement(?: ·.*)?$/i.test(String(e.event||''))&&
+  uniqueRows.some(v=>v.currency==='GBP'&&String(v.date||'').slice(0,10)==='2026-10-28'&&
+   /^UK Budget Statement & OBR Forecast/.test(String(v.event||''))&&v.releaseState==='released')));
+ dedupedRows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ return {...payload,events:dedupedRows,
+  overdue:dedupedRows.filter(e=>e.releaseState==='overdue').length,
+  checking:dedupedRows.filter(e=>e.releaseState==='checking').length,
   provider:(payload.provider||'Calendar')+' + official Oct 8–9 release overlay',
   releaseOverlayVerifiedAt:VERIFIED_AT};
 }
