@@ -2,6 +2,22 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 28 Oct 2026 11:30 AEDT ABS September CPI publication. The ABS result
+ // page was not independently retrievable at verification time; Reuters-
+ // syndicated FinancialJuice and Guardian both report MONTHLY headline NSA
+ // CPI +4.3% y/y (August +4.0%). Do NOT confuse with Q3 CPI +3.9% y/y
+ // (separate quarterly/seasonally adjusted headline in newswire).
+ // Trimmed mean monthly 3.6% y/y; Q3 trimmed mean 3.7% y/y.
+ // Keep numeric provenance SECONDARY until the ABS primary table is accessible.
+ {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
+  match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,
+  event:'CPI y/y · Sep (ABS Australia, monthly headline NSA)',actual:'4.3%',previous:'4.0%',forecast:'—',
+  importance:'HIGH',label:'RELEASED · monthly headline 4.3% · secondary verified',
+  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly all-groups CPI 4.3% y/y (Aug 4.0%); ABS release page pending independent primary retrieval; not the separate Q3 3.9% figure',
+  url:'https://www.financialjuice.com/News/9824005/Australia-Sept-CPI-all-groups-rises-43-year-on-year.aspx?xy=rss',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T00:30:04Z',force:true},
+
  // 27 Oct 2026 API WSB: a 20:46:32 UTC FinancialJuice wire reports
  // the API crude-stock component at -2.031M (prior -4.930M).
  // This is SECONDARY evidence of publication, not primary access to the
