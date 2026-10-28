@@ -2,6 +2,21 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 28 Oct 2026 UBS-CFA October survey: -15.3 vs +2.6 in September.
+ // Swiss Keystone-SDA dispatch at 10:19 CET cites UBS; TradingEconomics
+ // independently reports the same result. Original UBS October PDF has not
+ // been retrieved, so classify as SECONDARY, not PRIMARY.
+ // The exact 10:00 CET scheduled slot is calendar-sourced, not issuer verified.
+ {day:'2026-10-28',time:'10:00',dateOverride:'2026-10-28T10:00:00+01:00',ccy:'CHF',
+  match:/^(?:UBS Economic Expectations|ZEW Expectations|(?:Swiss )?Economic Sentiment Index)(?: ·.*)?$/i,
+  event:'UBS Economic Expectations · Oct (UBS-CFA survey)',
+  actual:'-15.3',previous:'2.6',forecast:'—',importance:'LOW',
+  label:'RELEASED · UBS-CFA -15.3 · secondary verified',
+  source:'Keystone-SDA / Nau.ch 28 Oct 2026 10:19 CET, citing UBS: October UBS-CFA expectations -15.3, September +2.6 (down 17.9 points); independently corroborated by TradingEconomics. Original UBS October bulletin not independently retrieved.',
+  url:'https://www.nau.ch/news/wirtschaft/konjunkturerwartungen-von-analysten-und-okonomen-truben-sich-ein-67194322',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',
+  releaseTimeVerified:false,verifiedAt:'2026-10-28T09:19:00Z',force:true},
+
  // 28 Oct 2026 08:00 CET: November German consumer climate was published.
  // FinancialJuice reported -30.8 vs -30.6 prior at 07:00 UTC.
  // NIM's official schedule confirms the release time, but the original NIM
