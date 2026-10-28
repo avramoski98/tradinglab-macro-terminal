@@ -12,6 +12,27 @@ const unresolvedNonScheduleOverdue=(data)=>data.events.filter(
  e=>e.releaseState==='overdue'&&e.verificationStatus!=='official-schedule'
 ).length;
 
+test('German GfK consumer climate clears live overdue and is added once in fallback with secondary provenance',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T08:00:00+01:00',currency:'EUR',event:'German GfK Consumer Climate',releaseState:'overdue',actual:'—',previous:'-30.6',forecast:'-30.3',importance:'MED'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const matches=out.events.filter(e=>e.currency==='EUR'&&/^German GfK Consumer Climate/.test(e.event));
+  assert.equal(matches.length,1,'one GfK release in '+payload.mode);
+  const row=matches[0];
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.actual,'-30.8');
+  assert.equal(row.previous,'-30.6');
+  assert.equal(row.forecast,'—','unverified wire consensus not imported');
+  assert.equal(row.verificationStatus,'verified-secondary');
+  assert.equal(row.releaseTimeVerified,true);
+  assert.match(row.source,/NIM numeric bulletin not independently verified/);
+  assert.ok(row.sourceUrl.includes('financialjuice.com'));
+  assert.equal(out.events.filter(e=>e.releaseState==='overdue'&&/GfK/.test(e.event)).length,0);
+ }
+});
+
 test('API WSB publication clears overdue in live and fallback without inventing full-report actual',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-27T21:30:00+01:00',currency:'USD',event:'API Weekly Statistical Bulletin',actual:'—',releaseState:'overdue',importance:'LOW'}]},
