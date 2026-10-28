@@ -300,11 +300,12 @@ test('G10 coverage and freshness do not count undated archived values',()=>{
  assert.equal(c.freshnessInfo(null).label,'UNVERIFIED');
  assert.equal(c.coverageInfo([['2026-03',3,'2026-04-15T10:00:00Z','verified-primary'],['2026-06',4,'2026-07-15T10:00:00Z','verified-primary']],'Quarterly CPI y/y').required,2);
 });
-test('EIA published overrides remain secondary verified and USDA is not auto-released',()=>{
+test('EIA Oct 28 official primary joins older secondary overrides while USDA is not auto-released',()=>{
  const c={Date,fetch:async()=>({ok:false}),console};vm.createContext(c);
  vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
- const rows=c.knownEiaRows();assert.equal(rows.length,4);assert.ok(rows.some(x=>x.event.includes('Natural Gas Storage')&&x.actual==='+77B'));assert.ok(rows.some(x=>x.event.includes('Crude Oil Inventories')&&x.actual==='-3.060M'));
- assert.ok(rows.every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
+ const rows=c.knownEiaRows();assert.equal(rows.length,5);assert.ok(rows.some(x=>x.event.includes('Natural Gas Storage')&&x.actual==='+77B'));assert.ok(rows.some(x=>x.event.includes('Crude Oil Inventories')&&x.actual==='-3.060M'));
+ const official=rows.filter(x=>x.verificationStatus==='verified-primary');assert.equal(official.length,1);assert.equal(official[0].actual,'-1.892M');assert.ok(official[0].sourceUrl.includes('ir.eia.gov'));
+ assert.ok(rows.filter(x=>x.verificationStatus!=='verified-primary').every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
  assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&(x.releaseState==='overdue'||(x.releaseState==='released'&&x.verificationStatus==='verified-primary'&&!!x.sourceUrl))));
 });
 
