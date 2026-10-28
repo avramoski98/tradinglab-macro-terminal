@@ -4,7 +4,7 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
-test('BoC 28 Oct +25bp release clears all three CAD overdue rows without primary provenance inflation',()=>{
+test('BoC 28 Oct +25bp release clears all three CAD overdue rows with official primary provenance',()=>{
  for(const payload of [
   {mode:'live',events:[
    {date:'2026-10-28T14:45:00+01:00',currency:'CAD',event:'BOC Monetary Policy Report',actual:'—',releaseState:'overdue'},
@@ -17,12 +17,12 @@ test('BoC 28 Oct +25bp release clears all three CAD overdue rows without primary
   const rows=out.events.filter(e=>e.currency==='CAD'&&/Bank of Canada Overnight Rate|BOC Rate Statement|BOC Monetary Policy Report/i.test(e.event));
   assert.equal(rows.length,3,'three distinct published BoC rows in '+payload.mode);
   assert.ok(rows.every(e=>e.releaseState==='released'),'no BoC overdue after verified publication');
-  assert.ok(rows.every(e=>/verified-secondary/.test(e.verificationStatus)),'original BoC primary statement not independently retrieved');
+  assert.ok(rows.every(e=>e.verificationStatus==='verified-primary'),'all three BoC releases now linked to official publisher');
   const rate=rows.find(e=>/Overnight Rate/.test(e.event));
   assert.equal(rate.actual,'2.50%');
   assert.equal(rate.previous,'2.25%');
   assert.equal(rate.forecast,'—','unverified provider forecast must not be elevated to consensus');
-  assert.equal(rate.actualVerifiedAt,'2026-10-28T13:50:00Z');
+  assert.equal(rate.actualVerifiedAt,'2026-10-28T15:38:00Z');
   for(const e of rows.filter(e=>!/Overnight Rate/.test(e.event))){
    assert.equal(e.actual,'Published');
    assert.equal(e.numericActualVerified,false);
@@ -1599,4 +1599,45 @@ test('Oct 28 CHF UBS-CFA release clears overdue once in LIVE and fallback with s
   assert.ok(e.sourceUrl.includes('nau.ch'));
   assert.equal(out.events.filter(e=>e.currency==='CHF'&&e.releaseState==='overdue'&&/UBS Economic Expectations/.test(e.event)).length,0);
  }
+});
+
+test('28 Oct EIA primary crude stocks and BoC opening statement clear live and fallback overdue',async()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-28T15:30:00+01:00',currency:'USD',event:'Crude Oil Inventories',actual:'—',releaseState:'overdue',importance:'LOW'},
+   {date:'2026-10-28T15:30:00+01:00',currency:'CAD',event:'BOC Press Conference',actual:'—',releaseState:'awaiting-confirmation',importance:'HIGH'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const crude=out.events.filter(e=>e.currency==='USD'&&e.event.startsWith('Crude Oil Inventories · EIA week'));
+  const boc=out.events.filter(e=>e.currency==='CAD'&&e.event.startsWith('BOC Press Conference · Oct'));
+  assert.equal(crude.length,1,'one EIA row in '+payload.mode);
+  assert.equal(boc.length,1,'one BoC press row in '+payload.mode);
+  assert.equal(crude[0].actual,'-1.892M');
+  assert.equal(crude[0].previous,'-3.060M');
+  assert.equal(crude[0].forecast,'—');
+  assert.equal(crude[0].verificationStatus,'verified-primary');
+  assert.equal(crude[0].releaseState,'released');
+  assert.equal(boc[0].actual,'Opening statement published');
+  assert.equal(boc[0].verificationStatus,'verified-primary-publication');
+  assert.equal(boc[0].numericActualVerified,false);
+  assert.equal(boc[0].actualVerifiedAt,null);
+  assert.equal(boc[0].releaseState,'released');
+  assert.equal(out.events.filter(e=>['CAD','USD'].includes(e.currency)&&/Crude Oil Inventories|BOC Press Conference/.test(e.event)&&e.releaseState==='overdue').length,0);
+ }
+ const source=fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function handler','async function handler');
+ const context=vm.createContext({Date,console,fetch:async()=>({ok:false})});
+ vm.runInContext(source,context);
+ const response={setHeader(){},status(n){this.code=n;return this},json(data){this.data=data;return data}};
+ await vm.runInContext('handler({}, response)',vm.createContext({...context,response}));
+ const commodity=response.data.events.filter(e=>e.event==='EIA · Crude Oil Inventories'&&e.date.startsWith('2026-10-28'));
+ assert.equal(commodity.length,1);
+ assert.equal(commodity[0].actual,'-1.892M');
+ assert.equal(commodity[0].verificationStatus,'verified-primary');
+ assert.equal(commodity[0].releaseState,'released');
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('EIA CRUDE STOCKS · USD / OIL (PRIMARY)'));
+ assert.ok(html.includes('EIA CRUDE INVENTORIES (PRIMARY VERIFIED)'));
+ assert.ok(html.includes('BoC HIKE +25bp / CAD (OFFICIAL PRIMARY)'));
 });

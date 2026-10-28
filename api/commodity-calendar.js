@@ -79,18 +79,19 @@ async function ff(url){try{const r=await fetch(url,{headers:{Accept:'application
 function energyRows(raw){return raw.filter(x=>/crude oil inventories|natural gas storage|gasoline inventories|distillate inventories/i.test(String(x.title||x.event||''))).map(x=>{const event=x.title||x.event||'';const actual=x.actual??'—',forecast=x.forecast??'—';return {date:x.date,country:'COM',currency:'COM',event:`EIA · ${event}`,category:/natural gas/i.test(event)?'ENERGY · GAS':'ENERGY · OIL',markets:/natural gas/i.test(event)?'Natural Gas':'WTI · Brent · Products',importance:/crude oil inventories|natural gas storage/i.test(event)?'HIGH':'MED',source:'ForexFactory / EIA',previous:x.previous??'—',forecast,actual,label:actual&&actual!=='—'?surprise(event,actual,forecast):(Date.parse(x.date)<Date.now()?'OVERDUE':'PENDING'),releaseState:actual&&actual!=='—'?'released':(Date.parse(x.date)<Date.now()?'overdue':'scheduled'),impact:'Inventory surprise',note:'Energy inventories support classic Previous / Forecast / Actual because the release has a single headline change.'};});}
 
 const VERIFIED_EIA=[
+ {date:'2026-10-28T15:30:00+01:00',event:'Crude Oil Inventories',actual:'-1.892M',forecast:'—',previous:'-3.060M',category:'ENERGY · OIL',markets:'WTI · Brent · Products',sourceUrl:'https://ir.eia.gov/wpsr/psw00.json',source:'U.S. Energy Information Administration · Weekly Petroleum Status Report',verificationStatus:'verified-primary',sourceUpdatedAt:'2026-10-28T14:30:00Z',note:'Official EIA WPSR JSON: commercial crude stocks 410.625M barrels for week ended 23 Oct versus 412.517M for 16 Oct = -1.892M. Prior week -3.060M. Forecast omitted because primary market consensus was not independently verified.'},
  {date:'2026-10-21T16:30:00+02:00',event:'Crude Oil Inventories',actual:'-3.060M',forecast:'-0.100M',previous:'-8.557M',category:'ENERGY · OIL',markets:'WTI · Brent · Products',sourceUrl:'https://www.eia.gov/petroleum/supply/weekly/',note:'Actual corroborated by official EIA weekly report; consensus from secondary economic calendar.'},
  {date:'2026-10-22T16:30:00+02:00',event:'Natural Gas Storage',actual:'+77B',forecast:'—',previous:'+67B',category:'ENERGY · GAS',markets:'Natural Gas',sourceUrl:'https://www.eia.gov/naturalgas/storage/',note:'Official EIA report: +77 Bcf net injection for week ending 16 Oct. No verified single-source market consensus.'},
  {date:'2026-10-07T16:30:00+02:00',event:'Crude Oil Inventories',actual:'-3.186M',forecast:'1.900M',previous:'0.922M',category:'ENERGY · OIL',markets:'WTI · Brent · Products',sourceUrl:'https://www.investing.com/economic-calendar/eia-crude-oil-inventories-75'},
  {date:'2026-10-08T16:30:00+02:00',event:'Natural Gas Storage',actual:'85B',forecast:'79B',previous:'64B',category:'ENERGY · GAS',markets:'Natural Gas',sourceUrl:'https://www.forexfactory.com/calendar/26-us-natural-gas-storage'}
 ];
-function knownEiaRows(){return VERIFIED_EIA.map(x=>({...x,country:'COM',currency:'COM',event:'EIA · '+x.event,importance:'HIGH',source:'EIA figures via published secondary calendar',verificationStatus:'verified-secondary',label:surprise(x.event,x.actual,x.forecast),releaseState:'released',impact:'Inventory surprise',note:x.note||'Reported EIA Actual and secondary-source forecast; official EIA report should be cross-checked.'}));}
+function knownEiaRows(){return VERIFIED_EIA.map(x=>({...x,country:'COM',currency:'COM',event:'EIA · '+x.event,importance:'HIGH',source:x.source||'EIA figures via published secondary calendar',verificationStatus:x.verificationStatus||'verified-secondary',sourceUpdatedAt:x.sourceUpdatedAt||null,forecastVerificationStatus:'provider-unverified',label:surprise(x.event,x.actual,x.forecast),releaseState:'released',impact:'Inventory surprise',note:x.note||'Reported EIA Actual and secondary-source forecast; official EIA report should be cross-checked.'}));}
 function reconcileEia(providerRows){
  const out=[...providerRows];
  for(const known of knownEiaRows()){
   const match=out.find(x=>String(x.date||'').slice(0,10)===known.date.slice(0,10)&&String(x.event||'').toLowerCase().includes(known.event.slice(6).toLowerCase()));
   if(!match)out.push(known);
-  else if(match.releaseState!=='released')Object.assign(match,known);
+  else if(match.releaseState!=='released'||known.verificationStatus==='verified-primary')Object.assign(match,known);
  }
  return out;
 }
