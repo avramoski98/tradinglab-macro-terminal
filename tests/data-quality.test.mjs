@@ -1449,21 +1449,29 @@ test('RBNZ Oct 28 media conference clears past pending without inventing a numer
  }
 });
 
-test('Oct 28 German 10-y Bund auction stays visible and overdue in fallback without fabricated yield',()=>{
- const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
- const rows=fallback.events.filter(e=>e.currency==='EUR'&&/^German 10-y Bond Auction/.test(e.event));
- assert.equal(rows.length,1);
- assert.equal(rows[0].date,'2026-10-28T10:42:00+01:00');
- assert.equal(rows[0].releaseState,'overdue');
- assert.equal(rows[0].actual,'—');
- assert.equal(rows[0].verificationStatus,'verified-secondary-schedule');
- assert.equal(rows[0].releaseTimeVerified,false);
- assert.match(rows[0].source,/not issuer-verified/);
- const live=applyVerifiedReleaseOverlay({mode:'live',events:[{
-  date:'2026-10-28T10:42:00+01:00',currency:'EUR',event:'German 10-y Bond Auction',
-  releaseState:'overdue',actual:'—',previous:'3.58|1.2',importance:'LOW'
- }]},{includeFullSchedule:true});
- assert.equal(live.events.filter(e=>e.currency==='EUR'&&/^German 10-y Bond Auction/.test(e.event)).length,1);
+test('Oct 28 German 10-y Bund auction is primary-verified and released exactly once in both modes',()=>{
+ for(const payload of [
+  {mode:'schedule-fallback',events:[]},
+  {mode:'live',events:[{
+   date:'2026-10-28T11:32:00+01:00',currency:'EUR',event:'German 10-y Bond Auction',
+   releaseState:'overdue',actual:'—',previous:'3.58%',importance:'LOW'
+  }]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&/^German 10-y Bond Auction/.test(e.event));
+  assert.equal(rows.length,1,'one auction row in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.date,'2026-10-28T11:32:00+01:00');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'3.37%');
+  assert.equal(e.previous,'3.58%');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,false);
+  assert.match(e.source,/cover 1.1/);
+  assert.ok(e.sourceUrl.includes('deutsche-finanzagentur.de'));
+  assert.equal(out.events.filter(x=>x.releaseState==='overdue'&&/German 10-y Bond Auction/.test(x.event)).length,0);
+ }
 });
 
 test('Oct 28 CHF UBS-CFA release clears overdue once in LIVE and fallback with secondary provenance',()=>{
