@@ -15,6 +15,16 @@ const VERIFIED=[
    status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
    verifiedAt:'2026-10-28T18:00:00Z',force:true},
 
+  // The separate ForexFactory FOMC Statement publication row must not remain OVERDUE
+  // after the Federal Reserve published the official policy statement at 14:00 EDT.
+  {day:'2026-10-28',time:'19:00',dateOverride:'2026-10-28T19:00:00+01:00',ccy:'USD',
+   match:/^FOMC Statement(?: ·.*)?$/i,event:'FOMC Statement · 28 Oct 2026',
+   actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+   label:'RELEASED · FED PRIMARY · official FOMC statement published',
+   source:'Federal Reserve 28 Oct 2026 official FOMC statement published 14:00 EDT: target range held at 3.75–4.00%, 10–2 vote. Qualitative statement publication, not a separate numerical Actual.',
+   url:'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm',
+   status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+   numericActualVerified:false,verifiedAt:'2026-10-28T18:00:00Z',force:true},
  // 28 Oct 2026 Bank of Canada official policy release, MPR projections and opening statement.
  // Numerical policy rate is primary verified; statement/report/conference are publication events, not scalar Actuals.
  {day:'2026-10-28',time:'14:45',dateOverride:'2026-10-28T14:45:00+01:00',ccy:'CAD',
