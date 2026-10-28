@@ -1366,3 +1366,16 @@ test('28 Oct AUD monthly CPI and trimmed-mean releases clear LIVE overdue withou
  }
  assert.equal(out.events.filter(x=>x.currency==='AUD'&&x.releaseState==='overdue').length,0);
 });
+
+test('28 Oct Bullock remarks are released as secondary publication without numeric policy decision',()=>{
+ const out=applyVerifiedReleaseOverlay({mode:'live',events:[{
+  date:'2026-10-28T01:15:00+01:00',currency:'AUD',event:'RBA Gov Bullock Speaks',
+  releaseState:'awaiting-confirmation',actual:'—',importance:'HIGH'
+ }]});
+ const matches=out.events.filter(x=>x.currency==='AUD'&&x.event.startsWith('RBA Gov Bullock Speaks'));
+ assert.equal(matches.length,1);
+ assert.equal(matches[0].releaseState,'released');
+ assert.equal(matches[0].actual,'Published');
+ assert.equal(matches[0].numericActualVerified,false);
+ assert.equal(matches[0].verificationStatus,'verified-secondary-publication');
+});
