@@ -2,6 +2,45 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-28T12:30:00.000Z';
 const VERIFIED=[
+ // 28 Oct 2026 09:45 EDT / 14:45 CET: BoC raised its overnight target 25bp
+ // to 2.50%, confirmed by Reuters post-decision report (13:50 UTC) and
+ // FinancialJuice release at 13:45 UTC. Original BoC press release was still
+ // displaying a pre-publication placeholder at independent verification.
+ // Preserve SECONDARY provenance, not official-primary; the FF forecast is
+ // not independently verified as a uniform market consensus.
+ {day:'2026-10-28',time:'14:45',dateOverride:'2026-10-28T14:45:00+01:00',ccy:'CAD',
+  match:/^(?:Overnight Rate|Bank of Canada Rate Decision(?: & Monetary Policy Report)?)(?: ·.*)?$/i,
+  event:'Bank of Canada Overnight Rate · 28 Oct 2026 (+25bp)',
+  actual:'2.50%',previous:'2.25%',forecast:'—',importance:'EXTREME',
+  label:'RELEASED · BoC HIKE +25bp to 2.50% · Reuters / FJ secondary',
+  source:'Reuters 28 Oct 2026 13:50 UTC reports BoC raised the overnight rate 25bp to 2.50%, first hike in more than three years; FinancialJuice 13:45 UTC independently reports Actual 2.5%, Previous 2.25%, Forecast 2.5%. The FF/FJ forecast is not treated as independently verified consensus. Original BoC press release not retrieved at verification.',
+  url:'https://www.reuters.com/world/americas/bank-canada-raises-key-interest-rate-says-another-hike-possible-2026-10-28/',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T13:50:00Z',force:true},
+ // Published Bank of Canada policy statement: a multi-paragraph policy release,
+ // not a single numerical Actual. Do not conflate with the rate row.
+ {day:'2026-10-28',time:'14:45',dateOverride:'2026-10-28T14:45:00+01:00',ccy:'CAD',
+  match:/^BOC Rate Statement(?: ·.*)?$/i,
+  event:'BOC Rate Statement · 28 Oct 2026',
+  actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+  label:'RELEASED · BoC policy statement · secondary publication',
+  source:'Reuters 28 Oct 2026 13:50 UTC reports the BoC decision and Governor Macklem guidance that further hikes may be required to contain broadening energy-led inflation. Original Bank of Canada statement not independently retrieved; no numerical statement Actual.',
+  url:'https://www.reuters.com/world/americas/bank-canada-raises-key-interest-rate-says-another-hike-possible-2026-10-28/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',
+  releaseTimeVerified:true,numericActualVerified:false,
+  verifiedAt:'2026-10-28T13:50:00Z',force:true},
+ // BoC MPR publication corroborated by Reuters and contemporaneous wire
+ // reports; do not misrepresent its multiple forecasts as one Actual.
+ {day:'2026-10-28',time:'14:45',dateOverride:'2026-10-28T14:45:00+01:00',ccy:'CAD',
+  match:/^BOC Monetary Policy Report(?: ·.*)?$/i,
+  event:'BOC Monetary Policy Report · Oct 2026',
+  actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+  label:'RELEASED · BoC MPR · secondary publication',
+  source:'Reuters 28 Oct 2026 13:50 UTC reports the BoC October MPR raised its 2027 inflation projection to 3.1% from 2.0% in July and 2026 GDP growth to 1.0% from 0.7%; FinancialJuice 13:46 UTC reports 2027-28 growth around 2%. Original MPR tables not independently retrieved.',
+  url:'https://www.reuters.com/world/americas/bank-canada-raises-key-interest-rate-says-another-hike-possible-2026-10-28/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',
+  releaseTimeVerified:true,numericActualVerified:false,
+  verifiedAt:'2026-10-28T13:50:00Z',force:true},
  // 28 Oct 2026 UK Budget: contemporary Press Association reporting at 13:17 UTC
  // confirms the Chancellor's statement and publication of the OBR forecasts.
  // The original OBR tables were not independently retrieved. This is a
