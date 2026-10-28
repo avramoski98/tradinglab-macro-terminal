@@ -15,6 +15,20 @@ const VERIFIED=[
    status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
    verifiedAt:'2026-10-28T18:00:00Z',force:true},
 
+  // Warsh's 28 Oct 14:30 ET press conference is confirmed as held by contemporaneous
+  // time-stamped live reporting. The Federal Reserve webcast was announced, but
+  // an official archived transcript/video was not independently retrieved here.
+  // Treat as secondary confirmation of an event, never a numerical Actual.
+  {day:'2026-10-28',time:'19:30',dateOverride:'2026-10-28T19:30:00+01:00',ccy:'USD',
+   match:/^(?:FOMC Chair Press Conference|FOMC Press Conference|Fed Chair (?:Warsh )?Press Conference)(?: ·.*)?$/i,
+   event:'FOMC Chair Press Conference · 28 Oct 2026 (Warsh)',
+   actual:'Held',previous:'—',forecast:'—',importance:'HIGH',
+   label:'RELEASED · WARSH PRESS CONFERENCE · secondary live coverage',
+   source:'Kiplinger live FOMC coverage, 28 Oct 2026: time-stamped reporting of Chair Kevin Warsh answering press questions after the 14:30 ET conference began, including comments on the 2% inflation target, gradual disinflation and interest-rate sensitivity of AI investment. Secondary event confirmation; no numerical Actual, market consensus or live rate odds.',
+   url:'https://www.kiplinger.com/investing/live/fed-meeting-updates-and-commentary-october-2026',
+   status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+   numericActualVerified:false,verifiedAt:'2026-10-28T19:02:10Z',force:true},
+
   // The separate ForexFactory FOMC Statement publication row must not remain OVERDUE
   // after the Federal Reserve published the official policy statement at 14:00 EDT.
   {day:'2026-10-28',time:'19:00',dateOverride:'2026-10-28T19:00:00+01:00',ccy:'USD',
