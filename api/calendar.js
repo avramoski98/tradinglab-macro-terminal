@@ -29,14 +29,14 @@ const VERIFIED=[
   numericActualVerified:false,verifiedAt:'2026-10-28T00:19:17Z',force:true},
 
  // ABS September 2026 monthly all-groups CPI +0.8% m/m, released
- // 28 Oct 00:30 UTC. FinancialJuice secondary wire; ABS primary pending.
+ // 28 Oct 00:30 UTC. ABS September 2026 official release is now independently verified.
  {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
   match:/^CPI m\/m(?: ·.*)?$/i,
   event:'CPI m/m · Sep (ABS Australia)',actual:'+0.8%',previous:'—',forecast:'—',
-  importance:'HIGH',label:'RELEASED · monthly CPI +0.8% · secondary verified',
-  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly all-groups CPI +0.8% m/m; original ABS primary table not independently retrievable',
-  url:'https://www.financialjuice.com/News/9824001/Australia-Sept-CPI-all-groups-rises-08-mm.aspx?xy=rss',
-  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  importance:'HIGH',label:'RELEASED · monthly CPI +0.8% · ABS primary verified',
+  source:'Australian Bureau of Statistics · September 2026 CPI · original all-groups monthly change +0.8% (not seasonally adjusted)',
+  url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release',
+  status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
   verifiedAt:'2026-10-28T00:30:04Z',force:true},
 
  // September MONTHLY trimmed mean CPI +0.3% m/m; do not confuse with
@@ -44,26 +44,24 @@ const VERIFIED=[
  {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
   match:/^Trimmed Mean CPI m\/m(?: ·.*)?$/i,
   event:'Trimmed Mean CPI m/m · Sep (ABS Australia)',actual:'+0.3%',previous:'+0.2%',forecast:'—',
-  importance:'HIGH',label:'RELEASED · trimmed mean +0.3% m/m · secondary verified',
-  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly trimmed mean CPI +0.3% m/m; original ABS primary table not independently retrievable',
-  url:'https://www.financialjuice.com/News/9824008/Australia-Sept-RBA-trimmed-mean-CPI-rises-03-mm.aspx?xy=rss',
-  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  importance:'HIGH',label:'RELEASED · trimmed mean +0.3% m/m · ABS primary verified',
+  source:'Australian Bureau of Statistics · September 2026 CPI · trimmed mean +0.3% m/m seasonally adjusted',
+  url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release',
+  status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
   verifiedAt:'2026-10-28T00:30:05Z',force:true},
 
- // 28 Oct 2026 11:30 AEDT ABS September CPI publication. The ABS result
- // page was not independently retrievable at verification time; Reuters-
- // syndicated FinancialJuice and Guardian both report MONTHLY headline NSA
+ // 28 Oct 2026 11:30 AEDT ABS September CPI publication. The ABS September primary release is independently available and confirms MONTHLY headline NSA
  // CPI +4.3% y/y (August +4.0%). Do NOT confuse with Q3 CPI +3.9% y/y
  // (separate quarterly/seasonally adjusted headline in newswire).
  // Trimmed mean monthly 3.6% y/y; Q3 trimmed mean 3.7% y/y.
- // Keep numeric provenance SECONDARY until the ABS primary table is accessible.
+ // All three numeric readings now have ABS PRIMARY provenance.
  {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
   match:/^(?:CPI y\/y|Monthly CPI|Consumer Price Index|Australia CPI)(?: ·.*)?$/i,
   event:'CPI y/y · Sep (ABS Australia, monthly headline NSA)',actual:'4.3%',previous:'4.0%',forecast:'—',
-  importance:'HIGH',label:'RELEASED · monthly headline 4.3% · secondary verified',
-  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly all-groups CPI 4.3% y/y (Aug 4.0%); ABS release page pending independent primary retrieval; not the separate Q3 3.9% figure',
-  url:'https://www.financialjuice.com/News/9824005/Australia-Sept-CPI-all-groups-rises-43-year-on-year.aspx?xy=rss',
-  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  importance:'HIGH',label:'RELEASED · monthly headline 4.3% · ABS primary verified',
+  source:'Australian Bureau of Statistics · September 2026 CPI · monthly headline NSA +4.3% y/y (Aug +4.0%); distinct from quarterly figures',
+  url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release',
+  status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
   verifiedAt:'2026-10-28T00:30:04Z',force:true},
 
  // 27 Oct 2026 API WSB: a 20:46:32 UTC FinancialJuice wire reports
