@@ -1449,6 +1449,23 @@ test('RBNZ Oct 28 media conference clears past pending without inventing a numer
  }
 });
 
+test('Oct 28 German 10-y Bund auction stays visible and overdue in fallback without fabricated yield',()=>{
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ const rows=fallback.events.filter(e=>e.currency==='EUR'&&/^German 10-y Bond Auction/.test(e.event));
+ assert.equal(rows.length,1);
+ assert.equal(rows[0].date,'2026-10-28T10:42:00+01:00');
+ assert.equal(rows[0].releaseState,'overdue');
+ assert.equal(rows[0].actual,'—');
+ assert.equal(rows[0].verificationStatus,'verified-secondary-schedule');
+ assert.equal(rows[0].releaseTimeVerified,false);
+ assert.match(rows[0].source,/not issuer-verified/);
+ const live=applyVerifiedReleaseOverlay({mode:'live',events:[{
+  date:'2026-10-28T10:42:00+01:00',currency:'EUR',event:'German 10-y Bond Auction',
+  releaseState:'overdue',actual:'—',previous:'3.58|1.2',importance:'LOW'
+ }]},{includeFullSchedule:true});
+ assert.equal(live.events.filter(e=>e.currency==='EUR'&&/^German 10-y Bond Auction/.test(e.event)).length,1);
+});
+
 test('Oct 28 CHF UBS-CFA release clears overdue once in LIVE and fallback with secondary provenance',()=>{
  for(const payload of [
   {mode:'schedule-fallback',events:[]},
