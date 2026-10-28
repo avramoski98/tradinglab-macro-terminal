@@ -1405,3 +1405,25 @@ test('28 Oct RBNZ rate statement and OCR decision are separate primary-verified 
   assert.equal(ocr[0].sourceUrl,statement[0].sourceUrl);
  }
 });
+
+test('RBNZ Oct 28 media conference clears past pending without inventing a numerical actual or primary transcript',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T03:00:00+01:00',currency:'NZD',event:'RBNZ Press Conference',actual:'—',releaseState:'awaiting-confirmation',importance:'HIGH'}]},
+  {mode:'live',events:[{date:'2026-10-28T03:00:00+01:00',currency:'NZD',event:'RBNZ Press Conference',actual:'—',releaseState:'overdue',importance:'HIGH'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(x=>x.currency==='NZD'&&/^RBNZ Press Conference · 28 Oct/.test(x.event));
+  assert.equal(rows.length,1,'exactly one qualitative conference event');
+  const e=rows[0];
+  assert.equal(e.date,'2026-10-28T03:00:00+01:00');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'Held · remarks reported');
+  assert.equal(e.numericActualVerified,false);
+  assert.equal(e.actualVerifiedAt,null);
+  assert.equal(e.verificationStatus,'verified-secondary-publication');
+  assert.equal(e.releaseTimeVerified,true);
+  assert.ok(e.sourceUrl.includes('investinglive.com/central-banks/'));
+  assert.equal(out.events.filter(x=>x.currency==='NZD'&&/^RBNZ Press Conference/.test(x.event)&&x.releaseState!=='released').length,0);
+ }
+});
