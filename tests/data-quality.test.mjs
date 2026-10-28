@@ -922,11 +922,11 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
   assert.equal(rows.length,1,currency+' '+prefix+' missing or duplicated');
   assert.equal(rows[0].date,date);
   if(currency==='AUD'&&prefix==='CPI y/y · Sep'){
-   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.equal(rows[0].verificationStatus,'verified-primary');
    assert.equal(rows[0].releaseState,'released');
    assert.equal(rows[0].actual,'4.3%');
    assert.equal(rows[0].previous,'4.0%');
-   assert.ok(rows[0].sourceUrl.includes('financialjuice.com'));
+   assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
@@ -1361,7 +1361,7 @@ test('28 Oct AUD monthly CPI and trimmed-mean releases clear LIVE overdue withou
   assert.equal(rows.length,1,name+' duplicate/missing');
   assert.equal(rows[0].actual,actual);
   assert.equal(rows[0].releaseState,'released');
-  assert.equal(rows[0].verificationStatus,'verified-secondary');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
   assert.equal(rows[0].forecast,'—');
  }
  assert.equal(out.events.filter(x=>x.currency==='AUD'&&x.releaseState==='overdue').length,0);
