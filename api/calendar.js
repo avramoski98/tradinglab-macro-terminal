@@ -2,6 +2,16 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-28T12:30:00.000Z';
 const VERIFIED=[
+ // 28 Oct 2026 08:30 EDT: official advance September wholesale inventories.
+ // Census CB26-177: +0.6% m/m, August +0.5% unrevised; do not carry FF +0.7% previous.
+ {day:'2026-10-28',time:'13:30',dateOverride:'2026-10-28T13:30:00+01:00',ccy:'USD',
+  match:/^Prelim(?:inary)? Wholesale Inventories(?: m\/m)?(?: ·.*)?$|^Advance Wholesale Inventories/i,
+  event:'Prelim Wholesale Inventories m/m · Sep (Census)',actual:'+0.6%',previous:'+0.5% (unrevised)',forecast:'—',importance:'LOW',
+  label:'RELEASED · Census CB26-177 PRIMARY · wholesale +0.6% m/m',
+  source:'U.S. Census Bureau Advance Economic Indicators September 2026, CB26-177, 28 Oct 2026: September advance wholesale inventories $1,011.5bn, +0.6% m/m (+7.4% y/y); August monthly increase unrevised at +0.5%. Provider previous +0.7% superseded; market consensus not independently verified.',
+  url:'https://www.census.gov/econ/indicators/current/index.html',status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T12:30:00Z',force:true},
+
  // 28 Oct 2026 08:30 EDT / 13:30 CET: Census advance September trade and inventories.
  // Official CB26-177 reports a $134.9bn goods deficit versus $132.1bn revised in August.
  // Provider prior -132.6B was superseded by the publisher's revised August figure.
