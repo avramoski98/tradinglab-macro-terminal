@@ -1087,7 +1087,7 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   ['USD','Durable Goods Orders m/m · Sep','2026-10-27T13:30:00+01:00','census.gov'],
   ['USD','New Home Sales · Sep (Census/HUD, SAAR)','2026-10-27T15:00:00+01:00','census.gov'],
   ['USD','Advance Goods Trade Balance · Sep','2026-10-28T13:30:00+01:00','census.gov'],
-  ['GBP','UK Budget Statement & OBR Forecast · 2026','2026-10-28T13:30:00+01:00','parliament.uk']
+  ['GBP','UK Budget Statement & OBR Forecast · 2026','2026-10-28T13:30:00+01:00','irishnews.com']
  ];
  const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  for(const [currency,name,date,domain] of expected){
@@ -1099,8 +1099,10 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
    assert.equal(rows[0].verificationStatus,'verified-primary');
    assert.equal(rows[0].actual,name.startsWith('New Home Sales')?'676K':name==='Advance Goods Trade Balance · Sep'?'-134.9B':'+1.8%');
   }else{
-   assert.equal(rows[0].verificationStatus,'official-schedule');
-   assert.equal(rows[0].actual,'—');
+   assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,'Published');
+   assert.equal(rows[0].numericActualVerified,false);
   }
   assert.equal(rows[0].forecast,'—');
   assert.ok(rows[0].sourceUrl.includes(domain));
@@ -1118,11 +1120,33 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   assert.equal(aliases.length,1,'duplicate '+name);
  }
  const budget=out.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
- assert.match(budget.label,/approximate time|OVERDUE/,'approximate UK Budget slot remains unverified after nominal start');
- assert.equal(budget.releaseTimeVerified,false);
+ assert.equal(budget.releaseState,'released');
+ assert.equal(budget.verificationStatus,'verified-secondary-publication');
+ assert.equal(budget.actual,'Published');
+ assert.equal(budget.releaseTimeVerified,false,'nominal Budget start is not issuer-confirmed');
  const budgetLive=merged.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
  assert.equal(budgetLive.date,'2026-10-28T13:30:00+01:00');
+ assert.equal(budgetLive.releaseState,'released');
+ assert.equal(budgetLive.verificationStatus,'verified-secondary-publication');
  assert.equal(budgetLive.releaseTimeVerified,false);
+});
+
+test('Oct 28 UK Budget and Autumn Forecast alias are one released secondary publication in LIVE and FALLBACK',()=>{
+ for(const mode of ['live','schedule-fallback']){
+  const out=applyVerifiedReleaseOverlay({mode,events:[
+   {date:'2026-10-28T13:30:00+01:00',currency:'GBP',event:'Annual Budget Release',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-28T13:30:00+01:00',currency:'GBP',event:'Autumn Forecast Statement',actual:'—',releaseState:'overdue'}
+  ]});
+  const rows=out.events.filter(x=>x.currency==='GBP'&&String(x.date).startsWith('2026-10-28'));
+  assert.equal(rows.length,1,'UK fiscal event should not be duplicated');
+  assert.equal(rows[0].event,'UK Budget Statement & OBR Forecast · 2026');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+  assert.equal(rows[0].actual,'Published');
+  assert.equal(rows[0].numericActualVerified,false);
+  assert.equal(rows[0].releaseTimeVerified,false);
+  assert.equal(out.overdue,0);
+ }
 });
 
 test('Oct 27 ADP and FHFA primary releases resolve overdue in both calendar modes without fabricating consensus',()=>{
