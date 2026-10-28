@@ -3,6 +3,32 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
+
+test('Census CB26-177 clears Sep advance goods trade overdue in LIVE and FALLBACK and updates both narratives',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Goods Trade Balance',actual:'—',previous:'-132.6B',forecast:'-130.4B',releaseState:'checking'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const matches=out.events.filter(e=>e.currency==='USD'&&e.event==='Advance Goods Trade Balance · Sep');
+  assert.equal(matches.length,1,'one Census trade release in '+payload.mode);
+  const row=matches[0];
+  assert.equal(row.actual,'-134.9B');
+  assert.equal(row.previous,'-132.1B revised','official revision supersedes provider previous');
+  assert.equal(row.forecast,'—','unverified market forecast must not be imported');
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.actualVerifiedAt,'2026-10-28T12:30:00Z');
+  assert.equal(row.releaseTimeVerified,true);
+  assert.equal(row.sourceUrl,'https://www.census.gov/econ/indicators/current/index.html');
+  assert.equal(out.events.filter(e=>e.currency==='USD'&&/Goods Trade Balance/.test(e.event)&&e.releaseState!=='released').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.equal(html.split('https://www.census.gov/econ/indicators/current/index.html').length-1,2,'Census source linked in Macro Watch and Weekly Focus');
+ assert.ok(html.includes('US ADVANCE GOODS TRADE (USD · CENSUS PRIMARY)'));
+ assert.ok(html.includes('US ADVANCE GOODS TRADE · USD (CENSUS PRIMARY)'));
+});
+
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
 // Regression fixtures may include real official-schedule events whose release
 // time has passed while their actual is still unverified. Those must remain
@@ -1049,10 +1075,10 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   const rows=out.events.filter(x=>x.currency===currency&&x.event===name);
   assert.equal(rows.length,1,name+' should appear exactly once');
   assert.equal(rows[0].date,date);
-  if(name==='Durable Goods Orders m/m · Sep'||name.startsWith('New Home Sales')){
-   // The Census report is now released and primary-verified.
+  if(name==='Durable Goods Orders m/m · Sep'||name.startsWith('New Home Sales')||name==='Advance Goods Trade Balance · Sep'){
+   // The Census reports are now released and primary-verified.
    assert.equal(rows[0].verificationStatus,'verified-primary');
-   assert.equal(rows[0].actual,name.startsWith('New Home Sales')?'676K':'+1.8%');
+   assert.equal(rows[0].actual,name.startsWith('New Home Sales')?'676K':name==='Advance Goods Trade Balance · Sep'?'-134.9B':'+1.8%');
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
