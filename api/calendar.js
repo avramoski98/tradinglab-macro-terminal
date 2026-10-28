@@ -28,6 +28,21 @@ const VERIFIED=[
   status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
   numericActualVerified:false,verifiedAt:'2026-10-28T01:00:00Z',force:true},
 
+ // 28 Oct 2026 15:00 NZDT / 03:00 CET: RBNZ's separately scheduled
+ // press conference was held. Contemporary reports quote Governor Breman
+ // speaking at the conference. This is SECONDARY confirmation of the event,
+ // not a primary video/transcript or a second numerical policy decision.
+ {day:'2026-10-28',time:'03:00',dateOverride:'2026-10-28T03:00:00+01:00',ccy:'NZD',
+  match:/^RBNZ Press Conference(?:.*)?$/i,
+  event:'RBNZ Press Conference · 28 Oct (Breman remarks)',
+  actual:'Held · remarks reported',previous:'—',forecast:'—',importance:'HIGH',
+  label:'RELEASED · media conference held · secondary reporting',
+  source:'RBNZ official 28 Oct MPR schedule confirms 3pm NZDT press conference; contemporaneous 28 Oct InvestingLive report quotes Governor Breman at the conference. Primary transcript/recording not independently verified.',
+  url:'https://investinglive.com/central-banks/rbnz-s-breman-more-hikes-likely-at-coming-meetings-possibly-into-restrictive-territory/',
+  status:'verified-secondary-publication',sourcePublishedAt:'2026-10-28',
+  releaseTimeVerified:true,numericActualVerified:false,
+  verifiedAt:'2026-10-28T02:42:09Z',force:true},
+
  // 28 Oct 2026 RBA Governor Bullock scheduled remarks: FinancialJuice
  // carried contemporaneous remarks from 00:17-00:20 UTC. This verifies
  // publication of comments, NOT an RBA decision or primary transcript.
