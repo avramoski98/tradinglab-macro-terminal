@@ -2,6 +2,28 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // ABS September 2026 monthly all-groups CPI +0.8% m/m, released
+ // 28 Oct 00:30 UTC. FinancialJuice secondary wire; ABS primary pending.
+ {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
+  match:/^CPI m\/m(?: ·.*)?$/i,
+  event:'CPI m/m · Sep (ABS Australia)',actual:'+0.8%',previous:'—',forecast:'—',
+  importance:'HIGH',label:'RELEASED · monthly CPI +0.8% · secondary verified',
+  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly all-groups CPI +0.8% m/m; original ABS primary table not independently retrievable',
+  url:'https://www.financialjuice.com/News/9824001/Australia-Sept-CPI-all-groups-rises-08-mm.aspx?xy=rss',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T00:30:04Z',force:true},
+
+ // September MONTHLY trimmed mean CPI +0.3% m/m; do not confuse with
+ // Q3 trimmed mean +1.0% q/q or 3.7% y/y (different frequencies).
+ {day:'2026-10-28',time:'01:30',dateOverride:'2026-10-28T01:30:00+01:00',ccy:'AUD',
+  match:/^Trimmed Mean CPI m\/m(?: ·.*)?$/i,
+  event:'Trimmed Mean CPI m/m · Sep (ABS Australia)',actual:'+0.3%',previous:'+0.2%',forecast:'—',
+  importance:'HIGH',label:'RELEASED · trimmed mean +0.3% m/m · secondary verified',
+  source:'FinancialJuice 28 Oct 2026 00:30 UTC reporting ABS September monthly trimmed mean CPI +0.3% m/m; original ABS primary table not independently retrievable',
+  url:'https://www.financialjuice.com/News/9824008/Australia-Sept-RBA-trimmed-mean-CPI-rises-03-mm.aspx?xy=rss',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T00:30:05Z',force:true},
+
  // 28 Oct 2026 11:30 AEDT ABS September CPI publication. The ABS result
  // page was not independently retrievable at verification time; Reuters-
  // syndicated FinancialJuice and Guardian both report MONTHLY headline NSA
