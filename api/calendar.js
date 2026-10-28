@@ -2,6 +2,20 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 28 Oct 2026 10-year Bund reopening DE000BU2Z072: Deutsche Finanzagentur
+ // independently published the auction results: average yield 3.37%,
+ // bid-to-cover 1.1; previous 30 Sep yield 3.58% and cover 1.2.
+ // Calendar's exact result slot comes from ForexFactory, not the issuer.
+ {day:'2026-10-28',time:'11:32',dateOverride:'2026-10-28T11:32:00+01:00',ccy:'EUR',
+  match:/^German 10-y Bond Auction(?: ·.*)?$|^Germany 10-Year (?:Bund|Bond) Auction(?: ·.*)?$/i,
+  event:'German 10-y Bond Auction · 28 Oct (DE000BU2Z072)',
+  actual:'3.37%',previous:'3.58%',forecast:'—',importance:'LOW',
+  label:'RELEASED · Bund 3.37% yield / 1.1 bid-cover · PRIMARY',
+  source:'Deutsche Finanzagentur official auction results, 28 Oct 2026, ISIN DE000BU2Z072: average yield 3.37%, weighted average price 96.95, cover 1.1, allotment EUR 3,890m; prior 30 Sep yield 3.58%, cover 1.2. 11:32 CET calendar time is provider-reported, not issuer-verified.',
+  url:'https://www.deutsche-finanzagentur.de/bundeswertpapiere/emissionen/emissionsergebnisse',
+  status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:false,
+  verifiedAt:'2026-10-28T11:22:00Z',force:true},
+
  // 28 Oct 2026 UBS-CFA October survey: -15.3 vs +2.6 in September.
  // Swiss Keystone-SDA dispatch at 10:19 CET cites UBS; TradingEconomics
  // independently reports the same result. Original UBS October PDF has not
@@ -520,15 +534,13 @@ const OFFICIAL_UPCOMING=[
   importance:'LOW',scheduleVerificationStatus:'verified-secondary-schedule',
   source:'Myfxbook Swiss economic sentiment calendar · scheduled 28 Oct 2026 09:00 UTC',
   url:'https://www.myfxbook.com/forex-economic-calendar/switzerland/economic-sentiment-index'},
- // German 10-year Bund auction on 28 Oct: Deutsche Finanzagentur confirms
- // reopening DE000BU2Z072 (Aug 2036) for EUR 5.5bn. ForexFactory LIVE
- // reports 10:42 CET result slot; exact timestamp is NOT issuer-verified.
- // The 28 Oct auction yield is still unverified: preserve OVERDUE in fallback.
- {date:'2026-10-28T10:42:00+01:00',ccy:'EUR',event:'German 10-y Bond Auction · 28 Oct',
+ // Official result verified by the overlay above. This schedule-only entry
+ // is retained solely as a fallback for tests/feeds lacking a verified overlay.
+ {date:'2026-10-28T11:32:00+01:00',ccy:'EUR',event:'German 10-y Bond Auction · 28 Oct',
   match:/German 10-y Bond Auction|Germany 10-Year (?:Bund|Bond) Auction/i,
   importance:'LOW',scheduleVerificationStatus:'verified-secondary-schedule',
-  source:'Deutsche Finanzagentur · 28 Oct 2026 Bund reopening DE000BU2Z072, EUR 5.5bn; exact 10:42 CET slot from ForexFactory (not issuer-verified)',
-  url:'https://www.deutsche-finanzagentur.de/bundeswertpapiere/bundeswertpapierarten/bundesanleihen'},
+  source:'Deutsche Finanzagentur · 28 Oct 2026 Bund reopening DE000BU2Z072; 11:32 CET provider time not issuer-verified',
+  url:'https://www.deutsche-finanzagentur.de/bundeswertpapiere/emissionen/emissionsergebnisse'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
