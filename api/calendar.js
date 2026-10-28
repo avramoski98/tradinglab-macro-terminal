@@ -520,6 +520,15 @@ const OFFICIAL_UPCOMING=[
   importance:'LOW',scheduleVerificationStatus:'verified-secondary-schedule',
   source:'Myfxbook Swiss economic sentiment calendar · scheduled 28 Oct 2026 09:00 UTC',
   url:'https://www.myfxbook.com/forex-economic-calendar/switzerland/economic-sentiment-index'},
+ // German 10-year Bund auction on 28 Oct: Deutsche Finanzagentur confirms
+ // reopening DE000BU2Z072 (Aug 2036) for EUR 5.5bn. ForexFactory LIVE
+ // reports 10:42 CET result slot; exact timestamp is NOT issuer-verified.
+ // The 28 Oct auction yield is still unverified: preserve OVERDUE in fallback.
+ {date:'2026-10-28T10:42:00+01:00',ccy:'EUR',event:'German 10-y Bond Auction · 28 Oct',
+  match:/German 10-y Bond Auction|Germany 10-Year (?:Bund|Bond) Auction/i,
+  importance:'LOW',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Deutsche Finanzagentur · 28 Oct 2026 Bund reopening DE000BU2Z072, EUR 5.5bn; exact 10:42 CET slot from ForexFactory (not issuer-verified)',
+  url:'https://www.deutsche-finanzagentur.de/bundeswertpapiere/bundeswertpapierarten/bundesanleihen'},
  // 28 Oct 08:30 EDT = 13:30 CET.
  {date:'2026-10-28T13:30:00+01:00',ccy:'USD',event:'Advance Goods Trade Balance · Sep',match:/Advance (?:Goods )?Trade Balance|Advance Economic Indicators/i,importance:'HIGH',source:'U.S. Census Bureau · advance economic indicators 28 Oct 2026 08:30 EDT',url:'https://www.census.gov/econ/indicators/release_schedule.html'},
  // UK Parliament (23 Oct notice): Budget statement Wed 28 Oct about 12:30 GMT = 13:30 CET in Skopje. Exact start depends on PMQs.
