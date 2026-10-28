@@ -1348,3 +1348,21 @@ test('Oct 27 BoJ underlying CPI clears live/fallback overdue and is shown in bot
  assert.ok(html.includes('27 OCT · BOJ UNDERLYING CORE CPI y/y (JPY / INFLATION)'));
  assert.ok(html.includes('Not the 2.1% national CPI'));
 });
+
+test('28 Oct AUD monthly CPI and trimmed-mean releases clear LIVE overdue without quarterly metric confusion',()=>{
+ const payload={mode:'live',events:[
+  {date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'CPI m/m',actual:'—',releaseState:'overdue',importance:'HIGH'},
+  {date:'2026-10-28T01:30:00+01:00',currency:'AUD',event:'Trimmed Mean CPI m/m',actual:'—',releaseState:'overdue',importance:'HIGH'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(payload);
+ const expected=[['CPI m/m · Sep','+0.8%'],['Trimmed Mean CPI m/m · Sep','+0.3%']];
+ for(const [name,actual] of expected){
+  const rows=out.events.filter(x=>x.currency==='AUD'&&x.event.startsWith(name));
+  assert.equal(rows.length,1,name+' duplicate/missing');
+  assert.equal(rows[0].actual,actual);
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-secondary');
+  assert.equal(rows[0].forecast,'—');
+ }
+ assert.equal(out.events.filter(x=>x.currency==='AUD'&&x.releaseState==='overdue').length,0);
+});
