@@ -4,6 +4,30 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('28 Oct Fed FOMC primary hold clears overdue in LIVE and FALLBACK and updates weekly context',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T19:00:00+01:00',currency:'USD',event:'Federal Funds Rate',actual:'—',releaseState:'overdue',forecast:'4.00%'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='USD'&&/^FOMC Rate Decision · 28 Oct 2026/.test(e.event));
+  assert.equal(rows.length,1,'one FOMC release in '+payload.mode);
+  assert.equal(rows[0].actual,'3.75–4.00% HOLD');
+  assert.equal(rows[0].previous,'3.75–4.00%');
+  assert.equal(rows[0].forecast,'—','unverified consensus is not imported');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
+  assert.equal(rows[0].actualVerifiedAt,'2026-10-28T18:00:00Z');
+  assert.equal(rows[0].sourceUrl,'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm');
+  assert.equal(out.events.filter(e=>e.currency==='USD'&&e.releaseState==='overdue'&&/FOMC Rate Decision|Federal Funds Rate/.test(e.event)).length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('FOMC RATE DECISION (USD / FED OFFICIAL PRIMARY)'));
+ assert.ok(html.includes('FED FOMC HOLD (USD / OFFICIAL PRIMARY)'));
+ const rates=fs.readFileSync('api/rates.js','utf8');
+ assert.ok(rates.includes("name:'Federal Reserve',nextMeeting:'9 Dec 2026'"));
+});
+
 test('BoC 28 Oct +25bp release clears all three CAD overdue rows with official primary provenance',()=>{
  for(const payload of [
   {mode:'live',events:[
