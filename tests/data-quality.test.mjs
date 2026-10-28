@@ -4,6 +4,39 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('BoC 28 Oct +25bp release clears all three CAD overdue rows without primary provenance inflation',()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-28T14:45:00+01:00',currency:'CAD',event:'BOC Monetary Policy Report',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-28T14:45:00+01:00',currency:'CAD',event:'BOC Rate Statement',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-28T14:45:00+01:00',currency:'CAD',event:'Overnight Rate',actual:'—',forecast:'2.50%',previous:'2.25%',releaseState:'overdue'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='CAD'&&/Bank of Canada Overnight Rate|BOC Rate Statement|BOC Monetary Policy Report/i.test(e.event));
+  assert.equal(rows.length,3,'three distinct published BoC rows in '+payload.mode);
+  assert.ok(rows.every(e=>e.releaseState==='released'),'no BoC overdue after verified publication');
+  assert.ok(rows.every(e=>/verified-secondary/.test(e.verificationStatus)),'original BoC primary statement not independently retrieved');
+  const rate=rows.find(e=>/Overnight Rate/.test(e.event));
+  assert.equal(rate.actual,'2.50%');
+  assert.equal(rate.previous,'2.25%');
+  assert.equal(rate.forecast,'—','unverified provider forecast must not be elevated to consensus');
+  assert.equal(rate.actualVerifiedAt,'2026-10-28T13:50:00Z');
+  for(const e of rows.filter(e=>!/Overnight Rate/.test(e.event))){
+   assert.equal(e.actual,'Published');
+   assert.equal(e.numericActualVerified,false);
+   assert.equal(e.actualVerifiedAt,null);
+  }
+  assert.equal(out.events.filter(e=>e.currency==='CAD'&&e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('BANK OF CANADA +25bp'));
+ assert.ok(html.includes('BoC HIKE +25bp'));
+ const rates=fs.readFileSync('api/rates.js','utf8');
+ assert.ok(rates.includes("nextMeeting:'9 Dec 2026',current:'2.50%',holdRate:'2.50%',hikeRate:'2.75%',cutRate:'2.25%'"));
+});
+
 test('Census CB26-177 clears Sep advance goods trade overdue in LIVE and FALLBACK and updates both narratives',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Goods Trade Balance',actual:'—',previous:'-132.6B',forecast:'-130.4B',releaseState:'checking'}]},
