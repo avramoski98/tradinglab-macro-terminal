@@ -19,7 +19,14 @@ test('28 Oct Fed FOMC primary hold clears overdue in LIVE and FALLBACK and updat
   assert.equal(rows[0].verificationStatus,'verified-primary');
   assert.equal(rows[0].actualVerifiedAt,'2026-10-28T18:00:00Z');
   assert.equal(rows[0].sourceUrl,'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm');
-  assert.equal(out.events.filter(e=>e.currency==='USD'&&e.releaseState==='overdue'&&/FOMC Rate Decision|Federal Funds Rate/.test(e.event)).length,0);
+  const statement=out.events.find(e=>e.currency==='USD'&&e.event==='FOMC Statement · 28 Oct 2026');
+  assert.ok(statement,'official statement publication exists in '+payload.mode);
+  assert.equal(statement.releaseState,'released');
+  assert.equal(statement.actual,'Published');
+  assert.equal(statement.verificationStatus,'verified-primary');
+  assert.equal(statement.numericActualVerified,false);
+  assert.equal(statement.actualVerifiedAt,null);
+  assert.equal(out.events.filter(e=>e.currency==='USD'&&e.releaseState==='overdue'&&/FOMC Rate Decision|Federal Funds Rate|FOMC Statement/.test(e.event)).length,0);
  }
  const html=fs.readFileSync('index.html','utf8');
  assert.ok(html.includes('FOMC RATE DECISION (USD / FED OFFICIAL PRIMARY)'));
