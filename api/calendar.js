@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-28T12:30:00.000Z';
 const VERIFIED=[
+  // 28 Oct 2026 FOMC: official Federal Reserve statement released 14:00 EDT / 19:00 CET.
+  // The target range was HELD at 3.75–4.00% by 10–2; Cook and Hammack preferred +25bp.
+  // Market consensus is not independently primary-verified. No fabricated live rate odds.
+  {day:'2026-10-28',time:'19:00',dateOverride:'2026-10-28T19:00:00+01:00',ccy:'USD',
+   match:/^(?:FOMC Rate Decision|Federal Funds Rate|Fed Rate Decision)(?: ·.*)?$/i,
+   event:'FOMC Rate Decision · 28 Oct 2026 (10–2 hold)',
+   actual:'3.75–4.00% HOLD',previous:'3.75–4.00%',forecast:'—',importance:'EXTREME',
+   label:'RELEASED · FED PRIMARY · 10–2 HOLD at 3.75–4.00%',
+   source:'Federal Reserve FOMC statement 28 Oct 2026 14:00 EDT: held target range at 3.75–4.00%, vote 10–2; Lisa D. Cook and Beth M. Hammack dissented in favour of a 25bp hike. Activity described as strong and inflation elevated. No independently verified market consensus.',
+   url:'https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm',
+   status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+   verifiedAt:'2026-10-28T18:00:00Z',force:true},
+
  // 28 Oct 2026 Bank of Canada official policy release, MPR projections and opening statement.
  // Numerical policy rate is primary verified; statement/report/conference are publication events, not scalar Actuals.
  {day:'2026-10-28',time:'14:45',dateOverride:'2026-10-28T14:45:00+01:00',ccy:'CAD',
