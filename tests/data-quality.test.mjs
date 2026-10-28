@@ -29,6 +29,25 @@ test('Census CB26-177 clears Sep advance goods trade overdue in LIVE and FALLBAC
  assert.ok(html.includes('US ADVANCE GOODS TRADE · USD (CENSUS PRIMARY)'));
 });
 
+
+test('Census CB26-177 releases September advance wholesale inventories with revised official prior',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-28T13:30:00+01:00',currency:'USD',event:'Prelim Wholesale Inventories m/m',actual:'—',previous:'0.7%',forecast:'0.5%',releaseState:'overdue'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const matches=out.events.filter(e=>e.currency==='USD'&&e.event==='Prelim Wholesale Inventories m/m · Sep (Census)');
+  assert.equal(matches.length,1);
+  const row=matches[0];
+  assert.equal(row.actual,'+0.6%');
+  assert.equal(row.previous,'+0.5% (unrevised)');
+  assert.equal(row.forecast,'—');
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.sourceUrl,'https://www.census.gov/econ/indicators/current/index.html');
+ }
+});
+
 const response=()=>({code:200,headers:{},setHeader(k,v){this.headers[k]=v;},status(c){this.code=c;return this;},json(d){this.data=d;return this;}});
 // Regression fixtures may include real official-schedule events whose release
 // time has passed while their actual is still unverified. Those must remain
@@ -1099,7 +1118,7 @@ test('verified Oct 26–28 G10 activity calendar is present in fallback without 
   assert.equal(aliases.length,1,'duplicate '+name);
  }
  const budget=out.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
- assert.match(budget.label,/approximate time/);
+ assert.match(budget.label,/approximate time|OVERDUE/,'approximate UK Budget slot remains unverified after nominal start');
  assert.equal(budget.releaseTimeVerified,false);
  const budgetLive=merged.events.find(x=>x.event==='UK Budget Statement & OBR Forecast · 2026');
  assert.equal(budgetLive.date,'2026-10-28T13:30:00+01:00');
