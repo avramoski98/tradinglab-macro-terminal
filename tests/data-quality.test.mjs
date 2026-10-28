@@ -1449,21 +1449,27 @@ test('RBNZ Oct 28 media conference clears past pending without inventing a numer
  }
 });
 
-test('Oct 28 CHF UBS expectations remain visible in fallback as secondary-scheduled overdue without invented actual',()=>{
- const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
- const rows=fallback.events.filter(e=>e.currency==='CHF'&&e.event==='UBS Economic Expectations · Oct');
- assert.equal(rows.length,1);
- const e=rows[0];
- assert.equal(e.date,'2026-10-28T10:00:00+01:00');
- assert.equal(e.verificationStatus,'verified-secondary-schedule');
- assert.equal(e.releaseTimeVerified,false);
- assert.equal(e.actual,'—');
- assert.equal(e.forecast,'—');
- assert.equal(e.releaseState,'overdue');
- assert.ok(e.sourceUrl.includes('myfxbook.com'));
- const live=applyVerifiedReleaseOverlay({mode:'live',events:[{
-  date:'2026-10-28T10:00:00+01:00',currency:'CHF',event:'UBS Economic Expectations',
-  releaseState:'overdue',actual:'—',previous:'2.6',forecast:'1.3',importance:'LOW'
- }]},{includeFullSchedule:true});
- assert.equal(live.events.filter(x=>x.currency==='CHF'&&/UBS Economic Expectations/.test(x.event)).length,1);
+test('Oct 28 CHF UBS-CFA release clears overdue once in LIVE and fallback with secondary provenance',()=>{
+ for(const payload of [
+  {mode:'schedule-fallback',events:[]},
+  {mode:'live',events:[{
+   date:'2026-10-28T10:00:00+01:00',currency:'CHF',event:'UBS Economic Expectations',
+   releaseState:'overdue',actual:'—',previous:'2.6',forecast:'1.3',importance:'LOW'
+  }]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='CHF'&&/^UBS Economic Expectations/.test(e.event));
+  assert.equal(rows.length,1,'one UBS-CFA row in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.date,'2026-10-28T10:00:00+01:00');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'-15.3');
+  assert.equal(e.previous,'2.6');
+  assert.equal(e.forecast,'—','unverified provider consensus not imported');
+  assert.equal(e.verificationStatus,'verified-secondary');
+  assert.equal(e.releaseTimeVerified,false);
+  assert.match(e.source,/Original UBS October bulletin not independently retrieved/);
+  assert.ok(e.sourceUrl.includes('nau.ch'));
+  assert.equal(out.events.filter(e=>e.currency==='CHF'&&e.releaseState==='overdue'&&/UBS Economic Expectations/.test(e.event)).length,0);
+ }
 });
