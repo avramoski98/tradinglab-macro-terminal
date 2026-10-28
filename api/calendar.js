@@ -7,13 +7,26 @@ const VERIFIED=[
  // Market expectations of a hike to 3.00% are pre-release SECONDARY context,
  // not live rate probabilities or a verified uniform consensus.
  {day:'2026-10-28',time:'02:00',dateOverride:'2026-10-28T02:00:00+01:00',ccy:'NZD',
-  match:/^(?:RBNZ|Official Cash Rate|OCR Decision)(?:.*)$/i,
+  match:/^(?:RBNZ (?:Official Cash Rate|OCR|Rate Decision)|Official Cash Rate|OCR Decision)(?:.*)$/i,
   event:'RBNZ OCR · 28 Oct 2026 (4–3 hold)',actual:'2.75% HOLD (4–3)',previous:'2.75%',forecast:'3.00% (pre-release market expectation)',
   importance:'EXTREME',label:'RELEASED · RBNZ PRIMARY · 4–3 hold; 3 favoured +25bp',
   source:'Reserve Bank of New Zealand Monetary Policy Review 28 Oct 2026: 4–3 hold at 2.75%; three favoured hike to 3.00%; next review 9 Dec 2026',
   url:'https://www.rbnz.govt.nz/news-and-events/news/2026/10/ocr-held-at-2-75-percent',
   status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
   verifiedAt:'2026-10-28T01:00:00Z',force:true},
+
+ // ForexFactory lists the separate qualitative RBNZ Rate Statement as its own
+ // calendar event. The OCR result overlay above must NOT consume this row;
+ // otherwise LIVE retains a false OVERDUE even after the official MPR is out.
+ // The published statement is not a second numeric rate decision.
+ {day:'2026-10-28',time:'02:00',dateOverride:'2026-10-28T02:00:00+01:00',ccy:'NZD',
+  match:/^RBNZ Rate Statement(?:.*)?$/i,
+  event:'RBNZ Rate Statement · Oct 28 (Monetary Policy Review)',actual:'Published',previous:'—',forecast:'—',
+  importance:'EXTREME',label:'RELEASED · official RBNZ Monetary Policy Review publication',
+  source:'Reserve Bank of New Zealand · Monetary Policy Review and MPC Record of Meeting, 28 Oct 2026; OCR held at 2.75% by 4–3',
+  url:'https://www.rbnz.govt.nz/news-and-events/news/2026/10/ocr-held-at-2-75-percent',
+  status:'verified-primary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  numericActualVerified:false,verifiedAt:'2026-10-28T01:00:00Z',force:true},
 
  // 28 Oct 2026 RBA Governor Bullock scheduled remarks: FinancialJuice
  // carried contemporaneous remarks from 00:17-00:20 UTC. This verifies
