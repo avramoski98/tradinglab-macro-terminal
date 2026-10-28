@@ -2,6 +2,21 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-24T00:23:53.521Z';
 const VERIFIED=[
+ // 28 Oct 2026 08:00 CET: November German consumer climate was published.
+ // FinancialJuice reported -30.8 vs -30.6 prior at 07:00 UTC.
+ // NIM's official schedule confirms the release time, but the original NIM
+ // numeric bulletin was not independently accessible at verification.
+ // Do not upgrade this to primary or carry the wire forecast as verified consensus.
+ {day:'2026-10-28',time:'08:00',dateOverride:'2026-10-28T08:00:00+01:00',ccy:'EUR',
+  match:/^German GfK Consumer (?:Climate|Sentiment)(?: ·.*)?$/i,
+  event:'German GfK Consumer Climate · Nov 2026 (NIM/GfK)',
+  actual:'-30.8',previous:'-30.6',forecast:'—',importance:'MED',
+  label:'RELEASED · GfK -30.8 · FinancialJuice secondary',
+  source:'FinancialJuice 28 Oct 2026 07:00 UTC reported German GfK Consumer Sentiment -30.8, previous -30.6. NIM confirms 28 Oct 08:00 CET scheduled publication; NIM numeric bulletin not independently verified.',
+  url:'https://www.financialjuice.com/News/9824507/German-GfK-Consumer-Sentiment-Actual--308-Forecast--303-Previous--306.aspx?xy=rss',
+  status:'verified-secondary',sourcePublishedAt:'2026-10-28',releaseTimeVerified:true,
+  verifiedAt:'2026-10-28T07:00:00Z',force:true},
+
  // 28 Oct 2026 14:00 NZDT / 02:00 CET: RBNZ official primary release.
  // The MPC unexpectedly held 2.75% by a 4–3 vote (3 voted for +25bp).
  // Market expectations of a hike to 3.00% are pre-release SECONDARY context,
