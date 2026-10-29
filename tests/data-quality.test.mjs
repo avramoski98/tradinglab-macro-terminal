@@ -1751,3 +1751,18 @@ test('29 Oct ABS trade price primary actuals clear overdue without duplicate ali
  assert.ok(html.includes('import prices -1.1% q/q'));
  assert.ok(html.includes('Export Price Index +1.4% q/q'));
 });
+
+test('post-28 Oct FOMC Weekly Focus and Macro Watch do not advertise the released decision as upcoming',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ for(const stale of [
+  'Monitor labor breadth, US 2Y/OIS and FOMC 28 Oct',
+  'ahead of FOMC 28 Oct',
+  'change FOMC 28 Oct expectations',
+  'Monitor US 2Y/Fed OIS and FOMC 28 Oct',
+  'Monitor US 2Y, retail consumption and 28 Oct FOMC',
+  'Monitor 28 Oct FOMC and US 2Y/OIS'
+ ]) assert.ok(!html.includes(stale),'stale future-tense FOMC reference: '+stale);
+ assert.ok(html.includes('After the 28 Oct FOMC hold'));
+ assert.ok(html.includes('Monitor post-FOMC US 2Y/OIS and labor breadth'));
+ assert.ok(html.includes('RELEASED / 28 OCT 19:00 CET · FOMC RATE DECISION'));
+});
