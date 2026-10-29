@@ -9,7 +9,7 @@ const VERIFIED=[
 // No mechanical Beat/Miss -> FX direction or structural G10 rerank.
 {day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
  match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance|GDP q\/q)(?: ·.*)?$/i,
- event:'GDP advance Q3 2026 · secondary confirmed · annualized',
+ event:'Advance GDP q/q · Q3 2026 (annualized, secondary confirmed)',
  actual:'3.4%',previous:'2.2%',forecast:'—',importance:'EXTREME',
  label:'RELEASED · GDP Q3 +3.4% annualized · VERIFIED-SECONDARY',
  source:'29 Oct 2026 Reuters and Financial Times post-release reporting: US Q3 real GDP +3.4% SAAR, Q2 +2.2%, private domestic final sales +4.9% vs Q2 +4.6%. Market survey around +3.2% per FT; primary BEA numeric release not independently retrieved. Not an automatic USD bullish catalyst.',
