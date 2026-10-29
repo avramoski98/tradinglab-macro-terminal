@@ -2008,3 +2008,17 @@ test('29 Oct ECB press conference publication clears fallback OVERDUE without cl
   assert.equal(out.events.filter(e=>e.releaseState==='overdue'&&/ECB Press Conference/.test(e.event)).length,0);
  }
 });
+
+
+test('29 Oct after-hours AI earnings spillover appears in Weekly Focus as secondary and non-live',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ const start=html.indexOf('function weekly(){');
+ assert.ok(start>=0);
+ const end=html.indexOf('function ',start+10);
+ const weekly=html.slice(start,end);
+ assert.match(weekly,/AI EARNINGS \/ TREASURY SPILLOVER/);
+ assert.match(weekly,/NOT live market prices/i);
+ assert.match(weekly,/live rate probabilities unavailable/i);
+ assert.match(weekly,/30 Oct BoJ decision/);
+ assert.match(weekly,/reuters\.com\/commentary\/reuters-open-interest/);
+});
