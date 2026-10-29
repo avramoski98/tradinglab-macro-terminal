@@ -196,6 +196,7 @@ test('28 Oct Fed FOMC primary hold clears overdue in LIVE and FALLBACK and updat
  assert.ok(html.includes('FED FOMC HOLD (USD / OFFICIAL PRIMARY)'));
  const rates=fs.readFileSync('api/rates.js','utf8');
  assert.ok(rates.includes("name:'Federal Reserve',nextMeeting:'9 Dec 2026'"));
+ assert.ok(rates.includes("name:'European Central Bank',nextMeeting:'17 Dec 2026'"),"ECB next meeting must roll forward after 29 Oct decision");
 });
 
 test('BoC 28 Oct +25bp release clears all three CAD overdue rows with official primary provenance',()=>{
