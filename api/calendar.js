@@ -23,6 +23,19 @@ const VERIFIED=[
  status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
  verifiedAt:'2026-10-29T15:02:00Z',force:true},
 
+// ECB press conference began at the official 14:45 CET slot. The ECB published
+// Lagarde/Vujcic's monetary policy statement from that press conference.
+// This confirms the event/publication, NOT a reviewed full Q&A transcript.
+{day:'2026-10-29',time:'14:45',dateOverride:'2026-10-29T14:45:00+01:00',ccy:'EUR',
+ match:/^ECB Press Conference(?: ·.*)?$/i,
+ event:'ECB Press Conference · 29 Oct 2026 (statement published)',
+ actual:'Statement published · Q&A not independently reviewed',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ECB PRIMARY STATEMENT · Q&A UNREVIEWED',
+ source:'European Central Bank published Lagarde and Vujcic monetary policy statement for the 29 October 2026 14:45 CET press conference. Publication is confirmed; no claim of a fully reviewed Q&A or numeric Actual.',
+ url:'https://www.ecb.europa.eu/press/press_conference/monetary-policy-statement/2026/html/ecb.is261029~5c5ffe99e5.en.html',
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
+
 // 29 Oct 2026 08:30 EDT / 13:30 CET: BEA GDP advance and September PCE.
 // GDP +3.4% SAAR and final sales +4.9% directly verified in the BEA advance release.
 // September PCE and personal income/outlays ARE directly verified from the
