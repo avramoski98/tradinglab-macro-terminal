@@ -1255,7 +1255,7 @@ test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive
  assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-28')&&x.event.includes('CPI y/y')).length,1);
  assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-29')&&/Trade Price Indexes|Import Price Index/.test(x.event)).length,1);
  assert.equal(merged.events.filter(x=>x.currency==='AUD'&&x.date.startsWith('2026-10-30')&&/Producer Price Indexes|PPI q\/q/.test(x.event)).length,1);
- assert.equal(merged.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-29')&&x.event.includes('Core PCE')).length,1);
+ assert.equal(merged.events.filter(x=>x.currency==='USD'&&x.date.startsWith('2026-10-29')&&x.event.startsWith('Core PCE Price Index m/m')).length,1);
  const boj=merged.events.filter(x=>x.currency==='JPY'&&x.date.startsWith('2026-10-30')&&x.event.includes('Press Conference'));
  assert.equal(boj.length,1);
  assert.equal(boj[0].date,'2026-10-30T07:30:00+01:00');
