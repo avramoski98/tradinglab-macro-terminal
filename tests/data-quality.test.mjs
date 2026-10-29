@@ -497,8 +497,8 @@ test('G10 coverage and freshness do not count undated archived values',()=>{
 test('EIA Oct 28 official primary joins older secondary overrides while USDA is not auto-released',()=>{
  const c={Date,fetch:async()=>({ok:false}),console};vm.createContext(c);
  vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
- const rows=c.knownEiaRows();assert.equal(rows.length,5);assert.ok(rows.some(x=>x.event.includes('Natural Gas Storage')&&x.actual==='+77B'));assert.ok(rows.some(x=>x.event.includes('Crude Oil Inventories')&&x.actual==='-3.060M'));
- const official=rows.filter(x=>x.verificationStatus==='verified-primary');assert.equal(official.length,1);assert.equal(official[0].actual,'-1.892M');assert.ok(official[0].sourceUrl.includes('ir.eia.gov'));
+ const rows=c.knownEiaRows();assert.equal(rows.length,6);assert.ok(rows.some(x=>x.event.includes('Natural Gas Storage')&&x.actual==='+77B'));assert.ok(rows.some(x=>x.event.includes('Crude Oil Inventories')&&x.actual==='-3.060M'));
+ const official=rows.filter(x=>x.verificationStatus==='verified-primary');assert.equal(official.length,2);assert.ok(official.some(x=>x.actual==='-1.892M'&&x.sourceUrl.includes('ir.eia.gov')));assert.ok(official.some(x=>x.actual==='+80B'&&x.sourceUrl.includes('ir.eia.gov')));
  assert.ok(rows.filter(x=>x.verificationStatus!=='verified-primary').every(x=>x.verificationStatus==='verified-secondary'&&x.releaseState==='released'));
  assert.ok(c.usdaRows().filter(x=>Date.parse(x.date)<Date.now()).every(x=>x.actual==='—'&&(x.releaseState==='overdue'||(x.releaseState==='released'&&x.verificationStatus==='verified-primary'&&!!x.sourceUrl))));
 });
@@ -1208,7 +1208,7 @@ test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive
   ['AUD','CPI y/y · Sep','2026-10-28T01:30:00+01:00','abs.gov.au'],
   ['AUD','International Trade Price Indexes · Sep quarter','2026-10-29T01:30:00+01:00','abs.gov.au'],
   ['AUD','Producer Price Indexes · Sep quarter','2026-10-30T01:30:00+01:00','abs.gov.au'],
-  ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','ft.com'],
+  ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Personal Income m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Personal Spending (current-dollar PCE) m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov']
@@ -1232,7 +1232,7 @@ test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive
    assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
   }else if(currency==='USD'){
    assert.equal(rows[0].releaseState,'released');
-   assert.equal(rows[0].verificationStatus,prefix.startsWith('Advance GDP')?'verified-secondary':'verified-primary');
+   assert.equal(rows[0].verificationStatus,'verified-primary');
    const actual=prefix.startsWith('Advance GDP')?'3.4%':prefix.startsWith('Personal Income')?'0.2%':prefix.startsWith('Personal Spending')?'0.5%':'0.3%';
    assert.equal(rows[0].actual,actual);
    if(prefix.startsWith('Core PCE'))assert.equal(rows[0].previous,'0.3%','August revised core PCE m/m is +0.3% per BEA');
