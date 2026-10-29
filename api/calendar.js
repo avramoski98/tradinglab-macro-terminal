@@ -794,7 +794,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
   e.releaseState==='released'&&/^verified-(primary|secondary)/.test(e.verificationStatus||''));
  const dedupedRows=uniqueRows.filter(e=>!(absTradePublished&&e.currency==='AUD'&&
   String(e.date||'').slice(0,10)==='2026-10-29'&&
-  /^Import Prices q\\/q/i.test(String(e.event||'')))&&!(e.currency==='GBP'&&
+  /^Import Prices q\/q/i.test(String(e.event||'')))&&!(e.currency==='GBP'&&
   String(e.date||'').slice(0,10)==='2026-10-28'&&
   /^Autumn Forecast Statement(?: ·.*)?$/i.test(String(e.event||''))&&
   uniqueRows.some(v=>v.currency==='GBP'&&String(v.date||'').slice(0,10)==='2026-10-28'&&
