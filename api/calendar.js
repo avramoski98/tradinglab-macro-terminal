@@ -2,6 +2,18 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-29T09:44:00.000Z';
 const VERIFIED=[
+// 29 Oct 2026 U.S. Department of Labor unemployment-insurance weekly claims.
+// DOL release at 08:30 EDT: 194,000 initial claims for week ended 24 Oct,
+// prior week revised to 195,000. The provider 198K forecast is not official.
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^Unemployment Claims(?: ·.*)?$|^Initial Jobless Claims(?: ·.*)?$/i,
+ event:'Initial Jobless Claims · week ending 24 Oct 2026',
+ actual:'194K',previous:'195K',forecast:'—',importance:'MED',
+ label:'RELEASED · DOL PRIMARY · 194K initial claims',
+ source:'U.S. Department of Labor weekly unemployment insurance claims, 29 Oct 2026 08:30 EDT: seasonally adjusted initial claims 194,000 for week ended 24 Oct, down 1,000 from prior week revised 195,000 (previously reported 194,000); 4-week average 196,750. Provider forecast not independently verified.',
+ url:'https://www.dol.gov/ui/data.pdf',
+ status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:32:00Z',force:true},
 // 29 Oct 2026 Italy BTP 10-year auction: issuer PDF not directly retrievable yet.
 // Two secondary publications identify 4.49% gross auction yield, 4.58% prior.
 // Soldionline reports MEF fifth tranche ISIN IT0005729931, EUR 3.5bn allocated,
