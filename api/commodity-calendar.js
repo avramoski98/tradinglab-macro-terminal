@@ -88,7 +88,8 @@ const VERIFIED_EIA=[
 ];
 function knownEiaRows(){return VERIFIED_EIA.map(x=>({...x,country:'COM',currency:'COM',event:'EIA · '+x.event,importance:'HIGH',source:x.source||'EIA figures via published secondary calendar',verificationStatus:x.verificationStatus||'verified-secondary',sourceUpdatedAt:x.sourceUpdatedAt||null,forecastVerificationStatus:'provider-unverified',label:surprise(x.event,x.actual,x.forecast),releaseState:'released',impact:'Inventory surprise',note:x.note||'Reported EIA Actual and secondary-source forecast; official EIA report should be cross-checked.'}));}
 function reconcileEia(providerRows){
- const out=[...providerRows];
+ // Week-boundary exports can overlap; keep only one row per release timestamp/title.
+ const out=providerRows.filter((row,i,all)=>all.findIndex(other=>String(other.date)===String(row.date)&&String(other.event)===String(row.event))===i);
  for(const known of knownEiaRows()){
   const match=out.find(x=>String(x.date||'').slice(0,10)===known.date.slice(0,10)&&String(x.event||'').toLowerCase().includes(known.event.slice(6).toLowerCase()));
   if(!match)out.push(known);
