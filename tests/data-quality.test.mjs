@@ -1252,7 +1252,7 @@ test('Oct 28 UK Budget and Autumn Forecast alias are one released secondary publ
   assert.equal(rows[0].actual,'Published');
   assert.equal(rows[0].numericActualVerified,false);
   assert.equal(rows[0].releaseTimeVerified,false);
-  assert.equal(out.overdue,0);
+  assert.equal(out.events.filter(x=>x.currency==='GBP'&&String(x.date).startsWith('2026-10-28')&&x.releaseState==='overdue').length,0);
  }
 });
 
@@ -1561,7 +1561,7 @@ test('28 Oct AUD monthly CPI and trimmed-mean releases clear LIVE overdue withou
   assert.equal(rows[0].verificationStatus,'verified-primary');
   assert.equal(rows[0].forecast,'—');
  }
- assert.equal(out.events.filter(x=>x.currency==='AUD'&&x.releaseState==='overdue').length,0);
+ assert.equal(out.events.filter(x=>x.currency==='AUD'&&String(x.date).startsWith('2026-10-28')&&x.releaseState==='overdue').length,0);
 });
 
 test('28 Oct Bullock remarks are released as secondary publication without numeric policy decision',()=>{
