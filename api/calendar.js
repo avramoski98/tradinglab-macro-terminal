@@ -2,6 +2,21 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-29T09:44:00.000Z';
 const VERIFIED=[
+// 29 Oct 2026 Italy BTP 10-year auction: issuer PDF not directly retrievable yet.
+// Two secondary publications identify 4.49% gross auction yield, 4.58% prior.
+// Soldionline reports MEF fifth tranche ISIN IT0005729931, EUR 3.5bn allocated,
+// EUR 5.45bn bids, 1.56 bid-to-cover, award price 96.48.
+// Investing.com JP economic calendar separately lists 29 Oct actual 4.49%.
+// Do not label this issuer-primary, and do not import a market consensus.
+{day:'2026-10-29',time:'11:08',dateOverride:'2026-10-29T11:08:00+01:00',ccy:'EUR',
+ match:/^Italian 10-y Bond Auction(?: ·.*)?$|^Italy 10-Year (?:BTP|Bond) Auction(?: ·.*)?$/i,
+ event:'Italian 10-y BTP Auction · 29 Oct 2026 (IT0005729931)',
+ actual:'4.49%',previous:'4.58%',forecast:'—',importance:'LOW',
+ label:'RELEASED · BTP 10Y 4.49% · VERIFIED-SECONDARY',
+ source:'Soldionline 29 Oct 2026 11:47 CET reporting MEF auction: fifth tranche IT0005729931, 10Y BTP 4.49% gross yield (prior 4.58%), EUR 3.5bn allocated, bid-cover 1.56; independently corroborated by Investing.com JP calendar. Original issuer auction result PDF not directly retrieved; provider 11:08 CET release slot unverified.',
+ url:'https://www.soldionline.it/notizie/obbligazioni-italia/asta-btp-ottobre-2036-it0005729931-quinta-tranche',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,
+ verifiedAt:'2026-10-29T10:47:00Z',force:true},
 // 29 Oct 2026 ISTAT September labour release. ISTAT's website explicitly warns that
 // its page header/attachments still refer to August due to a publishing error;
 // the corrected September text and series state unemployment was 6.3%, unchanged.

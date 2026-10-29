@@ -4,6 +4,29 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('29 Oct Italian BTP 10-year secondary-verified auction clears overdue without false primary claim',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T11:08:00+01:00',currency:'EUR',event:'Italian 10-y Bond Auction',actual:'—',previous:'4.58%',releaseState:'overdue',importance:'LOW'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-29')&&/Italian 10-y BTP Auction/.test(e.event));
+  assert.equal(rows.length,1,'one 10Y BTP auction in '+payload.mode);
+  const row=rows[0];
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.actual,'4.49%');
+  assert.equal(row.previous,'4.58%');
+  assert.equal(row.forecast,'—');
+  assert.equal(row.verificationStatus,'verified-secondary');
+  assert.equal(row.releaseTimeVerified,false);
+  assert.ok(row.sourceUrl.includes('soldionline.it'));
+  assert.equal(out.events.filter(e=>e.currency==='EUR'&&/Italian 10-y Bond Auction/.test(e.event)&&e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('ITALIAN 10Y BTP AUCTION (EUR / SECONDARY VERIFIED)'));
+ assert.ok(html.includes('ITALIAN 10Y BTP AUCTION (EUR / SECONDARY)'));
+});
+
 test('29 Oct ISTAT September unemployment primary release clears overdue without stale provider consensus',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-29T10:00:00+01:00',currency:'EUR',event:'Italian Monthly Unemployment Rate',actual:'—',previous:'6.2%',forecast:'6.2%',releaseState:'overdue',importance:'MED'}]},
