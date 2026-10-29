@@ -17,7 +17,7 @@ test('29 Oct ANZ primary release clears overdue in LIVE and FALLBACK without fab
   assert.equal(rows[0].forecast,'—','unverified market forecast cleared');
   assert.equal(rows[0].releaseState,'released');
   assert.equal(rows[0].verificationStatus,'verified-primary');
-  assert.match(rows[0].sourceUrl,/ANZ-BusinessOutlook-20261029\\.pdf/);
+  assert.match(rows[0].sourceUrl,/ANZ-BusinessOutlook-20261029\.pdf/);
   assert.equal(out.events.filter(e=>e.currency==='NZD'&&/ANZ Business Confidence/i.test(e.event)&&e.releaseState==='overdue').length,0);
  }
  const html=fs.readFileSync('index.html','utf8');
