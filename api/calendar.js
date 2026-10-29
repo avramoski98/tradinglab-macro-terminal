@@ -1,7 +1,20 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-29T12:45:00.000Z';
+const VERIFIED_AT='2026-10-29T14:00:00.000Z';
 const VERIFIED=[
+// ECB OCTOBER HOLD / 29 OCT 2026. Decision confirmed by Reuters after 14:15 CET.
+// ECB primary numeric press release not independently retrieved at this check.
+// Press conference is separate and remains LIVE / not final until Q&A reviewed.
+{day:'2026-10-29',time:'14:15',dateOverride:'2026-10-29T14:15:00+01:00',ccy:'EUR',
+ match:/^(?:ECB Rate Decision|Main Refinancing Rate|Deposit Facility Rate|ECB Deposit Rate)(?: ·.*)?$/i,
+ event:'ECB Rate Decision · 29 Oct 2026 (hold)',
+ actual:'Deposit 2.50% · MRO 2.65% · Marginal 2.90%',previous:'Deposit 2.50% · MRO 2.65%',forecast:'—',importance:'EXTREME',
+ label:'RELEASED · ECB HOLD 2.50% · VERIFIED-SECONDARY',
+ source:'Reuters 29 Oct 2026 13:23 UTC: ECB held all policy rates; energy shock increases upside inflation / downside growth risks, while underlying inflation and wages remain broadly stable. Tightening financing conditions and French 10Y spread ~155bp vs Bund complicate December decisions. ECB official numeric release not independently retrieved; no market consensus inferred.',
+ url:'https://www.reuters.com/business/ecb-keeps-rates-unchanged-points-mounting-inflation-risk-2026-10-29/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T13:35:00Z',force:true},
+
 // 29 Oct 2026 08:30 EDT / 13:30 CET: BEA GDP advance and September PCE.
 // GDP numeric +3.4% SAAR is independently corroborated by Reuters/FT, but the
 // original GDP BEA numeric release was not retrieved; retain SECONDARY provenance.
