@@ -2,6 +2,18 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-29T09:44:00.000Z';
 const VERIFIED=[
+// 29 Oct 2026 ISTAT September labour release. ISTAT's website explicitly warns that
+// its page header/attachments still refer to August due to a publishing error;
+// the corrected September text and series state unemployment was 6.3%, unchanged.
+{day:'2026-10-29',time:'10:00',dateOverride:'2026-10-29T10:00:00+01:00',ccy:'EUR',
+ match:/^Italian Monthly Unemployment Rate(?: ·.*)?$/i,
+ event:'Italian Monthly Unemployment Rate · Sep 2026',
+ actual:'6.3%',previous:'6.3%',forecast:'—',importance:'MED',
+ label:'RELEASED · ISTAT PRIMARY · Sep unemployment 6.3% unchanged',
+ source:'ISTAT Employment and unemployment, September 2026 (29 Oct): unemployment rate unchanged at 6.3%, youth rate 19.9%, employment rate 63.0%. Official page warns the header and old attachments still show August due to a technical issue; September figures are in the corrected release text. Provider previous 6.2% and consensus 6.2% not independently verified and not carried forward.',
+ url:'https://www.istat.it/comunicato-stampa/occupati-e-disoccupati-dati-provvisori-settembre-2026/',
+ status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,
+ verifiedAt:'2026-10-29T11:03:00Z',force:true},
   // 28 Oct 2026 FOMC: official Federal Reserve statement released 14:00 EDT / 19:00 CET.
   // The target range was HELD at 3.75–4.00% by 10–2; Cook and Hammack preferred +25bp.
   // Market consensus is not independently primary-verified. No fabricated live rate odds.
