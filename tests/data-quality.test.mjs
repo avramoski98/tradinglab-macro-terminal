@@ -4,6 +4,27 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('29 Oct ANZ primary release clears overdue in LIVE and FALLBACK without fabricated consensus',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T01:00:00+01:00',currency:'NZD',event:'ANZ Business Confidence',actual:'—',releaseState:'overdue',forecast:'51.5'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='NZD'&&e.event==='ANZ Business Confidence · Oct 2026 (net balance)');
+  assert.equal(rows.length,1,'single verified ANZ October result in '+payload.mode);
+  assert.equal(rows[0].actual,'52.5');
+  assert.equal(rows[0].previous,'51.9');
+  assert.equal(rows[0].forecast,'—','unverified market forecast cleared');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
+  assert.match(rows[0].sourceUrl,/ANZ-BusinessOutlook-20261029\\.pdf/);
+  assert.equal(out.events.filter(e=>e.currency==='NZD'&&/ANZ Business Confidence/i.test(e.event)&&e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('NZ ANZ BUSINESS CONFIDENCE (NZD / PRIMARY)'));
+ assert.ok(html.includes('ANZ BUSINESS OUTLOOK (NZD / PRIMARY)'));
+});
+
 test('28 Oct Warsh presser secondary verification clears overdue without inventing numerical Actual',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-28T19:30:00+01:00',currency:'USD',event:'FOMC Chair Press Conference',actual:'—',releaseState:'overdue'}]},
