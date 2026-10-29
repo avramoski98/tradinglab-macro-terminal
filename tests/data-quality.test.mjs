@@ -1101,12 +1101,12 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
    assert.equal(rows[0].previous,'4.0%');
    assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
   }else if(currency==='AUD'&&prefix.startsWith('International Trade Price Indexes')){
-   assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+   assert.equal(rows[0].verificationStatus,'verified-primary');
    assert.equal(rows[0].releaseState,'released');
-   assert.equal(rows[0].actual,'Published');
-   assert.equal(rows[0].numericActualVerified,false);
-   assert.equal(rows[0].actualVerifiedAt,null);
-   assert.ok(rows[0].sourceUrl.includes('marketscreener.com'));
+   assert.equal(rows[0].actual,'Import -1.1% q/q · Export +1.4% q/q');
+   assert.equal(rows[0].previous,'Import +5.7% · Export +1.1%');
+   assert.ok(rows[0].actualVerifiedAt);
+   assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
@@ -1723,7 +1723,7 @@ test('28 Oct EIA primary crude stocks and BoC opening statement clear live and f
  assert.ok(html.includes('BoC HIKE +25bp / CAD (OFFICIAL PRIMARY)'));
 });
 
-test('29 Oct ABS trade prices clear overdue with secondary publication, not fabricated numerical Actual',()=>{
+test('29 Oct ABS trade price primary actuals clear overdue without duplicate aliases',()=>{
  for(const payload of [
   {mode:'live',events:[
    {date:'2026-10-29T01:30:00+01:00',currency:'AUD',event:'Import Prices q/q',actual:'—',releaseState:'overdue',importance:'MED'},
@@ -1733,16 +1733,21 @@ test('29 Oct ABS trade prices clear overdue with secondary publication, not fabr
  ]){
   const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
   const rows=out.events.filter(e=>e.currency==='AUD'&&String(e.date).startsWith('2026-10-29')&&
-   /International Trade Price Indexes|Import Prices q\/q/.test(e.event));
+   (e.event.includes('International Trade Price Indexes')||e.event.includes('Import Prices q/q')));
   assert.equal(rows.length,1,'one ABS report in '+payload.mode);
   assert.equal(rows[0].event,'International Trade Price Indexes · Sep quarter (ABS Australia)');
   assert.equal(rows[0].releaseState,'released');
-  assert.equal(rows[0].actual,'Published');
-  assert.equal(rows[0].numericActualVerified,false);
-  assert.equal(rows[0].actualVerifiedAt,null);
-  assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+  assert.equal(rows[0].actual,'Import -1.1% q/q · Export +1.4% q/q');
+  assert.equal(rows[0].previous,'Import +5.7% · Export +1.1%');
+  assert.ok(rows[0].actualVerifiedAt);
+  assert.equal(rows[0].verificationStatus,'verified-primary');
   assert.equal(rows[0].forecast,'—');
-  assert.ok(rows[0].sourceUrl.includes('marketscreener.com'));
+  assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
   assert.equal(out.events.filter(e=>e.currency==='AUD'&&String(e.date).startsWith('2026-10-29')&&e.releaseState==='overdue').length,0);
  }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('ABS INTERNATIONAL TRADE PRICE INDEXES (AUD / VERIFIED PRIMARY)'));
+ assert.ok(html.includes('ABS TRADE PRICE INDEXES (AUD / VERIFIED PRIMARY)'));
+ assert.ok(html.includes('import prices -1.1% q/q'));
+ assert.ok(html.includes('Export Price Index +1.4% q/q'));
 });
