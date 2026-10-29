@@ -1969,3 +1969,23 @@ test('29 Oct commodity EIA natural gas +80 Bcf reconciles a provider overdue row
  assert.ok(html.includes('EIA NATURAL GAS STORAGE (US / EIA PRIMARY)'));
  assert.ok(html.includes('EIA NATURAL GAS STORAGE · VERIFIED PRIMARY'));
 });
+
+
+test('29 Oct BEA Q3 advance GDP is in G10 archive and USD growth chart with release provenance',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.USD.filter(x=>x.event==='Real GDP q/q annualized');
+ const q3=rows.find(x=>x.reference==='2026-09');
+ assert.ok(q3,'Q3 GDP must appear after official BEA release');
+ assert.equal(q3.actual,3.4);
+ assert.equal(q3.verificationStatus,'verified-primary');
+ assert.equal(q3.stage,'advance');
+ assert.equal(q3.releaseDate,'2026-10-29T12:30:00Z');
+ assert.match(q3.sourceUrl,/bea\.gov.*gdp-advance-estimate-3rd-quarter-2026/);
+ assert.ok(rows.some(x=>x.reference==='2026-03')&&rows.some(x=>x.reference==='2026-06'));
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes("'USD|growth|gdp':{label:'Real GDP q/q annualized'"));
+ assert.ok(html.includes("['2026-09',3.4]"));
+ assert.ok(html.includes('Q3 advance estimate released 29 Oct 2026'));
+ assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
+ assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
+});
