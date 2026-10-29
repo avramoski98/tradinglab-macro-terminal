@@ -4,6 +4,38 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+
+test('29 Oct BoE Money and Credit primary publication clears three GBP overdue records without fabricated M4 percent',()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-29T10:30:00+01:00',currency:'GBP',event:'M4 Money Supply m/m',releaseState:'overdue',actual:'—'},
+   {date:'2026-10-29T10:30:00+01:00',currency:'GBP',event:'Mortgage Approvals',releaseState:'overdue',actual:'—'},
+   {date:'2026-10-29T10:30:00+01:00',currency:'GBP',event:'Net Lending to Individuals m/m',releaseState:'overdue',actual:'—'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='GBP'&&String(e.date).startsWith('2026-10-29')&&/Mortgage Approvals|M4 Money Supply m\/m|Net Lending to Individuals m\/m/.test(e.event));
+  assert.equal(rows.length,3,'three distinct BoE releases in '+payload.mode);
+  assert.ok(rows.every(e=>e.releaseState==='released'));
+  assert.ok(rows.every(e=>/bankofengland\.co\.uk/.test(e.sourceUrl)));
+  const mortgage=rows.find(e=>/Mortgage Approvals/.test(e.event));
+  assert.equal(mortgage.actual,'53.4K');
+  assert.equal(mortgage.previous,'54.8K');
+  assert.equal(mortgage.verificationStatus,'verified-primary');
+  for(const e of rows.filter(e=>e!==mortgage)){
+   assert.equal(e.actual,'Published');
+   assert.equal(e.numericActualVerified,false);
+   assert.equal(e.actualVerifiedAt,null);
+   assert.equal(e.forecast,'—');
+  }
+  assert.equal(rows.filter(e=>e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('UK BANK OF ENGLAND MONEY AND CREDIT (GBP / PRIMARY)'));
+ assert.ok(html.includes('BANK OF ENGLAND MONEY AND CREDIT (GBP / PRIMARY)'));
+});
+
 test('29 Oct Japan Consumer Confidence primary release clears overdue in LIVE and FALLBACK',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-29T06:00:00+01:00',currency:'JPY',event:'Consumer Confidence',actual:'—',previous:'35.4',forecast:'35.1',releaseState:'overdue'}]},

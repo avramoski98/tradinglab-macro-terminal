@@ -1,6 +1,6 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-28T12:30:00.000Z';
+const VERIFIED_AT='2026-10-29T09:44:00.000Z';
 const VERIFIED=[
   // 28 Oct 2026 FOMC: official Federal Reserve statement released 14:00 EDT / 19:00 CET.
   // The target range was HELD at 3.75–4.00% by 10–2; Cook and Hammack preferred +25bp.
@@ -649,6 +649,37 @@ const VERIFIED=[
   url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/international-trade-price-indexes-australia/latest-release',
   status:'verified-primary',numericActualVerified:true,sourcePublishedAt:'2026-10-29',
   releaseTimeVerified:true,verifiedAt:'2026-10-29T02:33:50Z',force:true},
+
+ // Bank of England Money and Credit, September 2026, published 29 October 09:30 GMT / 10:30 CET.
+ // The Bank confirms 53,400 house-purchase mortgage approvals (August revised 54,800).
+ // Its M4ex net FLOW was GBP 3.9bn; that is NOT the M4 Money Supply m/m percentage.
+ // Net mortgage borrowing GBP 3.9bn and net consumer credit GBP 1.9bn are
+ // separately rounded components; do not invent an exact aggregate net-lending Actual.
+ {day:'2026-10-29',time:'10:30',dateOverride:'2026-10-29T10:30:00+01:00',ccy:'GBP',
+  match:/^Mortgage Approvals(?: ·.*)?$/i,event:'Mortgage Approvals · Sep 2026 (BoE)',
+  actual:'53.4K',previous:'54.8K',forecast:'—',importance:'MED',
+  label:'RELEASED · BoE PRIMARY · 53.4K mortgage approvals',
+  source:'Bank of England · Money and Credit September 2026, published 29 Oct 09:30 GMT: house-purchase mortgage approvals 53,400 vs revised August 54,800. No independently verified market consensus.',
+  url:'https://www.bankofengland.co.uk/statistics/money-and-credit/2026/september-2026',
+  status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+  verifiedAt:'2026-10-29T09:44:00Z',force:true},
+ {day:'2026-10-29',time:'10:30',dateOverride:'2026-10-29T10:30:00+01:00',ccy:'GBP',
+  match:/^M4 Money Supply m\/m(?: ·.*)?$/i,event:'M4 Money Supply m/m · Sep 2026 (BoE)',
+  actual:'Published',previous:'—',forecast:'—',importance:'LOW',
+  label:'RELEASED · BoE PRIMARY PUBLICATION · M4 m/m numeric unverified',
+  source:'Bank of England · Money and Credit September 2026, published 29 Oct: M4ex net FLOW GBP 3.9bn vs GBP 16.9bn in August, M4ex annual growth 4.0%. Neither is the calendar M4 Money Supply m/m percentage. Exact matching m/m Actual remains unverified.',
+  url:'https://www.bankofengland.co.uk/statistics/money-and-credit/2026/september-2026',
+  status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',
+  releaseTimeVerified:true,verifiedAt:'2026-10-29T09:44:00Z',force:true},
+ {day:'2026-10-29',time:'10:30',dateOverride:'2026-10-29T10:30:00+01:00',ccy:'GBP',
+  match:/^Net Lending to Individuals m\/m(?: ·.*)?$/i,event:'Net Lending to Individuals m/m · Sep 2026 (BoE)',
+  actual:'Published',previous:'—',forecast:'—',importance:'LOW',
+  label:'RELEASED · BoE PRIMARY PUBLICATION · aggregate numeric unverified',
+  source:'Bank of England · Money and Credit September 2026, published 29 Oct: net mortgage borrowing GBP 3.9bn and net consumer credit GBP 1.9bn (rounded separately). Do not misstate the sum as a directly verified exact Net Lending to Individuals m/m Actual.',
+  url:'https://www.bankofengland.co.uk/statistics/money-and-credit/2026/september-2026',
+  status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',
+  releaseTimeVerified:true,verifiedAt:'2026-10-29T09:44:00Z',force:true},
+
 ];
 const OFFICIAL_UPCOMING=[
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
