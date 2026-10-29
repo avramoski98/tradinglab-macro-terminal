@@ -13,14 +13,14 @@ const VERIFIED=[
  url:'https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp261029~9a493adf17.en.html',
  status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
  verifiedAt:'2026-10-29T15:02:00Z',force:true},
-{day:'2026-10-29',time:'14:15',dateOverride:'2026-10-29T14:15:00+01:00',ccy:'EUR',
+{day:'2026-10-29',time:'15:00',dateOverride:'2026-10-29T15:00:00+01:00',ccy:'EUR',
  match:/^Monetary Policy Statement(?: ·.*)?$/i,
  event:'ECB Monetary Policy Statement · 29 Oct 2026 (published)',
  actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
  label:'RELEASED · ECB PRIMARY PUBLICATION · qualitative statement',
  source:'ECB official Monetary policy statement by Lagarde and Vujcic, 29 Oct 2026. Confirms policy hold, energy inflation upside risks, growth downside risks and data-dependent policy. This is a qualitative publication, not a numeric Actual.',
  url:'https://www.ecb.europa.eu/press/press_conference/monetary-policy-statement/2026/html/ecb.is261029~5c5ffe99e5.en.html',
- status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
  verifiedAt:'2026-10-29T15:02:00Z',force:true},
 
 // 29 Oct 2026 08:30 EDT / 13:30 CET: BEA GDP advance and September PCE.
