@@ -1715,3 +1715,27 @@ test('28 Oct EIA primary crude stocks and BoC opening statement clear live and f
  assert.ok(html.includes('EIA CRUDE INVENTORIES (PRIMARY VERIFIED)'));
  assert.ok(html.includes('BoC HIKE +25bp / CAD (OFFICIAL PRIMARY)'));
 });
+
+test('29 Oct ABS trade prices clear overdue with secondary publication, not fabricated numerical Actual',()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-29T01:30:00+01:00',currency:'AUD',event:'Import Prices q/q',actual:'—',releaseState:'overdue',importance:'MED'},
+   {date:'2026-10-29T01:30:00+01:00',currency:'AUD',event:'International Trade Price Indexes · Sep quarter (ABS Australia)',actual:'—',releaseState:'overdue',importance:'MED'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='AUD'&&String(e.date).startsWith('2026-10-29')&&
+   /International Trade Price Indexes|Import Prices q\/q/.test(e.event));
+  assert.equal(rows.length,1,'one ABS report in '+payload.mode);
+  assert.equal(rows[0].event,'International Trade Price Indexes · Sep quarter (ABS Australia)');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].actual,'Published');
+  assert.equal(rows[0].numericActualVerified,false);
+  assert.equal(rows[0].actualVerifiedAt,null);
+  assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+  assert.equal(rows[0].forecast,'—');
+  assert.ok(rows[0].sourceUrl.includes('marketscreener.com'));
+  assert.equal(out.events.filter(e=>e.currency==='AUD'&&String(e.date).startsWith('2026-10-29')&&e.releaseState==='overdue').length,0);
+ }
+});
