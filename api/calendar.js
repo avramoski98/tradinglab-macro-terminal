@@ -622,10 +622,20 @@ const VERIFIED=[
  // 29 Oct ANZ Business Outlook: exact headline 52.5 vs September 51.9 from ANZ's original 29 Oct PDF, table 1.
  // This is a net-balance index, not the percentage share of optimistic respondents. Consensus is not primary-verified.
  {day:'2026-10-29',time:'01:00',ccy:'NZD',match:/^ANZ Business Confidence(?: ·.*)?$/i,event:'ANZ Business Confidence · Oct 2026 (net balance)',dateOverride:'2026-10-29T01:00:00+01:00',actual:'52.5',previous:'51.9',forecast:'—',importance:'MED',source:'ANZ New Zealand · Business Outlook, 29 Oct 2026, Table 1',url:'https://www.anz.co.nz/content/dam/anzconz/documents/economics-and-market-research/2026/ANZ-BusinessOutlook-20261029.pdf',status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,verifiedAt:'2026-10-29T00:42:50.859Z',force:true},
- // 29 Oct ABS trade-price report: MT Newswires confirms publication and directional moves.
- // ABS numeric September-quarter data could not be independently retrieved at verification time.
- // A published report is NOT a verified numerical Actual. Do not invent one or a consensus.
- {day:'2026-10-29',time:'01:30',ccy:'AUD',match:/^International Trade Price Indexes(?: ·.*)?$/i,event:'International Trade Price Indexes · Sep quarter (ABS Australia)',dateOverride:'2026-10-29T01:30:00+01:00',actual:'Published',previous:'—',forecast:'—',importance:'MED',label:'Published · secondary verified',source:'MT Newswires, 29 Oct 2026 · ABS trade-price release: import index fell, export index rose; exact q/q changes unverified',url:'https://www.marketscreener.com/news/australia-s-export-price-index-rises-in-september-quarter-import-price-index-falls-ce785cd3db80f521',status:'verified-secondary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,verifiedAt:'2026-10-29T01:17:00Z',force:true},
+ // 29 Oct 2026 ABS International Trade Price Indexes, September quarter.
+ // ABS original report (11:30 AEDT / 01:30 CET) confirms both
+ // quarter-on-quarter actuals; no independently verified market consensus.
+ {day:'2026-10-29',time:'01:30',ccy:'AUD',
+  match:/^International Trade Price Indexes(?: ·.*)?$/i,
+  event:'International Trade Price Indexes · Sep quarter (ABS Australia)',
+  dateOverride:'2026-10-29T01:30:00+01:00',
+  actual:'Import -1.1% q/q · Export +1.4% q/q',
+  previous:'Import +5.7% · Export +1.1%',forecast:'—',importance:'MED',
+  label:'RELEASED · ABS PRIMARY · Import -1.1% / Export +1.4%',
+  source:'Australian Bureau of Statistics · International Trade Price Indexes, September quarter 2026 · published 29 Oct 2026 11:30 AEDT. Import Price Index -1.1% q/q (+5.5% y/y); Export Price Index +1.4% q/q (+6.3% y/y). Previous quarter +5.7% and +1.1%. No verified consensus.',
+  url:'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/international-trade-price-indexes-australia/latest-release',
+  status:'verified-primary',numericActualVerified:true,sourcePublishedAt:'2026-10-29',
+  releaseTimeVerified:true,verifiedAt:'2026-10-29T02:33:50Z',force:true},
 ];
 const OFFICIAL_UPCOMING=[
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
