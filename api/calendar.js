@@ -1,7 +1,58 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-29T09:44:00.000Z';
+const VERIFIED_AT='2026-10-29T12:45:00.000Z';
 const VERIFIED=[
+// 29 Oct 2026, 08:30 EDT / 13:30 CET: BEA GDP advance and September PCE.
+// Numeric Actuals are corroborated by contemporaneous Reuters / FT reporting.
+// BEA's primary numeric release was not independently retrievable at this audit:
+// these entries are VERIFIED-SECONDARY, not verified-primary. Consensus is left blank.
+// No mechanical Beat/Miss -> FX direction or structural G10 rerank.
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance|GDP q\/q)(?: ·.*)?$/i,
+ event:'GDP advance Q3 2026 · secondary confirmed · annualized',
+ actual:'3.4%',previous:'2.2%',forecast:'—',importance:'EXTREME',
+ label:'RELEASED · GDP Q3 +3.4% annualized · VERIFIED-SECONDARY',
+ source:'29 Oct 2026 Reuters and Financial Times post-release reporting: US Q3 real GDP +3.4% SAAR, Q2 +2.2%, private domestic final sales +4.9% vs Q2 +4.6%. Market survey around +3.2% per FT; primary BEA numeric release not independently retrieved. Not an automatic USD bullish catalyst.',
+ url:'https://www.ft.com/content/f2de9f3c-3290-4e87-bbc2-55430025f2ab',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:45:00Z',force:true},
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^(?:Core PCE Price Index m\/m|Core PCE m\/m|PCE Price Index excluding food and energy m\/m)(?: ·.*)?$/i,
+ event:'Core PCE Price Index m/m · Sep 2026',
+ actual:'0.3%',previous:'0.2%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Core PCE m/m +0.3% · VERIFIED-SECONDARY',
+ source:'Reuters 29 Oct 2026 post-release: September core PCE +0.3% m/m, +3.1% y/y. Previous August core PCE +0.2% m/m and +3.0% y/y (BEA August release). Original September BEA numeric text not retrieved.',
+ url:'https://www.reuters.com/business/nasdaq-futures-slide-mixed-big-tech-results-test-ai-trade-2026-10-29/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:45:00Z',force:true},
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^(?:Core PCE Price Index y\/y|Core PCE y\/y|PCE Price Index excluding food and energy y\/y)(?: ·.*)?$/i,
+ event:'Core PCE Price Index y/y · Sep 2026',
+ actual:'3.1%',previous:'3.0%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Core PCE y/y 3.1% · VERIFIED-SECONDARY',
+ source:'Reuters 29 Oct 2026: September core PCE inflation 3.1% y/y versus August 3.0%; original BEA September numeric text not independently retrieved. This is persistent inflation, not automatically USD bullish.',
+ url:'https://www.reuters.com/business/nasdaq-futures-slide-mixed-big-tech-results-test-ai-trade-2026-10-29/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:45:00Z',force:true},
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^(?:PCE Price Index m\/m|Headline PCE m\/m|PCE m\/m)(?: ·.*)?$/i,
+ event:'Headline PCE Price Index m/m · Sep 2026',
+ actual:'0.5%',previous:'0.3%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Headline PCE m/m +0.5% · VERIFIED-SECONDARY',
+ source:'Reuters 29 Oct 2026: September headline PCE +0.5% m/m, +3.6% y/y; August +0.3% m/m and +3.4% y/y (BEA August release). BEA September primary numeric text not retrieved.',
+ url:'https://www.reuters.com/business/nasdaq-futures-slide-mixed-big-tech-results-test-ai-trade-2026-10-29/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:45:00Z',force:true},
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^(?:PCE Price Index y\/y|Headline PCE y\/y|PCE y\/y)(?: ·.*)?$/i,
+ event:'Headline PCE Price Index y/y · Sep 2026',
+ actual:'3.6%',previous:'3.4%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Headline PCE y/y 3.6% · VERIFIED-SECONDARY',
+ source:'Reuters 29 Oct 2026: September headline PCE inflation +3.6% y/y versus August +3.4%. Original September BEA numeric text not independently retrieved.',
+ url:'https://www.reuters.com/business/nasdaq-futures-slide-mixed-big-tech-results-test-ai-trade-2026-10-29/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T12:45:00Z',force:true},
+
 // 29 Oct 2026 U.S. Department of Labor unemployment-insurance weekly claims.
 // DOL release at 08:30 EDT: 194,000 initial claims for week ended 24 Oct,
 // prior week revised to 195,000. The provider 198K forecast is not official.
