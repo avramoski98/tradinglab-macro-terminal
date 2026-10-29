@@ -1100,6 +1100,13 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
    assert.equal(rows[0].actual,'4.3%');
    assert.equal(rows[0].previous,'4.0%');
    assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
+  }else if(currency==='AUD'&&prefix.startsWith('International Trade Price Indexes')){
+   assert.equal(rows[0].verificationStatus,'verified-secondary-publication');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,'Published');
+   assert.equal(rows[0].numericActualVerified,false);
+   assert.equal(rows[0].actualVerifiedAt,null);
+   assert.ok(rows[0].sourceUrl.includes('marketscreener.com'));
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
