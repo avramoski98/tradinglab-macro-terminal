@@ -2,6 +2,28 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-29T15:05:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026 00:30 CET (29 Oct 23:30 UTC): Japan releases appeared in
+// FinancialJuice contemporaneous wire; official Japan statistical PDF had
+// not yet updated when checked. Preserve SECONDARY verification, not primary.
+// Forecasts are not independently validated and are not used as policy odds.
+{day:'2026-10-30',time:'00:30',dateOverride:'2026-10-30T00:30:00+01:00',ccy:'JPY',
+ match:/^Tokyo Core CPI y\/y(?: ·.*)?$/i,
+ event:'Tokyo Core CPI y/y · Oct 2026 (ex fresh food)',
+ actual:'2.6%',previous:'2.7%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · SECONDARY WIRE · PRIMARY PENDING',
+ source:'FinancialJuice 29 Oct 2026 23:30 UTC contemporaneous release: Tokyo core CPI October +2.6% y/y, matching reported poll 2.6%; previous +2.7%. Official Statistics Bureau publication not independently verified at entry time.',
+ url:'https://www.financialjuice.com/News/9828288/Tokyo-Core-CPI-YoY-Actual-26-Forecast-26-Previous-27.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T23:30:03Z',force:true},
+{day:'2026-10-30',time:'00:30',dateOverride:'2026-10-30T00:30:00+01:00',ccy:'JPY',
+ match:/^Unemployment Rate(?: ·.*)?$/i,
+ event:'Japan Unemployment Rate · Sep 2026 (seasonally adjusted)',
+ actual:'2.4%',previous:'2.5%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · SECONDARY WIRE · PRIMARY PENDING',
+ source:'FinancialJuice 29 Oct 2026 23:30 UTC contemporaneous release: September seasonally adjusted unemployment 2.4%, poll 2.5%, previous 2.5%. Official Statistics Bureau publication not independently verified at entry time.',
+ url:'https://www.financialjuice.com/News/9828289/Japanese-Unemployment-Rate-Actual-24-Forecast-25-Previous-25.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T23:30:04Z',force:true},
 // ECB OCTOBER HOLD / 29 OCT 2026. Original ECB monetary policy decision now directly verified.
 // Press conference is separate and remains LIVE / not final until Q&A reviewed.
 {day:'2026-10-29',time:'14:15',dateOverride:'2026-10-29T14:15:00+01:00',ccy:'EUR',
