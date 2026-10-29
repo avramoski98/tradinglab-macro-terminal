@@ -622,6 +622,10 @@ const VERIFIED=[
  // 29 Oct ANZ Business Outlook: exact headline 52.5 vs September 51.9 from ANZ's original 29 Oct PDF, table 1.
  // This is a net-balance index, not the percentage share of optimistic respondents. Consensus is not primary-verified.
  {day:'2026-10-29',time:'01:00',ccy:'NZD',match:/^ANZ Business Confidence(?: ·.*)?$/i,event:'ANZ Business Confidence · Oct 2026 (net balance)',dateOverride:'2026-10-29T01:00:00+01:00',actual:'52.5',previous:'51.9',forecast:'—',importance:'MED',source:'ANZ New Zealand · Business Outlook, 29 Oct 2026, Table 1',url:'https://www.anz.co.nz/content/dam/anzconz/documents/economics-and-market-research/2026/ANZ-BusinessOutlook-20261029.pdf',status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,verifiedAt:'2026-10-29T00:42:50.859Z',force:true},
+ // 29 Oct ABS trade-price report: MT Newswires confirms publication and directional moves.
+ // ABS numeric September-quarter data could not be independently retrieved at verification time.
+ // A published report is NOT a verified numerical Actual. Do not invent one or a consensus.
+ {day:'2026-10-29',time:'01:30',ccy:'AUD',match:/^International Trade Price Indexes(?: ·.*)?$/i,event:'International Trade Price Indexes · Sep quarter (ABS Australia)',dateOverride:'2026-10-29T01:30:00+01:00',actual:'Published',previous:'—',forecast:'—',importance:'MED',label:'Published · secondary verified',source:'MT Newswires, 29 Oct 2026 · ABS trade-price release: import index fell, export index rose; exact q/q changes unverified',url:'https://www.marketscreener.com/news/australia-s-export-price-index-rises-in-september-quarter-import-price-index-falls-ce785cd3db80f521',status:'verified-secondary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,verifiedAt:'2026-10-29T01:17:00Z',force:true},
 ];
 const OFFICIAL_UPCOMING=[
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
@@ -781,7 +785,16 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
  // ForexFactory calls the same 28 Oct UK fiscal publication "Autumn Forecast
  // Statement". Once the verified UK Budget/OBR record exists, do not show
  // the alias as a separate overdue release.
- const dedupedRows=uniqueRows.filter(e=>!(e.currency==='GBP'&&
+ // The ForexFactory "Import Prices q/q" line and the official ABS ITPI publication
+ // describe the same September-quarter report. Once the report is publication-verified,
+ // suppress the stale alias rather than presenting it as a separate overdue release.
+ const absTradePublished=uniqueRows.some(e=>e.currency==='AUD'&&
+  String(e.date||'').slice(0,10)==='2026-10-29'&&
+  /^International Trade Price Indexes/.test(String(e.event||''))&&
+  e.releaseState==='released'&&/^verified-(primary|secondary)/.test(e.verificationStatus||''));
+ const dedupedRows=uniqueRows.filter(e=>!(absTradePublished&&e.currency==='AUD'&&
+  String(e.date||'').slice(0,10)==='2026-10-29'&&
+  /^Import Prices q\\/q/i.test(String(e.event||'')))&&!(e.currency==='GBP'&&
   String(e.date||'').slice(0,10)==='2026-10-28'&&
   /^Autumn Forecast Statement(?: ·.*)?$/i.test(String(e.event||''))&&
   uniqueRows.some(v=>v.currency==='GBP'&&String(v.date||'').slice(0,10)==='2026-10-28'&&
