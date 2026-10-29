@@ -1896,3 +1896,75 @@ test('post-28 Oct FOMC Weekly Focus and Macro Watch do not advertise the release
  assert.ok(html.includes('Monitor post-FOMC US 2Y/OIS and labor breadth'));
  assert.ok(html.includes('RELEASED / 28 OCT 19:00 CET · FOMC RATE DECISION'));
 });
+
+
+test('29 Oct ECB decision and statement are primary-verified and not overdue in LIVE/FALLBACK',()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-29T14:15:00+01:00',currency:'EUR',event:'Main Refinancing Rate',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-29T14:15:00+01:00',currency:'EUR',event:'Monetary Policy Statement',actual:'—',releaseState:'overdue'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const ecb=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-29')&&/ECB Rate Decision · 29 Oct|ECB Monetary Policy Statement · 29 Oct/.test(e.event));
+  assert.equal(ecb.length,2);
+  assert.ok(ecb.every(e=>e.releaseState==='released'));
+  assert.ok(ecb.every(e=>e.verificationStatus.startsWith('verified-primary')));
+  const decision=ecb.find(e=>e.event.startsWith('ECB Rate Decision'));
+  assert.match(decision.actual,/Deposit 2.50%/);
+  assert.match(decision.sourceUrl,/ecb\.europa\.eu\/press\/pr\/date\/2026/);
+  const statement=ecb.find(e=>e.event.startsWith('ECB Monetary Policy Statement'));
+  assert.equal(statement.actual,'Published');
+  assert.equal(statement.numericActualVerified,false);
+  assert.equal(statement.actualVerifiedAt,null);
+  assert.match(statement.sourceUrl,/monetary-policy-statement\/2026/);
+ }
+});
+
+test('29 Oct BEA GDP primary, GDP price index publication-only and EIA +80 Bcf clear three overdue entries',()=>{
+ for(const payload of [
+  {mode:'live',events:[
+   {date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Advance GDP q/q',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Advance GDP Price Index q/q',actual:'—',releaseState:'overdue'},
+   {date:'2026-10-29T15:30:00+01:00',currency:'USD',event:'Natural Gas Storage',actual:'—',releaseState:'overdue'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const today=out.events.filter(e=>e.currency==='USD'&&String(e.date).startsWith('2026-10-29'));
+  const gdp=today.find(e=>e.event.startsWith('Advance GDP q/q'));
+  const deflator=today.find(e=>e.event.startsWith('Advance GDP Price Index'));
+  const gas=today.find(e=>e.event.startsWith('Natural Gas Storage'));
+  assert.ok(gdp&&deflator&&gas);
+  assert.equal(gdp.actual,'3.4%');
+  assert.equal(gdp.verificationStatus,'verified-primary');
+  assert.equal(deflator.actual,'Published');
+  assert.equal(deflator.numericActualVerified,false);
+  assert.equal(deflator.actualVerifiedAt,null);
+  assert.equal(gas.actual,'+80B');
+  assert.equal(gas.previous,'+77B');
+  assert.equal(gas.forecast,'—');
+  assert.equal(gas.verificationStatus,'verified-primary');
+  assert.ok([gdp,deflator,gas].every(e=>e.releaseState==='released'));
+ }
+});
+
+test('29 Oct commodity EIA natural gas +80 Bcf reconciles a provider overdue row',async()=>{
+ const source=fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function handler','async function handler');
+ const input=[{date:'2026-10-29T10:30:00-04:00',title:'Natural Gas Storage',actual:'—',previous:'77B',forecast:'—'}];
+ const context=vm.createContext({Date,console,fetch:async()=>({ok:true,json:async()=>input})});
+ vm.runInContext(source,context);
+ const response={setHeader(){},status(n){this.code=n;return this},json(data){this.data=data;return data}};
+ await vm.runInContext('handler({}, response)',vm.createContext({...context,response}));
+ const rows=response.data.events.filter(e=>e.event==='EIA · Natural Gas Storage'&&String(e.date).startsWith('2026-10-29'));
+ assert.equal(rows.length,1);
+ assert.equal(rows[0].actual,'+80B');
+ assert.equal(rows[0].verificationStatus,'verified-primary');
+ assert.equal(rows[0].releaseState,'released');
+ assert.equal(rows[0].forecast,'—');
+ assert.match(rows[0].sourceUrl,/ir\.eia\.gov\/ngs/);
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('EIA NATURAL GAS STORAGE (US / EIA PRIMARY)'));
+ assert.ok(html.includes('EIA NATURAL GAS STORAGE · VERIFIED PRIMARY'));
+});
