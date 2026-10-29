@@ -4,6 +4,29 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('29 Oct Japan Consumer Confidence primary release clears overdue in LIVE and FALLBACK',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T06:00:00+01:00',currency:'JPY',event:'Consumer Confidence',actual:'—',previous:'35.4',forecast:'35.1',releaseState:'overdue'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='JPY'&&e.event==='Consumer Confidence · Oct 2026 (seasonally adjusted)');
+  assert.equal(rows.length,1,'one verified October JPY confidence release in '+payload.mode);
+  assert.equal(rows[0].date,'2026-10-29T06:00:00+01:00');
+  assert.equal(rows[0].actual,'35.0');
+  assert.equal(rows[0].previous,'35.4');
+  assert.equal(rows[0].forecast,'—','unverified provider consensus not carried into verified record');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
+  assert.equal(rows[0].releaseTimeVerified,false);
+  assert.match(rows[0].sourceUrl,/esri\.cao\.go\.jp/);
+  assert.equal(out.events.filter(e=>e.currency==='JPY'&&String(e.date).startsWith('2026-10-29')&&e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('JAPAN CONSUMER CONFIDENCE (JPY / PRIMARY)'));
+ assert.ok(html.includes('October seasonally adjusted index <b>35.0</b>'));
+});
+
 test('29 Oct ANZ primary release clears overdue in LIVE and FALLBACK without fabricated consensus',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-29T01:00:00+01:00',currency:'NZD',event:'ANZ Business Confidence',actual:'—',releaseState:'overdue',forecast:'51.5'}]},
