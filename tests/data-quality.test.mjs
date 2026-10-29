@@ -4,6 +4,27 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('29 Oct DOL initial claims primary release clears checking/overdue in LIVE and FALLBACK',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Unemployment Claims',actual:'—',previous:'194K',forecast:'198K',releaseState:'checking',importance:'MED'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='USD'&&String(e.date).startsWith('2026-10-29')&&/Initial Jobless Claims · week ending 24 Oct 2026/.test(e.event));
+  assert.equal(rows.length,1,'one DOL initial claims release in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.actual,'194K');
+  assert.equal(e.previous,'195K');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,true);
+  assert.match(e.sourceUrl,/dol\.gov\/ui\/data\.pdf/);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('US INITIAL JOBLESS CLAIMS (USD / DOL PRIMARY)'));
+});
+
 test('29 Oct Italian BTP 10-year secondary-verified auction clears overdue without false primary claim',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-29T11:08:00+01:00',currency:'EUR',event:'Italian 10-y Bond Auction',actual:'—',previous:'4.58%',releaseState:'overdue',importance:'LOW'}]},
