@@ -1989,3 +1989,22 @@ test('29 Oct BEA Q3 advance GDP is in G10 archive and USD growth chart with rele
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
 });
+
+test('29 Oct ECB press conference publication clears fallback OVERDUE without claiming Q&A verified',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T14:45:00+01:00',currency:'EUR',event:'ECB Press Conference',actual:'—',releaseState:'overdue'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-29')&&/^ECB Press Conference/.test(e.event));
+  assert.equal(rows.length,1,'one ECB press conference in '+payload.mode);
+  const row=rows[0];
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.verificationStatus,'verified-primary-publication');
+  assert.equal(row.numericActualVerified,false);
+  assert.equal(row.forecast,'—');
+  assert.match(row.actual,/Q&A not independently reviewed/);
+  assert.match(row.sourceUrl,/ecb\.europa\.eu\/press\/press_conference/);
+  assert.equal(out.events.filter(e=>e.releaseState==='overdue'&&/ECB Press Conference/.test(e.event)).length,0);
+ }
+});
