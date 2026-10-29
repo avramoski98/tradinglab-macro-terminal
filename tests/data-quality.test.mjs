@@ -4,6 +4,28 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('29 Oct ISTAT September unemployment primary release clears overdue without stale provider consensus',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-29T10:00:00+01:00',currency:'EUR',event:'Italian Monthly Unemployment Rate',actual:'—',previous:'6.2%',forecast:'6.2%',releaseState:'overdue',importance:'MED'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-29')&&/Italian Monthly Unemployment Rate/.test(e.event));
+  assert.equal(rows.length,1,'one ISTAT release in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'6.3%');
+  assert.equal(e.previous,'6.3%');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,false);
+  assert.ok(e.sourceUrl.includes('istat.it'));
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('ISTAT SEPTEMBER LABOUR (EUR / PRIMARY)'));
+});
+
+
 
 test('29 Oct BoE Money and Credit primary publication clears three GBP overdue records without fabricated M4 percent',()=>{
  for(const payload of [
