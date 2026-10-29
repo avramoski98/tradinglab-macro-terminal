@@ -619,6 +619,9 @@ const VERIFIED=[
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/Prelim UoM Consumer Sentiment/i,event:'Prelim UoM Consumer Sentiment · Oct',actual:'46.3',previous:'48.1',importance:'HIGH',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'},
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/Prelim UoM (?:1-Yr )?Inflation Expectations/i,event:'Prelim UoM 1-Yr Inflation Expectations · Oct',actual:'4.7%',previous:'4.6%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'},
  {day:'2026-10-09',time:'16:00',ccy:'USD',match:/UoM 5-Yr Inflation Expectations/i,event:'Prelim UoM 5-Yr Inflation Expectations · Oct',actual:'3.5%',previous:'3.4%',importance:'MED',source:'University of Michigan',url:'https://www.sca.isr.umich.edu/',status:'verified-primary'}
+ // 29 Oct ANZ Business Outlook: exact headline 52.5 vs September 51.9 from ANZ's original 29 Oct PDF, table 1.
+ // This is a net-balance index, not the percentage share of optimistic respondents. Consensus is not primary-verified.
+ {day:'2026-10-29',time:'01:00',ccy:'NZD',match:/^ANZ Business Confidence(?: ·.*)?$/i,event:'ANZ Business Confidence · Oct 2026 (net balance)',dateOverride:'2026-10-29T01:00:00+01:00',actual:'52.5',previous:'51.9',forecast:'—',importance:'MED',source:'ANZ New Zealand · Business Outlook, 29 Oct 2026, Table 1',url:'https://www.anz.co.nz/content/dam/anzconz/documents/economics-and-market-research/2026/ANZ-BusinessOutlook-20261029.pdf',status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,verifiedAt:'2026-10-29T00:42:50.859Z',force:true},
 ];
 const OFFICIAL_UPCOMING=[
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
