@@ -1202,14 +1202,16 @@ test('Weekly Focus policy matcher includes official fallback decision names with
  assert.ok(html.includes('&&weeklyPolicyEventName(x[3])'),'Weekly Focus must use this matcher, not an older inline regex');
 });
 
-test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactory is in fallback',()=>{
+test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive calendar fallback',()=>{
  const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]});
  const expected=[
   ['AUD','CPI y/y · Sep','2026-10-28T01:30:00+01:00','abs.gov.au'],
   ['AUD','International Trade Price Indexes · Sep quarter','2026-10-29T01:30:00+01:00','abs.gov.au'],
   ['AUD','Producer Price Indexes · Sep quarter','2026-10-30T01:30:00+01:00','abs.gov.au'],
-  ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','bea.gov'],
-  ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov']
+  ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','ft.com'],
+  ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
+  ['USD','Personal Income m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
+  ['USD','Personal Spending (current-dollar PCE) m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov']
  ];
  for(const [currency,prefix,date,domain] of expected){
   const rows=out.events.filter(x=>x.currency===currency&&x.event.startsWith(prefix));
@@ -1228,6 +1230,13 @@ test('ABS CPI and BEA GDP/PCE official schedule is present even when ForexFactor
    assert.equal(rows[0].previous,'Import +5.7% · Export +1.1%');
    assert.ok(rows[0].actualVerifiedAt);
    assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
+  }else if(currency==='USD'){
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].verificationStatus,prefix.startsWith('Advance GDP')?'verified-secondary':'verified-primary');
+   const actual=prefix.startsWith('Advance GDP')?'3.4%':prefix.startsWith('Personal Income')?'0.2%':prefix.startsWith('Personal Spending')?'0.5%':'0.3%';
+   assert.equal(rows[0].actual,actual);
+   if(prefix.startsWith('Core PCE'))assert.equal(rows[0].previous,'0.3%','August revised core PCE m/m is +0.3% per BEA');
+   assert.ok(rows[0].sourceUrl.includes(domain));
   }else{
    assert.equal(rows[0].verificationStatus,'official-schedule');
    assert.equal(rows[0].actual,'—');
