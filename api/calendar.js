@@ -1,35 +1,59 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-29T14:00:00.000Z';
+const VERIFIED_AT='2026-10-29T15:05:00.000Z';
 const VERIFIED=[
-// ECB OCTOBER HOLD / 29 OCT 2026. Decision confirmed by Reuters after 14:15 CET.
-// ECB primary numeric press release not independently retrieved at this check.
+// ECB OCTOBER HOLD / 29 OCT 2026. Original ECB monetary policy decision now directly verified.
 // Press conference is separate and remains LIVE / not final until Q&A reviewed.
 {day:'2026-10-29',time:'14:15',dateOverride:'2026-10-29T14:15:00+01:00',ccy:'EUR',
  match:/^(?:ECB Rate Decision|Main Refinancing Rate|Deposit Facility Rate|ECB Deposit Rate)(?: ·.*)?$/i,
  event:'ECB Rate Decision · 29 Oct 2026 (hold)',
  actual:'Deposit 2.50% · MRO 2.65% · Marginal 2.90%',previous:'Deposit 2.50% · MRO 2.65%',forecast:'—',importance:'EXTREME',
- label:'RELEASED · ECB HOLD 2.50% · VERIFIED-SECONDARY',
- source:'Reuters 29 Oct 2026 13:23 UTC: ECB held all policy rates; energy shock increases upside inflation / downside growth risks, while underlying inflation and wages remain broadly stable. Tightening financing conditions and French 10Y spread ~155bp vs Bund complicate December decisions. ECB official numeric release not independently retrieved; no market consensus inferred.',
- url:'https://www.reuters.com/business/ecb-keeps-rates-unchanged-points-mounting-inflation-risk-2026-10-29/',
- status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
- verifiedAt:'2026-10-29T13:35:00Z',force:true},
+ label:'RELEASED · ECB HOLD 2.50% · VERIFIED-PRIMARY',
+ source:'European Central Bank official Monetary policy decisions, 29 Oct 2026: deposit facility 2.50%, main refinancing operations 2.65%, marginal lending facility 2.90%, all unchanged. Energy shock raises inflation risks and lowers growth outlook; no predetermined policy path. No independently verified consensus.',
+ url:'https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp261029~9a493adf17.en.html',
+ status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
+{day:'2026-10-29',time:'14:15',dateOverride:'2026-10-29T14:15:00+01:00',ccy:'EUR',
+ match:/^Monetary Policy Statement(?: ·.*)?$/i,
+ event:'ECB Monetary Policy Statement · 29 Oct 2026 (published)',
+ actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ECB PRIMARY PUBLICATION · qualitative statement',
+ source:'ECB official Monetary policy statement by Lagarde and Vujcic, 29 Oct 2026. Confirms policy hold, energy inflation upside risks, growth downside risks and data-dependent policy. This is a qualitative publication, not a numeric Actual.',
+ url:'https://www.ecb.europa.eu/press/press_conference/monetary-policy-statement/2026/html/ecb.is261029~5c5ffe99e5.en.html',
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
 
 // 29 Oct 2026 08:30 EDT / 13:30 CET: BEA GDP advance and September PCE.
-// GDP numeric +3.4% SAAR is independently corroborated by Reuters/FT, but the
-// original GDP BEA numeric release was not retrieved; retain SECONDARY provenance.
+// GDP +3.4% SAAR and final sales +4.9% directly verified in the BEA advance release.
 // September PCE and personal income/outlays ARE directly verified from the
 // BEA 29 Oct release. August comparison values follow BEA's revised table.
 // No unverified market consensus or mechanical FX directional conclusion.
 {day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
  match:/^(?:Advance GDP q\/q|GDP.*Advance|Gross Domestic Product.*Advance|GDP q\/q)(?: ·.*)?$/i,
- event:'Advance GDP q/q · Q3 2026 (annualized, secondary confirmed)',
+ event:'Advance GDP q/q · Q3 2026 (annualized, BEA primary)',
  actual:'3.4%',previous:'2.2%',forecast:'—',importance:'EXTREME',
- label:'RELEASED · GDP Q3 +3.4% annualized · VERIFIED-SECONDARY',
- source:'29 Oct 2026 Reuters and Financial Times post-release reporting: US Q3 real GDP +3.4% SAAR, Q2 +2.2%, private domestic final sales +4.9%. Original BEA GDP numeric release not directly retrieved. No automatic USD bias.',
- url:'https://www.ft.com/content/f2de9f3c-3290-4e87-bbc2-55430025f2ab',
- status:'verified-secondary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
- verifiedAt:'2026-10-29T12:45:00Z',force:true},
+ label:'RELEASED · GDP Q3 +3.4% annualized · VERIFIED-PRIMARY',
+ source:'U.S. BEA GDP (Advance Estimate), 3rd Quarter 2026, released 29 Oct 08:30 EDT: real GDP +3.4% SAAR, Q2 +2.2%; real final sales to private domestic purchasers +4.9%. No unverified market consensus or automatic USD bias.',
+ url:'https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026',
+ status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
+{day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
+ match:/^Advance GDP Price Index q\/q(?: ·.*)?$/i,
+ event:'Advance GDP Price Index q/q · Q3 2026 (publication verified; exact deflator unverified)',
+ actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · BEA PRIMARY PUBLICATION · GDP deflator numeric unverified',
+ source:'BEA GDP advance estimate was released 29 Oct 2026. It reports gross domestic purchases price index +3.0% SAAR, which is NOT the same measure as the GDP price index/implicit deflator. Exact matching GDP price index value is not verified and is intentionally omitted.',
+ url:'https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026',
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
+{day:'2026-10-29',time:'15:30',dateOverride:'2026-10-29T15:30:00+01:00',ccy:'USD',
+ match:/^Natural Gas Storage(?: ·.*)?$/i,
+ event:'Natural Gas Storage · week ending 23 Oct 2026 (EIA)',
+ actual:'+80B',previous:'+77B',forecast:'—',importance:'HIGH',
+ label:'RELEASED · EIA PRIMARY · +80 Bcf injection',
+ source:'U.S. EIA Weekly Natural Gas Storage Report released 29 Oct 2026 10:30 EDT: Lower 48 stocks 3,724 Bcf as of 23 Oct, up 80 Bcf from 3,644 Bcf a week earlier; 38 Bcf above five-year average and 147 Bcf below year-ago. Forecast omitted because no primary-verified market consensus.',
+ url:'https://ir.eia.gov/ngs/ngs.html',status:'verified-primary',sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T15:02:00Z',force:true},
 {day:'2026-10-29',time:'13:30',dateOverride:'2026-10-29T13:30:00+01:00',ccy:'USD',
  match:/^(?:Core PCE Price Index m\/m|Core PCE m\/m|PCE Price Index excluding food and energy m\/m)(?: ·.*)?$/i,
  event:'Core PCE Price Index m/m · Sep 2026',
