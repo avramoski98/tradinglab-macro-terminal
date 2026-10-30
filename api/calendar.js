@@ -1160,7 +1160,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    actual:'—',releaseState:state,
    label:state==='scheduled'?'SCHEDULED · 14:00 CET (calendar cross-check)':'OVERDUE · Actual not verified',
    source:germanCpiSource,sourceUrl:germanCpiUrl,
-   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   verificationStatus:'verified-secondary-schedule',releaseTimeVerified:false,
    forecastVerificationStatus:'provider-unverified',lastUpdate:null};
  }
  if(!germanCpiPresent&&options.includeFullSchedule){
@@ -1171,7 +1171,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    importance:'HIGH',actual:'—',previous:'—',forecast:'—',
    label:state==='scheduled'?'SCHEDULED · 14:00 CET (calendar cross-check)':'OVERDUE · Actual not verified',
    releaseState:state,source:germanCpiSource,sourceUrl:germanCpiUrl,
-   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   verificationStatus:'verified-secondary-schedule',releaseTimeVerified:false,
    forecastVerificationStatus:'provider-unverified',lastUpdate:null});
  }
  // Keep the 30 Oct UK Nationwide HPI schedule visible even when the live
@@ -1188,7 +1188,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    label:state==='scheduled'?'SCHEDULED · secondary calendar':'OVERDUE · numeric Actual unverified',
    releaseState:state,source:'Investing.com economic calendar (secondary schedule; Nationwide primary October report not yet confirmed)',
    sourceUrl:'https://www.investing.com/economic-calendar/nationwide-hpi-363',
-   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   verificationStatus:'verified-secondary-schedule',releaseTimeVerified:false,
    forecastVerificationStatus:'provider-unverified',lastUpdate:null});
  }
  // The fallback archive can contain the same release under a different title.
