@@ -2,6 +2,37 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 Germany: newly published releases absent from the fallback
+// calendar. The numbers below are SECONDARY verified, not original publisher
+// numeric tables; do not imply official consensus or exact release timestamps.
+{day:'2026-10-30',time:'10:00',dateOverride:'2026-10-30T10:00:00+01:00',ccy:'EUR',
+ match:/^(?:German (?:Prelim |Flash )?GDP q\/q|Germany GDP q\/q|German Flash GDP)(?: ·.*)?$/i,
+ event:'German Flash GDP q/q · Q3 2026 (SA)',
+ actual:'+0.2%',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Germany Q3 GDP +0.2% q/q · SECONDARY VERIFIED',
+ source:'Welt / German newswire, 30 Oct 2026, citing Destatis preliminary Q3 GDP +0.2% q/q. Original Destatis numeric release not independently retrieved. Do not infer consensus.',
+ url:'https://www.welt.de/article6ae45da9aacefa08f5b99140',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T09:20:00Z',force:true},
+{day:'2026-10-30',time:'09:55',dateOverride:'2026-10-30T09:55:00+01:00',ccy:'EUR',
+ match:/^German Unemployment Change(?: ·.*)?$/i,
+ event:'German Unemployment Change · Oct 2026 (seasonally adjusted)',
+ actual:'+4K',previous:'+12K',forecast:'—',importance:'HIGH',
+ label:'RELEASED · German unemployment +4K SA · SECONDARY VERIFIED',
+ source:'Reuters 30 Oct 2026 citing Federal Employment Agency: October seasonally adjusted unemployed +4,000 to 3.016 million; previous September +12,000 from agency series. Original October BA table not independently retrieved; unadjusted figures differ.',
+ url:'https://www.reuters.com/business/german-unemployment-rises-slightly-less-than-expected-october-2026-10-30/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T09:20:00Z',force:true},
+{day:'2026-10-30',time:'09:55',dateOverride:'2026-10-30T09:55:00+01:00',ccy:'EUR',
+ match:/^German Unemployment Rate(?: ·.*)?$/i,
+ event:'German Unemployment Rate · Oct 2026 (seasonally adjusted)',
+ actual:'6.4%',previous:'6.4%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · German unemployment rate 6.4% SA · SECONDARY VERIFIED',
+ source:'Reuters 30 Oct 2026 citing Federal Employment Agency: October SA rate unchanged at 6.4%. Unadjusted national rate 6.3% is a different series.',
+ url:'https://www.reuters.com/business/german-unemployment-rises-slightly-less-than-expected-october-2026-10-30/',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T09:20:00Z',force:true},
+
 // 29 Oct central-bank appearances: issuer-published evidence, not numeric
 // releases. SNB has published the speech text; BoC lists the lecture webcast.
 // Do not infer rate guidance or a numerical policy surprise from either.
@@ -1071,6 +1102,20 @@ const VERIFIED=[
 
 ];
 const OFFICIAL_UPCOMING=[
+// 30 Oct 11:00 CET Eurostat releases. Publisher confirms the date and 11:00
+// Luxembourg schedule. These remain SCHEDULED until actuals are independently
+// verified; never use yesterday's values as today's release.
+{date:'2026-10-30T11:00:00+01:00',ccy:'EUR',
+ event:'Euro Area Preliminary Flash GDP q/q · Q3 2026',
+ match:/^(?:Euro(?:zone| Area) (?:Prelim(?:inary)? )?(?:Flash )?GDP(?: q\/q)?|GDP Flash · Euro Area)(?: ·.*)?$/i,
+ importance:'HIGH',source:'Eurostat · official Euro indicators release calendar, 30 Oct 2026 11:00 CET',
+ url:'https://ec.europa.eu/eurostat/en/news/euro-indicators/release-calendar',fullScheduleOnly:true},
+{date:'2026-10-30T11:00:00+01:00',ccy:'EUR',
+ event:'Euro Area Unemployment Rate · Sep 2026 (SA)',
+ match:/^(?:Euro(?:zone| Area) Unemployment(?: Rate)?|Unemployment Rate · Euro Area)(?: ·.*)?$/i,
+ importance:'HIGH',source:'Eurostat · official Euro indicators release calendar, 30 Oct 2026 11:00 CET',
+ url:'https://ec.europa.eu/eurostat/en/news/euro-indicators/release-calendar',fullScheduleOnly:true},
+
  // Verified publisher schedules for 26–28 Oct 2026. US remains on EDT until 1 Nov; Skopje switched to CET on 25 Oct.
  // 26 Oct 10:30 CET = 10:30 Europe/Skopje.
  {date:'2026-10-26T10:30:00+01:00',ccy:'EUR',event:'German Ifo Business Climate · Oct',match:/Ifo Business Climate|German Ifo|GE Ifo/i,importance:'HIGH',source:'ifo Institute · official release schedule 26 Oct 2026 10:30 CET',url:'https://www.ifo.de/umfrage/ifo-geschaeftsklima-deutschland'},
