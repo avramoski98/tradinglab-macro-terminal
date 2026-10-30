@@ -2,6 +2,17 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 Eurostat September unemployment: 6.5% SA, August revised to
+// 6.5% from the 1 Oct vintage of 6.4%; July also revised to 6.5%.
+// Do not carry the old 6.4% as the current previous or infer consensus.
+{day:'2026-10-30',time:'11:00',dateOverride:'2026-10-30T11:00:00+01:00',ccy:'EUR',
+ match:/^(?:Euro(?:zone| Area) Unemployment(?: Rate)?|Unemployment Rate · Euro Area|Unemployment Rate)(?: ·.*)?$/i,
+ event:'Euro Area Unemployment Rate · Sep 2026 (SA)',
+ actual:'6.5%',previous:'6.5%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · EUROSTAT PRIMARY · SEP 6.5% · AUG REVISED 6.5%',
+ source:'Eurostat 30 Oct 2026 September unemployment: euro area 6.5%, stable vs revised August 6.5% (previously reported 6.4%); July also revised to 6.5%. EU 6.2%. Market consensus not independently verified.',
+ url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/3-30102026-bp',status:'verified-primary',sourcePublishedAt:'2026-10-30',
+ releaseTimeVerified:false,verifiedAt:'2026-10-30T11:06:00Z',force:true},
 // 30 Oct 2026 Eurostat Q3 flash GDP: original publisher's numeric table
 // verifies euro area +0.4% q/q and Italy 0.0% q/q. These are preliminary,
 // subject to revision on 13 Nov. No unverified market consensus is asserted.

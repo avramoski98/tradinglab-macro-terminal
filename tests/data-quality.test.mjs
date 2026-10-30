@@ -2158,9 +2158,10 @@ test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented wit
   const labor=out.events.filter(e=>e.currency==='EUR'&&e.event.startsWith('Euro Area Unemployment Rate')&&String(e.date).startsWith('2026-10-30'));
   assert.equal(labor.length,1,mode+' unemployment schedule missing');
   assert.equal(labor[0].date,'2026-10-30T11:00:00+01:00');
-  assert.equal(labor[0].releaseState,Date.now()<Date.parse(labor[0].date)?'scheduled':'overdue');
-  assert.equal(labor[0].actual,'—');
-  assert.equal(labor[0].verificationStatus,'official-schedule');
+  assert.equal(labor[0].releaseState,'released');
+  assert.equal(labor[0].actual,'6.5%');
+  assert.equal(labor[0].previous,'6.5%');
+  assert.equal(labor[0].verificationStatus,'verified-primary');
  }
  const html=fs.readFileSync('index.html','utf8');
  assert.match(html,/30 OCT 10:00 CET · GERMANY GDP\/LABOR/);
@@ -2175,7 +2176,20 @@ test('generic live Euro Area Unemployment Rate merges into one official overdue 
  const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-30')&&(e.event==='Unemployment Rate'||e.event==='Euro Area Unemployment Rate · Sep 2026 (SA)'));
  assert.equal(rows.length,1,'generic and official unemployment must not duplicate');
  assert.equal(rows[0].event,'Euro Area Unemployment Rate · Sep 2026 (SA)');
- assert.equal(rows[0].actual,'—');
- assert.equal(rows[0].verificationStatus,'official-schedule');
- assert.equal(rows[0].releaseState,Date.now()<Date.parse(rows[0].date)?'scheduled':'overdue');
+ assert.equal(rows[0].actual,'6.5%');
+ assert.equal(rows[0].verificationStatus,'verified-primary');
+ assert.equal(rows[0].releaseState,'released');
+});
+
+
+test('Eurostat 30 Oct September unemployment and July/Aug revisions have primary provenance',()=>{
+ const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=d.currencies.EUR.filter(x=>x.event==='Unemployment rate · SA');
+ const last=rows.filter(x=>['2026-07','2026-08','2026-09'].includes(x.reference));
+ assert.deepEqual(last.map(x=>x.reference),['2026-07','2026-08','2026-09']);
+ assert.deepEqual(last.map(x=>x.actual),[6.5,6.5,6.5]);
+ for(const x of last){assert.equal(x.verificationStatus,'verified-primary');assert.equal(x.releaseDate,'2026-10-30');assert.match(x.sourceUrl,/3-30102026-bp/);}
+ const h=fs.readFileSync('index.html','utf8');
+ assert.ok(h.includes('Eurostat unemployment · 30 Oct'));
+ assert.ok(!h.includes('unemployment still awaiting verified Actual'));
 });
