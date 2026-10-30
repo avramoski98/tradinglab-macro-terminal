@@ -2165,13 +2165,14 @@ test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented wit
  const html=fs.readFileSync('index.html','utf8');
  assert.match(html,/30 OCT 10:00 CET · GERMANY GDP\/LABOR/);
  assert.match(html,/EURO AREA \+ ITALY Q3 GDP/);
+ assert.doesNotMatch(html,/Euro Area GDP\/unemployment/);
 });
 
 test('generic live Euro Area Unemployment Rate merges into one official overdue row',()=>{
  const out=applyVerifiedReleaseOverlay({mode:'live',events:[
   {date:'2026-10-30T11:00:00+01:00',currency:'EUR',event:'Unemployment Rate',actual:'—',releaseState:'overdue',importance:'HIGH',source:'ForexFactory'}
  ]},{includeFullSchedule:true});
- const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-30')&&/Unemployment Rate/.test(e.event));
+ const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-30')&&(e.event==='Unemployment Rate'||e.event==='Euro Area Unemployment Rate · Sep 2026 (SA)'));
  assert.equal(rows.length,1,'generic and official unemployment must not duplicate');
  assert.equal(rows[0].event,'Euro Area Unemployment Rate · Sep 2026 (SA)');
  assert.equal(rows[0].actual,'—');
