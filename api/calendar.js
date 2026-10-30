@@ -1,7 +1,20 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-30T01:40:00.000Z';
+const VERIFIED_AT='2026-10-30T05:20:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026 06:00 CET (14:00 JST): Japan September housing starts.
+// MLIT confirms the official release slot; the numeric Actual is currently
+// verified only from the contemporaneous FinancialJuice wire (05:00:12 UTC).
+// Do not classify the value or the wire survey forecast as primary verified.
+{day:'2026-10-30',time:'06:00',dateOverride:'2026-10-30T06:00:00+01:00',ccy:'JPY',
+ match:/^Housing Starts y\/y(?: ·.*)?$/i,
+ event:'Housing Starts y/y · Sep 2026',
+ actual:'-2.743%',previous:'6.1%',forecast:'—',importance:'MED',
+ label:'RELEASED · JPY housing starts -2.743% · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 05:00:12 UTC reports Japan September housing starts -2.743% y/y, previous +6.1%; the wire forecast +2.85% is not independently verified as official consensus. MLIT confirms the scheduled 30 Oct 14:00 JST release; original September numeric report has not been independently retrieved. Preserve reported precision pending primary verification.',
+ url:'https://www.financialjuice.com/News/9828725/Japanese-Housing-Starts-YoY-Actual--2743-Forecast-285-Previous-61.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T05:00:12Z',force:true},
 // 30 Oct 2026: official BoJ Statement on Monetary Policy and October Outlook.
 // The BOJ fixes the release DAY but not the decision's exact clock time.
 // ForexFactory's 03:30 CET feed slot is indicative, NOT a verified publication time.
