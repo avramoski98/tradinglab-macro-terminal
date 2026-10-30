@@ -2,6 +2,20 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 Germany preliminary national CPI: FinancialJuice timestamped
+// 13:00 UTC wire, corroborated by contemporaneous German reporting.
+// National CPI m/m -0.2%, y/y +2.8%; do not conflate with HICP m/m -0.1%.
+// Original Destatis numeric press release not independently retrieved: SECONDARY.
+{day:'2026-10-30',time:'14:00',dateOverride:'2026-10-30T14:00:00+01:00',ccy:'EUR',
+ match:/^German (?:Prelim(?:inary)? |Flash )?CPI m\/m(?: ·.*)?$/i,
+ event:'German Prelim CPI m/m · Oct 2026 (national CPI, provisional)',
+ actual:'-0.2%',previous:'+0.6%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · GERMANY OCT CPI -0.2% m/m · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 13:00:03 UTC: Germany national preliminary CPI -0.2% m/m, +2.8% y/y (Sep +0.6% m/m, +3.3% y/y). Separate HICP -0.1% m/m / +2.8% y/y. Contemporaneous German reports corroborate the annual national CPI; Destatis original October numeric release not independently retrieved. Wire forecast is NOT official verified consensus.',
+ url:'https://www.financialjuice.com/News/9829524/German-CPI-MoM-Prelim--Actual--02-Forecast-01-Previous-060.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T13:00:03Z',force:true},
+
 // 30 Oct 2026 US Employment Cost Index, Q3 civilian compensation costs,
 // seasonally adjusted q/q. Contemporaneous FinancialJuice timestamped wire;
 // BLS official October numeric release was not independently retrievable at check.
@@ -78,10 +92,10 @@ const VERIFIED=[
  match:/^(?:German (?:Prelim |Flash )?GDP q\/q|Germany GDP q\/q|German Flash GDP)(?: ·.*)?$/i,
  event:'German Flash GDP q/q · Q3 2026 (SA)',
  actual:'+0.2%',previous:'—',forecast:'—',importance:'HIGH',
- label:'RELEASED · Germany Q3 GDP +0.2% q/q · SECONDARY VERIFIED',
- source:'Welt / German newswire, 30 Oct 2026, citing Destatis preliminary Q3 GDP +0.2% q/q. Original Destatis numeric release not independently retrieved. Do not infer consensus.',
- url:'https://www.welt.de/article6ae45da9aacefa08f5b99140',
- status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ label:'RELEASED · Germany Q3 GDP +0.2% q/q · DESTATIS PRIMARY',
+ source:'Destatis press release No. 381, 30 Oct 2026: Q3 2026 German real GDP +0.2% q/q price-, seasonally and calendar-adjusted; +1.3% y/y price-adjusted. Preliminary estimate. No independently verified market consensus.',
+ url:'https://www.destatis.de/EN/Press/2026/10/PE26_381_811.html',
+ status:'verified-primary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
  verifiedAt:'2026-10-30T09:20:00Z',force:true},
 {day:'2026-10-30',time:'09:55',dateOverride:'2026-10-30T09:55:00+01:00',ccy:'EUR',
  match:/^German Unemployment Change(?: ·.*)?$/i,
