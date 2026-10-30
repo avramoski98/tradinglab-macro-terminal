@@ -2,6 +2,27 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 29 Oct central-bank appearances: issuer-published evidence, not numeric
+// releases. SNB has published the speech text; BoC lists the lecture webcast.
+// Do not infer rate guidance or a numerical policy surprise from either.
+{day:'2026-10-29',time:'18:30',dateOverride:'2026-10-29T18:30:00+01:00',ccy:'CHF',
+ match:/^Gov Board Member Tschudin Speaks(?: ·.*)?$/i,
+ event:'SNB Tschudin / Moser · Collateral Policy Speech · 29 Oct',
+ actual:'Speech text published',previous:'—',forecast:'—',importance:'MED',
+ label:'RELEASED · SNB speech publication · VERIFIED PRIMARY',
+ source:'Swiss National Bank official speech text dated 29 Oct 2026, Petra Tschudin and Thomas Moser, Liquidity against collateral: the SNB approach. This confirms publication, not a numeric policy-rate decision.',
+ url:'https://www.snb.ch/en/publications/communication/speeches/2026/ref_20261029_gpetmo',
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T08:45:00Z',force:true},
+{day:'2026-10-29',time:'16:30',dateOverride:'2026-10-29T16:30:00+01:00',ccy:'CAD',
+ match:/^Gov Council Member Vincent Speaks(?: ·.*)?$/i,
+ event:'BoC Nicolas Vincent · John Kuszczak Memorial Lecture Introduction · 29 Oct',
+ actual:'Webcast published · introductory remarks',previous:'—',forecast:'—',importance:'MED',
+ label:'RELEASED · BoC webcast published · VERIFIED PRIMARY',
+ source:'Bank of Canada official 29 Oct 2026 annual conference program and published John Kuszczak Memorial Lecture webcast identify Deputy Governor Nicolas Vincent as the introductory speaker at 11:30 ET / 16:30 CET. No separate numeric policy decision or speech transcript is asserted.',
+ url:'https://www.bankofcanada.ca/press/speeches/webcasts/',
+ status:'verified-primary-publication',numericActualVerified:false,sourcePublishedAt:'2026-10-29',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T08:45:00Z',force:true},
 // 30 Oct 2026 08:00-09:00 CET: release results cross-checked against
 // timestamped FinancialJuice wires and Reuters. Original issuer numeric
 // bulletins not yet independently fetched; do NOT upgrade to primary.
