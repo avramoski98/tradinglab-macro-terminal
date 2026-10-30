@@ -2123,3 +2123,40 @@ test('30 Oct European release overlay resolves six overdue rows in LIVE and FALL
  assert.match(html,/30 OCT 09:00 CET · EUROPEAN FLASH CPI/);
  assert.match(html,/0\/10 LIVE rate probabilities/);
 });
+
+test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented without invented primary values',()=>{
+ const specs=[
+  ['German Flash GDP q/q','+0.2%'],
+  ['German Unemployment Change','+4K'],
+  ['German Unemployment Rate','6.4%']
+ ];
+ for(const mode of ['live','schedule-fallback']){
+  const events=mode==='live'?[
+   {date:'2026-10-30T10:00:00+01:00',currency:'EUR',event:'German GDP q/q',actual:'—',releaseState:'overdue',importance:'HIGH'},
+   {date:'2026-10-30T09:55:00+01:00',currency:'EUR',event:'German Unemployment Change',actual:'—',releaseState:'overdue',importance:'HIGH'},
+   {date:'2026-10-30T09:55:00+01:00',currency:'EUR',event:'German Unemployment Rate',actual:'—',releaseState:'overdue',importance:'HIGH'}
+  ]:[];
+  const out=applyVerifiedReleaseOverlay({mode,events},{includeFullSchedule:true});
+  for(const [prefix,actual] of specs){
+   const rows=out.events.filter(e=>e.currency==='EUR'&&e.event.startsWith(prefix)&&String(e.date).startsWith('2026-10-30'));
+   assert.equal(rows.length,1,mode+' '+prefix+' should be unique');
+   assert.equal(rows[0].actual,actual);
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.equal(rows[0].forecast,'—');
+   assert.match(rows[0].sourceUrl,/^https:\/\//);
+  }
+  for(const prefix of ['Euro Area Preliminary Flash GDP','Euro Area Unemployment Rate']){
+   const rows=out.events.filter(e=>e.currency==='EUR'&&e.event.startsWith(prefix)&&String(e.date).startsWith('2026-10-30'));
+   assert.equal(rows.length,1,mode+' '+prefix+' schedule missing');
+   assert.equal(rows[0].date,'2026-10-30T11:00:00+01:00');
+   assert.equal(rows[0].releaseState,Date.now()<Date.parse(rows[0].date)?'scheduled':'overdue');
+   assert.equal(rows[0].actual,'—');
+   assert.equal(rows[0].verificationStatus,'official-schedule');
+   assert.match(rows[0].sourceUrl,/ec\.europa\.eu/);
+  }
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(html,/30 OCT 10:00 CET · GERMANY GDP\/LABOR/);
+ assert.match(html,/Euro Area GDP and unemployment/);
+});
