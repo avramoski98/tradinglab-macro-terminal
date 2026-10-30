@@ -4,6 +4,36 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('30 Oct Germany preliminary national CPI clears overdue in LIVE and FALLBACK with secondary provenance',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-30T14:00:00+01:00',currency:'EUR',event:'German Prelim CPI m/m',actual:'—',releaseState:'overdue',importance:'HIGH'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&/^German Prelim CPI m\/m/.test(e.event));
+  assert.equal(rows.length,1,'one German CPI row for '+payload.mode);
+  assert.equal(rows[0].actual,'-0.2%');
+  assert.equal(rows[0].previous,'+0.6%');
+  assert.equal(rows[0].forecast,'—');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-secondary');
+  assert.equal(rows[0].releaseTimeVerified,true);
+  assert.match(rows[0].sourceUrl,/financialjuice\.com/);
+  assert.equal(out.events.filter(e=>e.currency==='EUR'&&/German Prelim CPI/.test(e.event)&&e.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('GERMANY PRELIMINARY CPI (EUR · SECONDARY VERIFIED)'));
+ assert.ok(html.includes('GERMAN FLASH CPI (EUR / SECONDARY VERIFIED)'));
+});
+test('30 Oct German Q3 GDP is now independently primary verified by Destatis',()=>{
+ const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ const row=out.events.find(e=>e.currency==='EUR'&&/^German Flash GDP q\/q · Q3 2026/.test(e.event));
+ assert.ok(row);
+ assert.equal(row.actual,'+0.2%');
+ assert.equal(row.verificationStatus,'verified-primary');
+ assert.match(row.sourceUrl,/destatis\.de\/EN\/Press\/2026\/10\/PE26_381_811/);
+});
+
 test('30 Oct ECI and Canadian GDP timestamped wires clear overdue in LIVE and FALLBACK, but stay secondary',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-30T13:30:00+01:00',currency:'USD',event:'Employment Cost Index q/q',actual:'—',previous:'0.9%',forecast:'0.8%',releaseState:'checking',importance:'HIGH'},{date:'2026-10-30T13:30:00+01:00',currency:'CAD',event:'GDP m/m',actual:'—',releaseState:'overdue',importance:'HIGH'}]},
