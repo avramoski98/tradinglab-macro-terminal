@@ -2091,3 +2091,35 @@ test('Oct 30 BoJ primary policy and Outlook clear all three provider overdue ali
  assert.ok(html.includes('JPY 330bn to JPY 860bn per year'));
  assert.ok(html.includes('rate probabilities remain unavailable (0/10 live)'));
 });
+
+test('30 Oct European release overlay resolves six overdue rows in LIVE and FALLBACK without false primary status',()=>{
+ const specs=[
+  ['GBP','Nationwide HPI m/m','0.0%'],
+  ['EUR','French Prelim CPI m/m','+0.4%'],
+  ['EUR','French Prelim Private Payrolls q/q','-0.1%'],
+  ['CHF','KOF Economic Barometer','107.6'],
+  ['EUR','Spanish Flash CPI y/y','4.9%'],
+  ['EUR','Spanish Flash GDP q/q','+0.6%']
+ ];
+ for(const mode of ['live','schedule-fallback']){
+  const events=mode==='live'?specs.map(([currency,event])=>({
+   date:currency==='GBP'?'2026-10-30T08:00:00+01:00':event.startsWith('French')?'2026-10-30T08:45:00+01:00':'2026-10-30T09:00:00+01:00',
+   currency,event,actual:'—',releaseState:'overdue',importance:'MED'
+  })):[];
+  const out=applyVerifiedReleaseOverlay({mode,events},{includeFullSchedule:true});
+  for(const [ccy,prefix,actual] of specs){
+   const rows=out.events.filter(e=>e.currency===ccy&&String(e.date).startsWith('2026-10-30')&&e.event.startsWith(prefix));
+   assert.equal(rows.length,1,mode+' '+prefix+' must be unique');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,actual);
+   assert.equal(rows[0].forecast,'—','wire poll is not verified official consensus');
+   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.match(rows[0].sourceUrl,/^https:\/\//);
+  }
+  assert.equal(out.events.filter(e=>e.releaseState==='overdue'&&specs.some(([ccy,p])=>e.currency===ccy&&e.event.startsWith(p))).length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(html,/30 OCT 08:00–09:00 CET · EUROPEAN CPI/);
+ assert.match(html,/30 OCT 09:00 CET · EUROPEAN FLASH CPI/);
+ assert.match(html,/0\/10 LIVE rate probabilities/);
+});
