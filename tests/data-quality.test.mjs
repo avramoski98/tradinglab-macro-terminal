@@ -2262,3 +2262,21 @@ test('Eurostat 30 Oct September unemployment and July/Aug revisions have primary
  assert.ok(h.includes('Eurostat unemployment · 30 Oct'));
  assert.ok(!h.includes('unemployment still awaiting verified Actual'));
 });
+
+
+test('30 Oct Chicago PMI headline is primary verified against MNI, with forecast kept provider-only',()=>{
+ for(const payload of [{mode:'live',events:[{date:'2026-10-30T14:45:00+01:00',currency:'USD',event:'Chicago PMI',actual:'—',releaseState:'overdue',importance:'MED'}]},{mode:'schedule-fallback',events:[]}]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='USD'&&/Chicago PMI · Oct 2026/.test(e.event));
+  assert.equal(rows.length,1);
+  assert.equal(rows[0].actual,'55.3');
+  assert.equal(rows[0].previous,'58.8');
+  assert.equal(rows[0].releaseState,'released');
+  assert.equal(rows[0].verificationStatus,'verified-primary');
+  assert.match(rows[0].sourceUrl,/mnimarkets\.com\/articles\/chicago-business-barometer/);
+  assert.match(rows[0].source,/provider consensus, not an MNI figure/i);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('MNI primary-verified headline'));
+ assert.ok(html.includes('MNI · Chicago PMI October actual'));
+});

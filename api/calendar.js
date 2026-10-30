@@ -3,17 +3,17 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 // 30 Oct 2026 09:45 EDT (14:45 CET) Chicago Business Barometer.
-// Investing.com economic calendar updated its October release to 55.3, versus
-// provider forecast 55.8 and September 58.8. Secondary numeric verification;
-// do not interpret the modest miss as a structural Fed or USD policy pivot.
+// MNI's own 30 Oct publication confirms October 55.3 versus September 58.8.
+// Provider forecast 55.8 is NOT a primary-source MNI consensus.
+// Do not interpret this moderate slowdown as a structural Fed or USD policy pivot.
 {day:'2026-10-30',time:'14:45',dateOverride:'2026-10-30T14:45:00+01:00',ccy:'USD',
  match:/Chicago (?:PMI|Business Barometer)|Chicago Purchasing Managers/i,
  event:'Chicago PMI · Oct 2026 (MNI Business Barometer)',
  actual:'55.3',previous:'58.8',forecast:'55.8',importance:'MED',
- label:'RELEASED · CHICAGO PMI 55.3 vs 55.8 · SECONDARY VERIFIED',
- source:'Investing.com economic calendar, Oct 30 2026: Chicago PMI 55.3, forecast 55.8, previous 58.8. Above 50 expansion, but deceleration and small miss. Not an official MNI primary numeric release.',
- url:'https://www.investing.com/economic-calendar/chicago-pmi-38',
- status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ label:'RELEASED · CHICAGO PMI 55.3 · PRIMARY VERIFIED (MNI)',
+ source:'MNI Chicago Business Barometer, 30 Oct 2026: October headline 55.3, down 3.5 points from September 58.8; remains above 50. Forecast 55.8 is an unverified provider consensus, not an MNI figure.',
+ url:'https://www.mnimarkets.com/articles/chicago-business-barometertm-dipped-to-553-in-october-1793367900177',
+ status:'verified-primary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
  verifiedAt:'2026-10-30T13:45:00Z',force:true},
 
 // 30 Oct 2026 Germany preliminary national CPI: FinancialJuice timestamped
