@@ -4,6 +4,29 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('30 Oct ISTAT preliminary national CPI clears LIVE overdue and is present in FALLBACK without HICP confusion',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-30T11:00:00+01:00',currency:'EUR',event:'Italian Prelim CPI m/m',actual:'—',previous:'+0.7%',forecast:'+0.3%',releaseState:'overdue',importance:'HIGH'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='EUR'&&String(e.date).startsWith('2026-10-30')&&/Italian Prelim CPI m\/m/.test(e.event));
+  assert.equal(rows.length,1,'single ISTAT NIC CPI row in '+payload.mode);
+  const e=rows[0];
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'+0.9%');
+  assert.equal(e.previous,'+0.7%');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.verificationStatus,'verified-primary');
+  assert.equal(e.releaseTimeVerified,false);
+  assert.match(e.sourceUrl,/istat\.it\/en\/press-release\/consumer-prices-provisional-data-october-2026/);
+  assert.match(e.source,/HICP is a distinct series/);
+  assert.equal(out.events.filter(x=>x.currency==='EUR'&&/Italian Prelim CPI m\/m/.test(x.event)&&x.releaseState==='overdue').length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('ITALY PRELIM OCTOBER CPI · ISTAT PRIMARY'));
+});
+
 test('29 Oct DOL initial claims primary release clears checking/overdue in LIVE and FALLBACK',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-29T13:30:00+01:00',currency:'USD',event:'Unemployment Claims',actual:'—',previous:'194K',forecast:'198K',releaseState:'checking',importance:'MED'}]},

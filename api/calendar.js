@@ -2,6 +2,20 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 ISTAT October provisional national CPI (NIC, incl tobacco).
+// Distinguish NIC +0.9% m/m from HICP +1.2% m/m; the provider's
+// Italian Prelim CPI m/m event is the national NIC series, not HICP.
+// Publisher confirms release date, but not the feed's exact 11:00 CET minute.
+{day:'2026-10-30',time:'11:00',dateOverride:'2026-10-30T11:00:00+01:00',ccy:'EUR',
+ match:/^(?:Italian|Italy) (?:Prelim(?:inary)? |Flash )?CPI m\/m(?: ·.*)?$/i,
+ event:'Italian Prelim CPI m/m · Oct 2026 (NIC, provisional)',
+ actual:'+0.9%',previous:'+0.7%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ISTAT PRIMARY · ITALY OCT NIC +0.9% m/m',
+ source:'ISTAT 30 Oct 2026 preliminary October national NIC CPI including tobacco: +0.9% m/m, +5.4% y/y (September +0.7% m/m, +4.2% y/y). HICP is a distinct series (+1.2% m/m, +5.6% y/y); core inflation +2.0% y/y. Energy and unprocessed food led the acceleration. No independently verified survey consensus; preliminary, final release 17 Nov.',
+ url:'https://www.istat.it/en/press-release/consumer-prices-provisional-data-october-2026/',
+ status:'verified-primary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T12:28:00Z',force:true},
+
 // 30 Oct 2026 Eurostat September unemployment: 6.5% SA, August revised to
 // 6.5% from the 1 Oct vintage of 6.4%; July also revised to 6.5%.
 // Do not carry the old 6.4% as the current previous or infer consensus.
