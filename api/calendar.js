@@ -1267,6 +1267,16 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-29T14:45:00+01:00',ccy:'EUR',event:'ECB Press Conference',match:/ECB.*Press Conference|Lagarde.*Press Conference/i,importance:'HIGH',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
  {date:'2026-10-30T07:30:00+01:00',ccy:'JPY',event:'BoJ Governor Ueda Press Conference (rate decision & Outlook Report time TBA)',match:/BoJ.*Press Conference|Ueda.*Press Conference/i,importance:'HIGH',source:'Bank of Japan official calendar',url:'https://www.boj.or.jp/about/calendar/index.htm'},
  {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'},
+ // 30 Oct 09:45 EDT = 14:45 CET: Chicago Business Barometer (October).
+ // ForexFactory/MNI schedule corroborates the release time, but the October
+ // numeric result has not been independently verified. Keep the event visible
+ // as OVERDUE in FALLBACK when the LIVE ForexFactory feed is unavailable;
+ // do not copy September's 58.8 or manufacture a consensus/Actual.
+ {date:'2026-10-30T14:45:00+01:00',ccy:'USD',event:'Chicago PMI · Oct 2026',
+  match:/Chicago (?:PMI|Business Barometer)|Chicago Purchasing Managers/i,
+  importance:'MED',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'MNI / ForexFactory · Chicago Business Barometer, 30 Oct 2026 09:45 EDT (14:45 CET)',
+  url:'https://www.forexfactory.com/calendar/189-us-chicago-pmi',fullScheduleOnly:true},
  // Next-week high-impact publisher-verified schedule (2–6 Nov 2026).
  // Dates and times use Europe/Skopje CET (UTC+1). The US moves to EST on 1 Nov.
  // These are SCHEDULE-ONLY rows: never fabricate actual, consensus or release status.
