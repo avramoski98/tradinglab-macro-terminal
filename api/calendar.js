@@ -964,7 +964,22 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-10-29T14:15:00+01:00',ccy:'EUR',event:'ECB Rate Decision',match:/ECB.*Rate|Main Refinancing Rate|Deposit Facility Rate/i,importance:'EXTREME',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
  {date:'2026-10-29T14:45:00+01:00',ccy:'EUR',event:'ECB Press Conference',match:/ECB.*Press Conference|Lagarde.*Press Conference/i,importance:'HIGH',source:'European Central Bank',url:'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html'},
  {date:'2026-10-30T07:30:00+01:00',ccy:'JPY',event:'BoJ Governor Ueda Press Conference (rate decision & Outlook Report time TBA)',match:/BoJ.*Press Conference|Ueda.*Press Conference/i,importance:'HIGH',source:'Bank of Japan official calendar',url:'https://www.boj.or.jp/about/calendar/index.htm'},
- {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'}
+ {date:'2026-10-30T13:30:00+01:00',ccy:'USD',event:'Employment Cost Index · Q3',match:/Employment Cost Index/i,importance:'HIGH',source:'U.S. BLS',url:'https://www.bls.gov/schedule/2026/home.htm'},
+ // Next-week high-impact publisher-verified schedule (2–6 Nov 2026).
+ // Dates and times use Europe/Skopje CET (UTC+1). The US moves to EST on 1 Nov.
+ // These are SCHEDULE-ONLY rows: never fabricate actual, consensus or release status.
+ {date:'2026-11-02T16:00:00+01:00',ccy:'USD',event:'ISM Manufacturing PMI · Oct',match:/ISM.*Manufacturing|Manufacturing PMI.*ISM/i,importance:'HIGH',source:'Institute for Supply Management · official 2026 release calendar, 2 Nov 10:00 EST',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/'},
+ // 3 Nov 14:30 AEDT = 04:30 CET. The RBA statement is released with the decision.
+ {date:'2026-11-03T04:30:00+01:00',ccy:'AUD',event:'RBA Rate Decision & Statement on Monetary Policy · Nov',match:/RBA.*Rate|Cash Rate|Reserve Bank of Australia.*Rate|RBA Monetary Policy Decision/i,importance:'EXTREME',source:'Reserve Bank of Australia · official coming-up schedule, 3 Nov 14:30 AEDT',url:'https://www.rba.gov.au/coming-up/'},
+ // 3 Nov 10:00 EST = 16:00 CET.
+ {date:'2026-11-03T16:00:00+01:00',ccy:'USD',event:'JOLTS Job Openings · Sep',match:/JOLTS|Job Openings and Labor Turnover/i,importance:'HIGH',source:'U.S. Bureau of Labor Statistics · official November 2026 release schedule',url:'https://www.bls.gov/schedule/2026/11_sched_list.htm'},
+ // Eurostat confirms 4 Nov flash October HICP; 11:00 Luxembourg CET.
+ {date:'2026-11-04T11:00:00+01:00',ccy:'EUR',event:'Euro Area Flash HICP Inflation y/y · Oct',match:/Flash.*(?:HICP|CPI|Inflation)|(?:HICP|CPI).*Flash|Eurozone.*Inflation/i,importance:'HIGH',source:'Eurostat · October 2026 flash inflation, official 4 Nov release',url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-16102026-ap'},
+ {date:'2026-11-04T16:00:00+01:00',ccy:'USD',event:'ISM Services PMI · Oct',match:/ISM.*Services|ISM.*Non-Manufacturing|Services PMI.*ISM/i,importance:'HIGH',source:'Institute for Supply Management · official 2026 release calendar, 4 Nov 10:00 EST',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/'},
+ // 5 Nov 12:00 GMT = 13:00 CET.
+ {date:'2026-11-05T13:00:00+01:00',ccy:'GBP',event:'BoE Bank Rate Decision & MPC Minutes · Nov',match:/BoE.*Rate|Bank Rate|Official Bank Rate|MPC.*Rate/i,importance:'EXTREME',source:'Bank of England · official November 2026 Monetary Policy Summary at 12:00 GMT',url:'https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/november-2026'},
+ // 6 Nov 08:30 EST = 14:30 CET.
+ {date:'2026-11-06T14:30:00+01:00',ccy:'USD',event:'US Employment Situation / Nonfarm Payrolls · Oct',match:/Employment Situation|Nonfarm Payrolls|Non-Farm Employment Change|Non-Farm Payrolls/i,importance:'EXTREME',source:'U.S. Bureau of Labor Statistics · official employment release schedule, 6 Nov 08:30 EST',url:'https://www.bls.gov/schedule/news_release/empsit.htm'}
 ];
 const rank={LOW:1,MED:2,HIGH:3,EXTREME:4};
 export function applyVerifiedReleaseOverlay(payload,options={}){
