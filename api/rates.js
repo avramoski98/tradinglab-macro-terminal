@@ -1,7 +1,7 @@
 const BANKS = [
   {id:'FED',ccy:'USD',name:'Federal Reserve',nextMeeting:'9 Dec 2026',current:'3.75–4.00%',holdRate:'3.75–4.00%',hikeRate:'4.00–4.25%',cutRate:'3.50–3.75%',url:'https://centralbank.watch/federal-reserve/',previous:{hike:66.0,hold:34.0,cut:0.0}},
   {id:'ECB',ccy:'EUR',name:'European Central Bank',nextMeeting:'17 Dec 2026',current:'2.50%',holdRate:'2.50%',hikeRate:'2.75%',cutRate:'2.25%',url:'https://centralbank.watch/european-central-bank/',previous:{hike:38.6,hold:61.4,cut:0.0}},
-  {id:'BOJ',ccy:'JPY',name:'Bank of Japan',nextMeeting:'30 Oct 2026',current:'1.25%',holdRate:'1.25%',hikeRate:'1.50%',cutRate:'1.00%',url:'https://centralbank.watch/bank-of-japan/',previous:{hike:0.0,hold:98.8,cut:1.2}},
+  {id:'BOJ',ccy:'JPY',name:'Bank of Japan',nextMeeting:'18 Dec 2026',current:'1.25%',holdRate:'1.25%',hikeRate:'1.50%',cutRate:'1.00%',url:'https://centralbank.watch/bank-of-japan/',previous:{hike:0.0,hold:98.8,cut:1.2}},
   {id:'BOE',ccy:'GBP',name:'Bank of England',nextMeeting:'5 Nov 2026',current:'3.75%',holdRate:'3.75%',hikeRate:'4.00%',cutRate:'3.50%',url:'https://centralbank.watch/bank-of-england/',previous:{hike:85.7,hold:14.3,cut:0.0}},
   {id:'BOC',ccy:'CAD',name:'Bank of Canada',nextMeeting:'9 Dec 2026',current:'2.50%',holdRate:'2.50%',hikeRate:'2.75%',cutRate:'2.25%',url:'https://centralbank.watch/bank-of-canada/',previous:{hike:NaN,hold:NaN,cut:NaN}},
   {id:'RBA',ccy:'AUD',name:'Reserve Bank of Australia',nextMeeting:'3 Nov 2026',current:'4.60%',holdRate:'4.60%',hikeRate:'4.85%',cutRate:'4.35%',url:'https://centralbank.watch/reserve-bank-of-australia/',previous:{hike:90.0,hold:10.0,cut:0.0}},
