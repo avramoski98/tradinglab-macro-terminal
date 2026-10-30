@@ -4,6 +4,22 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('30 Oct ECI and Canadian GDP timestamped wires clear overdue in LIVE and FALLBACK, but stay secondary',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-10-30T13:30:00+01:00',currency:'USD',event:'Employment Cost Index q/q',actual:'—',previous:'0.9%',forecast:'0.8%',releaseState:'checking',importance:'HIGH'},{date:'2026-10-30T13:30:00+01:00',currency:'CAD',event:'GDP m/m',actual:'—',releaseState:'overdue',importance:'HIGH'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const eci=out.events.filter(e=>e.currency==='USD'&&/Employment Cost Index q\/q · Q3 2026/.test(e.event));
+  const cad=out.events.filter(e=>e.currency==='CAD'&&/Canada GDP m\/m · Aug 2026/.test(e.event));
+  assert.equal(eci.length,1);assert.equal(cad.length,1);
+  assert.equal(eci[0].actual,'+0.8%');assert.equal(eci[0].previous,'+0.9%');
+  assert.equal(cad[0].actual,'0.0%');assert.equal(cad[0].previous,'0.0%');
+  for(const e of [eci[0],cad[0]]){assert.equal(e.releaseState,'released');assert.equal(e.verificationStatus,'verified-secondary');assert.equal(e.forecast,'—');assert.equal(e.releaseTimeVerified,true);}
+ }
+ assert.ok(fs.readFileSync('index.html','utf8').includes('US ECI + CANADA MONTHLY GDP · SECONDARY VERIFIED'));
+});
+
 test('30 Oct ISTAT preliminary national CPI clears LIVE overdue and is present in FALLBACK without HICP confusion',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-30T11:00:00+01:00',currency:'EUR',event:'Italian Prelim CPI m/m',actual:'—',previous:'+0.7%',forecast:'+0.3%',releaseState:'overdue',importance:'HIGH'}]},

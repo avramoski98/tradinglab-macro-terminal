@@ -2,6 +2,30 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 US Employment Cost Index, Q3 civilian compensation costs,
+// seasonally adjusted q/q. Contemporaneous FinancialJuice timestamped wire;
+// BLS official October numeric release was not independently retrievable at check.
+{day:'2026-10-30',time:'13:30',dateOverride:'2026-10-30T13:30:00+01:00',ccy:'USD',
+ match:/^Employment Cost Index(?: q\/q| ·.*)?$/i,
+ event:'Employment Cost Index q/q · Q3 2026 (civilian compensation, SA)',
+ actual:'+0.8%',previous:'+0.9%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · US ECI Q3 +0.8% · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 12:30:03 UTC: US Employment Costs +0.8% q/q (prior +0.9%). Wire survey +0.8% not independently primary-verified as consensus; BLS original September-quarter numeric release not independently retrieved. Official BLS schedule confirms 30 Oct 08:30 EDT / 13:30 CET.',
+ url:'https://www.financialjuice.com/News/9829463/US-Employment-Costs-Actual-08-Forecast-08-Previous-09.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T12:30:03Z',force:true},
+// 30 Oct 2026 Canadian monthly real GDP by industry (August reference month).
+// Secondary wire is NOT the official Statistics Canada numeric bulletin.
+{day:'2026-10-30',time:'13:30',dateOverride:'2026-10-30T13:30:00+01:00',ccy:'CAD',
+ match:/^(?:Canadian |Canada )?GDP m\/m(?: ·.*)?$/i,
+ event:'Canada GDP m/m · Aug 2026 (real GDP by industry)',
+ actual:'0.0%',previous:'0.0%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · CANADA AUG GDP 0.0% · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 12:30:01 UTC: Canadian monthly GDP 0.0% m/m, previous 0.0%; wire poll +0.2% is not independently verified as official consensus. Statistics Canada August 2026 primary numeric publication not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9829462/Canadian-GDP-MoM-Actual-0-Forecast-02-Previous-00.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T12:30:01Z',force:true},
+
 // 30 Oct 2026 ISTAT October provisional national CPI (NIC, incl tobacco).
 // Distinguish NIC +0.9% m/m from HICP +1.2% m/m; the provider's
 // Italian Prelim CPI m/m event is the national NIC series, not HICP.
