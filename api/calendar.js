@@ -2,6 +2,20 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 09:45 EDT (14:45 CET) Chicago Business Barometer.
+// Investing.com economic calendar updated its October release to 55.3, versus
+// provider forecast 55.8 and September 58.8. Secondary numeric verification;
+// do not interpret the modest miss as a structural Fed or USD policy pivot.
+{day:'2026-10-30',time:'14:45',dateOverride:'2026-10-30T14:45:00+01:00',ccy:'USD',
+ match:/Chicago (?:PMI|Business Barometer)|Chicago Purchasing Managers/i,
+ event:'Chicago PMI · Oct 2026 (MNI Business Barometer)',
+ actual:'55.3',previous:'58.8',forecast:'55.8',importance:'MED',
+ label:'RELEASED · CHICAGO PMI 55.3 vs 55.8 · SECONDARY VERIFIED',
+ source:'Investing.com economic calendar, Oct 30 2026: Chicago PMI 55.3, forecast 55.8, previous 58.8. Above 50 expansion, but deceleration and small miss. Not an official MNI primary numeric release.',
+ url:'https://www.investing.com/economic-calendar/chicago-pmi-38',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T13:45:00Z',force:true},
+
 // 30 Oct 2026 Germany preliminary national CPI: FinancialJuice timestamped
 // 13:00 UTC wire, corroborated by contemporaneous German reporting.
 // National CPI m/m -0.2%, y/y +2.8%; do not conflate with HICP m/m -0.1%.
