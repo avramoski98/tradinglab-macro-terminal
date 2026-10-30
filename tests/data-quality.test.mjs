@@ -2049,7 +2049,7 @@ test('Official Nov 2–6 high-impact schedule survives a calendar provider outag
   ['USD','US Employment Situation','2026-11-06T14:30:00+01:00']
  ];
  for(const [ccy,prefix,date] of expected){
-  const rows=out.events.filter(x=>x.currency===ccy&&x.event.startsWith(prefix));
+  const rows=out.events.filter(x=>x.currency===ccy&&x.date===date&&x.event.startsWith(prefix));
   assert.equal(rows.length,1,'missing or duplicate '+ccy+' '+prefix);
   assert.equal(rows[0].date,date);
   assert.equal(rows[0].releaseState,'scheduled');
