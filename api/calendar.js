@@ -1139,6 +1139,40 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
    verificationStatus:o.scheduleVerificationStatus||'official-schedule',releaseTimeVerified:o.scheduleVerificationStatus?false:(o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null)),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
+ // ForexFactory's "all day" German preliminary CPI slot is not an 08:29
+ // publication. Destatis October 2026 flash CPI is scheduled for 14:00 CET
+ // on 30 Oct (cross-checked with Econfeed/Destatis and Investing.com).
+ // Do not flag it OVERDUE before that time, or treat the feed's arbitrary
+ // all-day display time as a verified source timestamp.
+ const germanCpiTime='2026-10-30T14:00:00+01:00';
+ const germanCpiSource='Destatis CPI release calendar (via Econfeed, checked 28 Oct 2026); Investing.com calendar confirms 14:00 CET';
+ const germanCpiUrl='https://econfeed.io/releases/de-destatis-cpi/';
+ let germanCpiPresent=false;
+ for(let i=0;i<rows.length;i++){
+  const e=rows[i];
+  const name=String(e.event||'').toLowerCase();
+  if(e.currency!=='EUR'||String(e.date||'').slice(0,10)!=='2026-10-30'||
+     !['german prelim cpi','german preliminary cpi','german flash cpi'].some(prefix=>name.startsWith(prefix)))continue;
+  germanCpiPresent=true;
+  if(e.releaseState==='released')continue; // Preserve independently verified Actual if available.
+  const state=Date.parse(germanCpiTime)>Date.now()?'scheduled':'overdue';
+  rows[i]={...e,date:germanCpiTime,sourceDate:germanCpiTime,timeZone:'Europe/Skopje',
+   actual:'—',releaseState:state,
+   label:state==='scheduled'?'SCHEDULED · 14:00 CET (calendar cross-check)':'OVERDUE · Actual not verified',
+   source:germanCpiSource,sourceUrl:germanCpiUrl,
+   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   forecastVerificationStatus:'provider-unverified',lastUpdate:null};
+ }
+ if(!germanCpiPresent){
+  const state=Date.parse(germanCpiTime)>Date.now()?'scheduled':'overdue';
+  rows.push({date:germanCpiTime,sourceDate:germanCpiTime,timeZone:'Europe/Skopje',
+   country:'EUR',currency:'EUR',event:'German Prelim CPI m/m · Oct 2026',
+   importance:'HIGH',actual:'—',previous:'—',forecast:'—',
+   label:state==='scheduled'?'SCHEDULED · 14:00 CET (calendar cross-check)':'OVERDUE · Actual not verified',
+   releaseState:state,source:germanCpiSource,sourceUrl:germanCpiUrl,
+   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   forecastVerificationStatus:'provider-unverified',lastUpdate:null});
+ }
  // Keep the 30 Oct UK Nationwide HPI schedule visible even when the live
  // ForexFactory feed is unavailable. A calendar listing confirms the
  // 07:00 GMT slot, but Nationwide has not published a new numeric report
