@@ -96,7 +96,7 @@ const VERIFIED=[
  source:'Destatis press release No. 381, 30 Oct 2026: Q3 2026 German real GDP +0.2% q/q price-, seasonally and calendar-adjusted; +1.3% y/y price-adjusted. Preliminary estimate. No independently verified market consensus.',
  url:'https://www.destatis.de/EN/Press/2026/10/PE26_381_811.html',
  status:'verified-primary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
- verifiedAt:'2026-10-30T09:20:00Z',force:true},
+ verifiedAt:'2026-10-30T13:14:00Z',force:true},
 {day:'2026-10-30',time:'09:55',dateOverride:'2026-10-30T09:55:00+01:00',ccy:'EUR',
  match:/^German Unemployment Change(?: ·.*)?$/i,
  event:'German Unemployment Change · Oct 2026 (seasonally adjusted)',
