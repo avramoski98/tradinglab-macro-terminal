@@ -1196,7 +1196,14 @@ test('Weekly Focus policy matcher includes official fallback decision names with
   'Durable Goods Orders m/m · Sep',
   'New Home Sales · Sep',
   'Advance Goods Trade Balance · Sep',
-  'UK Budget Statement & OBR Forecast · 2026'
+  'UK Budget Statement & OBR Forecast · 2026',
+  'ISM Manufacturing PMI · Oct',
+  'RBA Rate Decision & Statement on Monetary Policy · Nov',
+  'JOLTS Job Openings · Sep',
+  'Euro Area Flash HICP Inflation y/y · Oct',
+  'ISM Services PMI · Oct',
+  'BoE Bank Rate Decision & MPC Minutes · Nov',
+  'US Employment Situation / Nonfarm Payrolls · Oct'
  ];
  for(const event of accepted)assert.equal(c.weeklyPolicyEventName(event),true,event);
  for(const event of ['Consumer Confidence','EIA Crude Oil Inventories','Retail Sales m/m'])assert.equal(c.weeklyPolicyEventName(event),false,event);
