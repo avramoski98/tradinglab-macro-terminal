@@ -1208,7 +1208,7 @@ test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive
  const expected=[
   ['AUD','CPI y/y · Sep','2026-10-28T01:30:00+01:00','abs.gov.au'],
   ['AUD','International Trade Price Indexes · Sep quarter','2026-10-29T01:30:00+01:00','abs.gov.au'],
-  ['AUD','Producer Price Indexes · Sep quarter','2026-10-30T01:30:00+01:00','abs.gov.au'],
+  ['AUD','PPI q/q · Q3 2026 (ABS Final Demand)','2026-10-30T01:30:00+01:00','financialjuice.com'],
   ['USD','Advance GDP q/q · Q3','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Core PCE Price Index m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
   ['USD','Personal Income m/m · Sep','2026-10-29T13:30:00+01:00','bea.gov'],
@@ -1231,6 +1231,13 @@ test('ABS official releases and BEA GDP/PCE primary/secondary provenance survive
    assert.equal(rows[0].previous,'Import +5.7% · Export +1.1%');
    assert.ok(rows[0].actualVerifiedAt);
    assert.ok(rows[0].sourceUrl.includes('abs.gov.au'));
+  }else if(currency==='AUD'&&prefix.startsWith('PPI q/q')){
+   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,'1.1%');
+   assert.equal(rows[0].previous,'1.3%');
+   assert.ok(rows[0].actualVerifiedAt);
+   assert.ok(rows[0].sourceUrl.includes('financialjuice.com'));
   }else if(currency==='USD'){
    assert.equal(rows[0].releaseState,'released');
    assert.equal(rows[0].verificationStatus,'verified-primary');
@@ -2021,4 +2028,27 @@ test('29 Oct after-hours AI earnings spillover appears in Weekly Focus as second
  assert.match(weekly,/live rate probabilities unavailable/i);
  assert.match(weekly,/30 Oct BoJ decision/);
  assert.match(weekly,/reuters\.com\/commentary\/reuters-open-interest/);
+});
+
+test('Official Nov 2–6 high-impact schedule survives a calendar provider outage',()=>{
+ const out=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ const expected=[
+  ['USD','ISM Manufacturing PMI','2026-11-02T16:00:00+01:00'],
+  ['AUD','RBA Rate Decision','2026-11-03T04:30:00+01:00'],
+  ['USD','JOLTS Job Openings','2026-11-03T16:00:00+01:00'],
+  ['EUR','Euro Area Flash HICP','2026-11-04T11:00:00+01:00'],
+  ['USD','ISM Services PMI','2026-11-04T16:00:00+01:00'],
+  ['GBP','BoE Bank Rate','2026-11-05T13:00:00+01:00'],
+  ['USD','US Employment Situation','2026-11-06T14:30:00+01:00']
+ ];
+ for(const [ccy,prefix,date] of expected){
+  const rows=out.events.filter(x=>x.currency===ccy&&x.event.startsWith(prefix));
+  assert.equal(rows.length,1,'missing or duplicate '+ccy+' '+prefix);
+  assert.equal(rows[0].date,date);
+  assert.equal(rows[0].releaseState,'scheduled');
+  assert.equal(rows[0].verificationStatus,'official-schedule');
+  assert.equal(rows[0].actual,'—');
+  assert.equal(rows[0].forecast,'—');
+  assert.ok(/^https:\/\//.test(rows[0].sourceUrl));
+ }
 });
