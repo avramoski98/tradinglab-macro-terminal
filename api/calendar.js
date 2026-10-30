@@ -1,7 +1,20 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-30T05:20:00.000Z';
+const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 08:00 CET: German September import prices. Contemporaneous
+// FinancialJuice wire at 07:00:03 UTC confirms the numeric Actual; the
+// original Destatis numeric publication is not independently retrieved.
+// Wire consensus +2.0% is NOT treated as a primary-verified forecast.
+{day:'2026-10-30',time:'08:00',dateOverride:'2026-10-30T08:00:00+01:00',ccy:'EUR',
+ match:/^German Imports? Prices? m\/m(?: ·.*)?$/i,
+ event:'German Import Prices m/m · Sep 2026',
+ actual:'2.1%',previous:'1.0%',forecast:'—',importance:'MED',
+ label:'RELEASED · German import prices +2.1% m/m · SECONDARY VERIFIED',
+ source:'FinancialJuice wire 30 Oct 2026 07:00:03 UTC: September German import prices +2.1% m/m (previous +1.0%; wire forecast +2.0% unverified as primary consensus). Original Destatis numeric release not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828862/German-Imports-Prices-MoM-Actual-21-Forecast-2-Previous-10.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T07:00:03Z',force:true},
 // 30 Oct 2026 07:30 CET: Ueda's scheduled press conference has started.
 // FinancialJuice published live remarks at 06:35-06:41 UTC (15:35-15:41 JST).
 // This confirms commencement, NOT completion. Do not invent a numerical Actual.
@@ -1125,6 +1138,23 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?(o.approximate?'Scheduled · approximate time':'Scheduled · official'):'OVERDUE · unverified',
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
    verificationStatus:o.scheduleVerificationStatus||'official-schedule',releaseTimeVerified:o.scheduleVerificationStatus?false:(o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null)),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+ }
+ // Keep the 30 Oct UK Nationwide HPI schedule visible even when the live
+ // ForexFactory feed is unavailable. A calendar listing confirms the
+ // 07:00 GMT slot, but Nationwide has not published a new numeric report
+ // on its primary press page at verification time. Do not invent Actual.
+ const nationwideDate='2026-10-30T08:00:00+01:00';
+ if(!rows.some(e=>e.currency==='GBP'&&String(e.date||'').slice(0,10)==='2026-10-30'&&
+  /^Nationwide HPI m\/m(?: ·.*)?$/i.test(String(e.event||'')))){
+  const state=Date.parse(nationwideDate)>Date.now()?'scheduled':'overdue';
+  rows.push({date:nationwideDate,sourceDate:nationwideDate,timeZone:'Europe/Skopje',
+   country:'GBP',currency:'GBP',event:'Nationwide HPI m/m · Oct 2026',
+   importance:'MED',actual:'—',previous:'—',forecast:'—',
+   label:state==='scheduled'?'SCHEDULED · secondary calendar':'OVERDUE · numeric Actual unverified',
+   releaseState:state,source:'Investing.com economic calendar (secondary schedule; Nationwide primary October report not yet confirmed)',
+   sourceUrl:'https://www.investing.com/economic-calendar/nationwide-hpi-363',
+   verificationStatus:'secondary-schedule',releaseTimeVerified:false,
+   forecastVerificationStatus:'provider-unverified',lastUpdate:null});
  }
  // The fallback archive can contain the same release under a different title.
  // Prefer a source-verified overlay over the manually inherited duplicate.
