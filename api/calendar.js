@@ -2,6 +2,29 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T05:20:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026 07:30 CET: France Q3 flash GDP and September goods spending.
+// Numeric releases confirmed by timestamped FinancialJuice wires at 06:30-06:31 UTC.
+// INSEE confirms the official 07:30 CET release slots, but the original
+// 30 October numeric publications have not yet been independently retrieved.
+// Therefore keep verified-secondary, with no primary-verified consensus.
+{day:'2026-10-30',time:'07:30',dateOverride:'2026-10-30T07:30:00+01:00',ccy:'EUR',
+ match:/^French Flash GDP q\/q(?: ·.*)?$/i,
+ event:'French Flash GDP q/q · Q3 2026',
+ actual:'-0.1%',previous:'0.0%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · France Q3 GDP -0.1% q/q · SECONDARY VERIFIED',
+ source:'FinancialJuice wire 30 Oct 2026 06:30 UTC reports French preliminary Q3 GDP -0.1% q/q, previous 0.0%; wire forecast +0.1% not independently verified. INSEE confirms scheduled release 30 Oct 07:30 CET; original numerical publication not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828825/French-GDP-QoQ-Prelim-Actual--01-Forecast-01-Previous-00.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T06:30:00Z',force:true},
+{day:'2026-10-30',time:'07:30',dateOverride:'2026-10-30T07:30:00+01:00',ccy:'EUR',
+ match:/^French Consumer Spending m\/m(?: ·.*)?$/i,
+ event:'French Consumer Spending m/m · Sep 2026 (goods volume)',
+ actual:'-0.5%',previous:'-0.5%',forecast:'—',importance:'MED',
+ label:'RELEASED · French goods consumption -0.5% · SECONDARY VERIFIED',
+ source:'FinancialJuice wire 30 Oct 2026 06:31:39 UTC reports September French household goods spending -0.5% m/m, previous -0.5%; wire forecast +0.1% not independently verified. INSEE confirms scheduled 30 Oct 07:30 CET release; original numeric publication not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828827/French-Consumer-Spending-MoM-Actual--05-Forecast-01-Previous--05.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T06:31:39Z',force:true},
 // 30 Oct 2026 06:00 CET (14:00 JST): Japan September housing starts.
 // MLIT confirms the official release slot; the numeric Actual is currently
 // verified only from the contemporaneous FinancialJuice wire (05:00:12 UTC).
