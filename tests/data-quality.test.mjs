@@ -2280,3 +2280,20 @@ test('30 Oct Chicago PMI headline is primary verified against MNI, with forecast
  assert.ok(html.includes('MNI primary-verified headline'));
  assert.ok(html.includes('MNI · Chicago PMI October actual'));
 });
+
+
+test('30 Oct Strait of Hormuz tanker violence is high-impact energy/geopolitical news, not ordinary shipping chatter',()=>{
+ const violent=[
+  'UKMTO: Received a time-late report of an incident in the Strait of Hormuz. Crude tanker hit by projectile transiting Hormuz strait',
+  'IRGC: 4th tanker explodes after hitting mine in Strait of Hormuz - IRIB'
+ ];
+ for(const headline of violent){
+  assert.equal(regimeHighImpact(headline),true,headline);
+  assert.ok(categories(headline).includes('ENERGY'),headline);
+  assert.ok(categories(headline).includes('GEOPOLITICS'),headline);
+ }
+ for(const headline of [
+  'IRGC: Tanker ignored warnings against using unauthorised route through Strait of Hormuz',
+  'Shipping rates ease as tanker traffic returns to normal'
+ ])assert.equal(regimeHighImpact(headline),false,headline);
+});
