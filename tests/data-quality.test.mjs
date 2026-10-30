@@ -2059,3 +2059,35 @@ test('Official Nov 2–6 high-impact schedule survives a calendar provider outag
   assert.ok(/^https:\/\//.test(rows[0].sourceUrl));
  }
 });
+
+
+test('Oct 30 BoJ primary policy and Outlook clear all three provider overdue aliases',()=>{
+ const cases=[
+  {mode:'live',events:[
+   {date:'2026-10-30T03:30:00+01:00',currency:'JPY',event:'BOJ Policy Rate',actual:'—',releaseState:'overdue',importance:'HIGH'},
+   {date:'2026-10-30T03:30:00+01:00',currency:'JPY',event:'Monetary Policy Statement',actual:'—',releaseState:'overdue',importance:'HIGH'},
+   {date:'2026-10-30T03:31:00+01:00',currency:'JPY',event:'BOJ Outlook Report',actual:'—',releaseState:'overdue',importance:'HIGH'}
+  ]},
+  {mode:'schedule-fallback',events:[]}
+ ];
+ for(const input of cases){
+  const out=applyVerifiedReleaseOverlay(input,{includeFullSchedule:true});
+  const rows=out.events.filter(x=>x.currency==='JPY'&&String(x.date||'').slice(0,10)==='2026-10-30');
+  const rate=rows.find(x=>x.event.includes('BoJ Policy Rate · 30 Oct 2026'));
+  const statement=rows.find(x=>x.event.includes('BoJ Monetary Policy Statement · 30 Oct'));
+  const outlook=rows.find(x=>x.event.includes('BoJ Outlook Report · Oct 2026'));
+  assert.ok(rate&&statement&&outlook,'all three BoJ official publications must be represented');
+  assert.equal(rate.actual,'1.25%');
+  assert.equal(rate.verificationStatus,'verified-primary');
+  for(const row of [rate,statement,outlook]){
+   assert.equal(row.releaseState,'released');
+   assert.equal(row.releaseTimeVerified,false,'provider time is indicative, not official');
+   assert.ok(row.sourceUrl.startsWith('https://www.boj.or.jp/'));
+  }
+  assert.equal(rows.filter(x=>x.releaseState==='overdue'&&/BOJ Policy Rate|Monetary Policy Statement|BOJ Outlook Report/i.test(x.event)).length,0);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('BOJ 30 OCT 2026 · PRIMARY VERIFIED · POLICY HOLD'));
+ assert.ok(html.includes('JPY 330bn to JPY 860bn per year'));
+ assert.ok(html.includes('rate probabilities remain unavailable (0/10 live)'));
+});
