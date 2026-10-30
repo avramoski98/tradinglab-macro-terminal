@@ -1158,7 +1158,17 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
   String(e.date||'').slice(0,10)==='2026-10-29'&&
   /^International Trade Price Indexes/.test(String(e.event||''))&&
   e.releaseState==='released'&&/^verified-(primary|secondary)/.test(e.verificationStatus||''));
- const dedupedRows=uniqueRows.filter(e=>!(absTradePublished&&e.currency==='AUD'&&
+ // Ueda's verified live conference start supersedes the unconfirmed official-schedule
+ // alias for the same event/day; do not render two separate press conferences.
+ const dedupedRows=uniqueRows.filter(e=>!(e.currency==='JPY'&&
+  String(e.date||'').slice(0,10)==='2026-10-30'&&
+  /Ueda.*Press Conference/i.test(String(e.event||''))&&
+  e.releaseState!=='released'&&
+  uniqueRows.some(v=>v!==e&&v.currency==='JPY'&&
+   String(v.date||'').slice(0,10)==='2026-10-30'&&
+   /Ueda.*Press Conference/i.test(String(v.event||''))&&
+   v.releaseState==='released'&&/^verified-(primary|secondary)/.test(v.verificationStatus||'')))&&
+  !(absTradePublished&&e.currency==='AUD'&&
   String(e.date||'').slice(0,10)==='2026-10-29'&&
   /^(?:Import Prices q\/q|Import Price Index)/i.test(String(e.event||'')))&&!(e.currency==='GBP'&&
   String(e.date||'').slice(0,10)==='2026-10-28'&&
