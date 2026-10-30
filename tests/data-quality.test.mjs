@@ -2193,7 +2193,7 @@ test('30 Oct European release overlay resolves six overdue rows in LIVE and FALL
  assert.match(html,/0\/10 LIVE rate probabilities/);
 });
 
-test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented without invented primary values',()=>{
+test('Germany GDP/labor fallback and Eurostat 11:00 schedule retain accurate source provenance',()=>{
  const specs=[
   ['German Flash GDP q/q','+0.2%'],
   ['German Unemployment Change','+4K'],
@@ -2211,7 +2211,7 @@ test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented wit
    assert.equal(rows.length,1,mode+' '+prefix+' should be unique');
    assert.equal(rows[0].actual,actual);
    assert.equal(rows[0].releaseState,'released');
-   assert.equal(rows[0].verificationStatus,'verified-secondary');
+   assert.equal(rows[0].verificationStatus,prefix==='German Flash GDP q/q'?'verified-primary':'verified-secondary');
    assert.equal(rows[0].forecast,'—');
    assert.match(rows[0].sourceUrl,/^https:\/\//);
   }
