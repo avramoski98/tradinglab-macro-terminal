@@ -1,7 +1,47 @@
 
 // Source-confirmed releases, added without inventing market consensus.
-const VERIFIED_AT='2026-10-29T15:05:00.000Z';
+const VERIFIED_AT='2026-10-30T01:40:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026: four contemporaneous releases independently read from the
+// terminal's live FinancialJuice wire (29 Oct 23:50 UTC / 30 Oct 00:30 UTC).
+// These are SECONDARY verified actuals, not primary publisher publications.
+// Keep provider survey forecasts out of primary-verified consensus fields.
+{day:'2026-10-30',time:'00:50',dateOverride:'2026-10-30T00:50:00+01:00',ccy:'JPY',
+ match:/^(?:Prelim Industrial Production m\\/m|Japanese Industrial Output Prelim)(?: ·.*)?$/i,
+ event:'Prelim Industrial Production m/m · Sep 2026 (seasonally adjusted)',
+ actual:'2.2%',previous:'-2.4%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · JPY industrial output +2.2% · SECONDARY VERIFIED',
+ source:'FinancialJuice 29 Oct 2026 23:50:03 UTC: Japanese preliminary September industrial production +2.2% m/m SA, previous -2.4%; wire forecast +1.2% is not independently primary verified. METI original numeric release not yet independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828317/Japanese-Industrial-Output-Prelim-MoM-SA-Actual-22-Forecast-12-Previous--24.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T23:50:03Z',force:true},
+{day:'2026-10-30',time:'00:50',dateOverride:'2026-10-30T00:50:00+01:00',ccy:'JPY',
+ match:/^Retail Sales y\\/y(?: ·.*)?$/i,
+ event:'Retail Sales y/y · Sep 2026',
+ actual:'2.3%',previous:'2.7%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · JPY retail sales +2.3% · SECONDARY VERIFIED',
+ source:'FinancialJuice 29 Oct 2026 23:51:40 UTC: Japan September retail sales +2.3% y/y, previous +2.7%; reported poll +3.3% is secondary only. METI primary publication not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828318/Japanese-Retail-Sales-YoY-Actual-23-Forecast-33-Previous-27.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-29T23:51:40Z',force:true},
+{day:'2026-10-30',time:'01:30',dateOverride:'2026-10-30T01:30:00+01:00',ccy:'AUD',
+ match:/^(?:PPI q\\/q|Producer Price Indexes)(?: ·.*)?$/i,
+ event:'PPI q/q · Q3 2026 (ABS Final Demand)',
+ actual:'1.1%',previous:'1.3%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · AUD PPI +1.1% q/q · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 00:30:01 UTC: Australia September-quarter producer price index +1.1% q/q, previous +1.3%. ABS confirms official 30 Oct 11:30 AEDT schedule, but September numeric release not independently retrievable when checked.',
+ url:'https://www.financialjuice.com/News/9828356/Australian-PPI-QoQ-Actual-11-Forecast---Previous-13.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T00:30:01Z',force:true},
+{day:'2026-10-30',time:'01:30',dateOverride:'2026-10-30T01:30:00+01:00',ccy:'AUD',
+ match:/^Private Sector Credit m\\/m(?: ·.*)?$/i,
+ event:'Private Sector Credit m/m · Sep 2026',
+ actual:'0.6%',previous:'0.6%',forecast:'—',importance:'MED',
+ label:'RELEASED · AUD private credit +0.6% · SECONDARY VERIFIED',
+ source:'FinancialJuice 30 Oct 2026 00:30:14 UTC: Australia September seasonally adjusted private-sector credit +0.6% m/m, previous +0.6%; reported poll +0.5% is secondary only. RBA original release not independently retrieved.',
+ url:'https://www.financialjuice.com/News/9828358/Australian-Private-Sector-Credit-Actual-06-Forecast-05-Previous-06.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T00:30:14Z',force:true},
 // 30 Oct 2026 00:30 CET (29 Oct 23:30 UTC): Japan releases appeared in
 // FinancialJuice contemporaneous wire; official Japan statistical PDF had
 // not yet updated when checked. Preserve SECONDARY verification, not primary.
