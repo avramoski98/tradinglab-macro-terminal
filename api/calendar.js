@@ -1132,7 +1132,7 @@ const OFFICIAL_UPCOMING=[
  url:'https://ec.europa.eu/eurostat/en/news/euro-indicators/release-calendar',fullScheduleOnly:true},
 {date:'2026-10-30T11:00:00+01:00',ccy:'EUR',
  event:'Euro Area Unemployment Rate · Sep 2026 (SA)',
- match:/^(?:Euro(?:zone| Area) Unemployment(?: Rate)?|Unemployment Rate · Euro Area)(?: ·.*)?$/i,
+ match:/^(?:Euro(?:zone| Area) Unemployment(?: Rate)?|Unemployment Rate · Euro Area|Unemployment Rate)(?: ·.*)?$/i,
  importance:'HIGH',source:'Eurostat · official Euro indicators release calendar, 30 Oct 2026 11:00 CET',
  url:'https://ec.europa.eu/eurostat/en/news/euro-indicators/release-calendar',fullScheduleOnly:true},
 
@@ -1268,6 +1268,18 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
      event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
      verificationStatus:'official-schedule',releaseTimeVerified:true,
      actual:'—',forecast:'—',releaseState:state,label:state==='scheduled'?'Scheduled · official':'OVERDUE · unverified',
+     forecastVerificationStatus:'provider-unverified'};
+   }
+   // ForexFactory often labels the euro-area series simply "Unemployment Rate".
+   // Match and normalize it to the official Eurostat row instead of adding a
+   // duplicate OVERDUE event in LIVE mode. Never fabricate September Actual.
+   if(o.ccy==='EUR'&&/^Euro Area Unemployment Rate/.test(o.event)&&rows[matching].releaseState!=='released'){
+    const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
+    rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+     event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+     verificationStatus:'official-schedule',releaseTimeVerified:false,
+     actual:'—',forecast:'—',releaseState:state,
+     label:state==='scheduled'?'Scheduled · official':'OVERDUE · unverified',
      forecastVerificationStatus:'provider-unverified'};
    }
    if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)&&rows[matching].releaseState!=='released'){
