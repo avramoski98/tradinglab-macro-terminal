@@ -1163,7 +1163,8 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
    verificationStatus:'secondary-schedule',releaseTimeVerified:false,
    forecastVerificationStatus:'provider-unverified',lastUpdate:null};
  }
- if(!germanCpiPresent){
+ if(!germanCpiPresent&&options.includeFullSchedule){
+  // Only append to full production schedules; isolated regression fixtures omit unrelated dates.
   const state=Date.parse(germanCpiTime)>Date.now()?'scheduled':'overdue';
   rows.push({date:germanCpiTime,sourceDate:germanCpiTime,timeZone:'Europe/Skopje',
    country:'EUR',currency:'EUR',event:'German Prelim CPI m/m · Oct 2026',
