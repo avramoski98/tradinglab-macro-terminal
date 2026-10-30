@@ -2,6 +2,18 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T05:20:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026 07:30 CET: Ueda's scheduled press conference has started.
+// FinancialJuice published live remarks at 06:35-06:41 UTC (15:35-15:41 JST).
+// This confirms commencement, NOT completion. Do not invent a numerical Actual.
+{day:'2026-10-30',time:'07:30',dateOverride:'2026-10-30T07:30:00+01:00',ccy:'JPY',
+ match:/^(?:BoJ Governor Ueda Press Conference|BOJ Gov Ueda Press Conference)(?: ·.*| \(.*)?$/i,
+ event:'BoJ Ueda Press Conference · 30 Oct 2026 (underway)',
+ actual:'Started · remarks ongoing',previous:'—',forecast:'—',importance:'HIGH',
+ label:'STARTED · Ueda remarks ongoing · SECONDARY VERIFIED',
+ source:'BoJ official calendar sets 15:30 JST start. FinancialJuice published live Ueda remarks 30 Oct 2026 06:35–06:41 UTC: underlying inflation broadly consistent with 2% target; watch FX, AI and Middle East. This confirms event start, not press-conference completion.',
+ url:'https://www.financialjuice.com/News/9828838/BoJs-Governor-Ueda-Underlying-CPI-inflation-at-level-generally-consistent-with-2-price-stability-target-expected-to-remain-at-around-that-level.aspx?xy=rss',
+ status:'verified-secondary',numericActualVerified:false,sourcePublishedAt:'2026-10-30',releaseTimeVerified:true,
+ verifiedAt:'2026-10-30T06:35:25Z',force:true},
 // 30 Oct 2026 07:30 CET: France Q3 flash GDP and September goods spending.
 // Numeric releases confirmed by timestamped FinancialJuice wires at 06:30-06:31 UTC.
 // INSEE confirms the official 07:30 CET release slots, but the original
@@ -1101,7 +1113,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
      actual:'—',forecast:'—',releaseState:state,label:state==='scheduled'?'Scheduled · official':'OVERDUE · unverified',
      forecastVerificationStatus:'provider-unverified'};
    }
-   if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)){
+   if(o.ccy==='JPY'&&/Press Conference/i.test(o.event)&&rows[matching].releaseState!=='released'){
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
      event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
      verificationStatus:'official-schedule',releaseTimeVerified:true};
