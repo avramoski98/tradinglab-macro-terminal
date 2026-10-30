@@ -2,6 +2,26 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 30 Oct 2026 Eurostat Q3 flash GDP: original publisher's numeric table
+// verifies euro area +0.4% q/q and Italy 0.0% q/q. These are preliminary,
+// subject to revision on 13 Nov. No unverified market consensus is asserted.
+{day:'2026-10-30',time:'11:00',dateOverride:'2026-10-30T11:00:00+01:00',ccy:'EUR',
+ match:/^(?:(?:Euro Area|Eurozone) (?:Prelim(?:inary)? )?(?:Flash )?GDP(?: q\/q)?|Prelim(?:inary)? Flash GDP(?: q\/q)?|GDP Flash · Euro Area)(?: ·.*)?$/i,
+ event:'Euro Area Preliminary Flash GDP q/q · Q3 2026',
+ actual:'+0.4%',previous:'+0.6%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Euro Area Q3 GDP +0.4% q/q · EUROSTAT PRIMARY',
+ source:'Eurostat 30 Oct 2026 preliminary flash GDP: euro area +0.4% q/q in Q3 vs +0.6% Q2, +1.3% y/y. Preliminary and subject to revision 13 Nov 2026. No primary-verified survey consensus.',
+ url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-30102026-ap',status:'verified-primary',sourcePublishedAt:'2026-10-30',
+ releaseTimeVerified:false,verifiedAt:'2026-10-30T10:11:02.623Z',force:true},
+{day:'2026-10-30',time:'10:00',dateOverride:'2026-10-30T10:00:00+01:00',ccy:'EUR',
+ match:/^(?:Italian (?:Prelim(?:inary)? |Flash )?GDP(?: q\/q)?|Italy (?:Prelim(?:inary)? )?GDP(?: q\/q)?)(?: ·.*)?$/i,
+ event:'Italian Prelim GDP q/q · Q3 2026 (SA)',
+ actual:'0.0%',previous:'+0.2%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · Italy Q3 GDP 0.0% q/q · EUROSTAT PRIMARY',
+ source:'Eurostat 30 Oct 2026 Q3 preliminary flash GDP table: Italy 0.0% q/q vs Q2 +0.2%, +0.8% y/y. Release slot 10:00 CET from calendar is not independently issuer-time verified. No primary-verified consensus.',
+ url:'https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-30102026-ap',status:'verified-primary',sourcePublishedAt:'2026-10-30',
+ releaseTimeVerified:false,verifiedAt:'2026-10-30T10:11:02.623Z',force:true},
+
 // 30 Oct 2026 Germany: newly published releases absent from the fallback
 // calendar. The numbers below are SECONDARY verified, not original publisher
 // numeric tables; do not imply official consensus or exact release timestamps.

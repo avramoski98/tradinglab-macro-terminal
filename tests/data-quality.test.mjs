@@ -2146,17 +2146,23 @@ test('Germany GDP/labor fallback and Eurostat 11:00 schedule are represented wit
    assert.equal(rows[0].forecast,'—');
    assert.match(rows[0].sourceUrl,/^https:\/\//);
   }
-  for(const prefix of ['Euro Area Preliminary Flash GDP','Euro Area Unemployment Rate']){
+  for(const [prefix,actual] of [['Euro Area Preliminary Flash GDP','+0.4%'],['Italian Prelim GDP','0.0%']]){
    const rows=out.events.filter(e=>e.currency==='EUR'&&e.event.startsWith(prefix)&&String(e.date).startsWith('2026-10-30'));
-   assert.equal(rows.length,1,mode+' '+prefix+' schedule missing');
-   assert.equal(rows[0].date,'2026-10-30T11:00:00+01:00');
-   assert.equal(rows[0].releaseState,Date.now()<Date.parse(rows[0].date)?'scheduled':'overdue');
-   assert.equal(rows[0].actual,'—');
-   assert.equal(rows[0].verificationStatus,'official-schedule');
+   assert.equal(rows.length,1,mode+' '+prefix+' must be unique');
+   assert.equal(rows[0].releaseState,'released');
+   assert.equal(rows[0].actual,actual);
+   assert.equal(rows[0].verificationStatus,'verified-primary');
+   assert.equal(rows[0].forecast,'—');
    assert.match(rows[0].sourceUrl,/ec\.europa\.eu/);
   }
+  const labor=out.events.filter(e=>e.currency==='EUR'&&e.event.startsWith('Euro Area Unemployment Rate')&&String(e.date).startsWith('2026-10-30'));
+  assert.equal(labor.length,1,mode+' unemployment schedule missing');
+  assert.equal(labor[0].date,'2026-10-30T11:00:00+01:00');
+  assert.equal(labor[0].releaseState,Date.now()<Date.parse(labor[0].date)?'scheduled':'overdue');
+  assert.equal(labor[0].actual,'—');
+  assert.equal(labor[0].verificationStatus,'official-schedule');
  }
  const html=fs.readFileSync('index.html','utf8');
  assert.match(html,/30 OCT 10:00 CET · GERMANY GDP\/LABOR/);
- assert.match(html,/Euro Area GDP and unemployment/);
+ assert.match(html,/EURO AREA \+ ITALY Q3 GDP/);
 });
