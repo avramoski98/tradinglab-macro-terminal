@@ -2,6 +2,40 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T01:40:00.000Z';
 const VERIFIED=[
+// 30 Oct 2026: official BoJ Statement on Monetary Policy and October Outlook.
+// The BOJ fixes the release DAY but not the decision's exact clock time.
+// ForexFactory's 03:30 CET feed slot is indicative, NOT a verified publication time.
+// Official policy statement and Bank's View are now published; Ueda Q&A is separate.
+{day:'2026-10-30',time:'03:30',dateOverride:'2026-10-30T03:30:00+01:00',ccy:'JPY',
+ match:/^BOJ Policy Rate(?: ·.*)?$/i,
+ event:'BoJ Policy Rate · 30 Oct 2026 (HOLD 1.25%)',
+ actual:'1.25%',previous:'1.25%',forecast:'—',importance:'EXTREME',
+ label:'RELEASED · BoJ HOLD 1.25% · VERIFIED-PRIMARY',
+ source:'Bank of Japan Statement on Monetary Policy, 30 Oct 2026: uncollateralized overnight call rate held around 1.25%, vote 8–1 (Takata preferred 1.50%). ETF sales pace increased from approximately JPY 330bn/year to JPY 860bn/year starting Jan 2027. Provider 03:30 CET slot is approximate, not independently verified as official release time. No verified survey consensus or market-implied odds.',
+ url:'https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k261030a.pdf',
+ status:'verified-primary',sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T03:15:00Z',force:true},
+{day:'2026-10-30',time:'03:30',dateOverride:'2026-10-30T03:30:00+01:00',ccy:'JPY',
+ match:/^Monetary Policy Statement(?: ·.*)?$/i,
+ event:'BoJ Monetary Policy Statement · 30 Oct 2026 (published)',
+ actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · BoJ official statement published · VERIFIED-PRIMARY',
+ source:'Bank of Japan published Statement on Monetary Policy 30 Oct 2026, documenting the 1.25% hold, 8–1 vote and ETF-sale acceleration. Qualitative publication, not a separate numeric rate observation. Provider 03:30 CET slot is approximate.',
+ url:'https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k261030a.pdf',
+ status:'verified-primary-publication',numericActualVerified:false,
+ sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T03:15:00Z',force:true},
+{day:'2026-10-30',time:'03:31',dateOverride:'2026-10-30T03:31:00+01:00',ccy:'JPY',
+ match:/^BOJ Outlook Report(?: ·.*)?$/i,
+ event:"BoJ Outlook Report · Oct 2026 (The Bank's View published)",
+ actual:'Published',previous:'—',forecast:'—',importance:'HIGH',
+ label:'RELEASED · BoJ October Outlook published · VERIFIED-PRIMARY',
+ source:'Bank of Japan October 2026 Outlook (The Bank\'s View) published 30 Oct: FY2027 core CPI (excluding fresh food) forecast 2.6% y/y, revised up 0.2pp from July; FY2026 2.5%, FY2028 2.0%. Price risks skewed to upside, economic risks broadly balanced. Qualitative report publication; forecast figures are BoJ projections, not a market consensus. Provider 03:31 CET slot is indicative only.',
+ url:'https://www.boj.or.jp/en/mopo/outlook/gor2610a.pdf',
+ status:'verified-primary-publication',numericActualVerified:false,
+ sourcePublishedAt:'2026-10-30',releaseTimeVerified:false,
+ verifiedAt:'2026-10-30T03:15:00Z',force:true},
+
 // 30 Oct 2026: four contemporaneous releases independently read from the
 // terminal's live FinancialJuice wire (29 Oct 23:50 UTC / 30 Oct 00:30 UTC).
 // These are SECONDARY verified actuals, not primary publisher publications.
