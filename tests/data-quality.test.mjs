@@ -2349,3 +2349,22 @@ test('Commodity Calendar UI uses verified releaseState for multi-metric publishe
  assert.equal(isReleased({releaseState:'overdue',actual:'—'}),false,'overdue report is not falsely published');
  assert.ok(html.includes("x.actual&&x.actual!=='—'?x.actual:(x.label||'RELEASED')"),'non-numeric verified reports render PUBLISHED instead of a dash');
 });
+
+test('31 Oct verified G10 policy facts override archived 3M rate fields',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ const match=html.match(/const VERIFIED_POLICY_20261031=(\\{[^\\n]+\\});/);
+ assert.ok(match,'policy facts snapshot is embedded in production HTML');
+ const policies=JSON.parse(match[1]);
+ assert.equal(Object.keys(policies).length,10);
+ const expected={USD:'3.75–4.00%',EUR:'2.50% deposit',GBP:'3.75%',JPY:'1.25%',CHF:'0.00%',CAD:'2.50%',AUD:'4.60%',NZD:'2.75%',SEK:'1.75%',NOK:'4.50%'};
+ for(const [ccy,rate] of Object.entries(expected)){
+  assert.equal(policies[ccy].rate,rate,ccy+' latest official policy rate');
+  assert.ok(policies[ccy].lastDecision&&policies[ccy].policySource.startsWith('https://'),ccy+' official decision provenance');
+ }
+ assert.match(policies.CAD.lastDecision,/28 Oct 2026/);
+ assert.match(policies.AUD.lastDecision,/29 Sep 2026/);
+ assert.match(policies.USD.lastDecision,/28 Oct 2026/);
+ assert.ok(html.includes('Object.assign(RES[ccy],facts)'),'official facts must override archived static cards');
+ assert.ok(html.includes("['Latest Policy Decision',r.lastDecision]"),'drawer must expose decision provenance');
+ assert.ok(html.includes('BASE = archived 3M macro / policy thesis'),'qualitative bias must not be presented as current pricing');
+});
