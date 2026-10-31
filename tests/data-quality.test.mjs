@@ -2324,3 +2324,15 @@ test('31 Oct China NBS PMI contraction appears in Weekly Focus with secondary pr
  assert.ok(weekly.includes('G10 historical PMI coverage and live central-bank rate probabilities remain unchanged'));
  assert.ok(weekly.indexOf('NEW / 31 OCT')<weekly.indexOf('NEW / 30 OCT'));
 });
+
+test('Commodity Calendar UI uses verified releaseState for multi-metric published reports',()=>{
+ const html=fs.readFileSync('commodity-calendar.html','utf8');
+ const source=html.match(/function isReleased\(x\)\{[^}]*\}/)?.[0];
+ assert.ok(source,'isReleased function exists');
+ const isReleased=vm.runInNewContext('('+source+')');
+ assert.equal(isReleased({releaseState:'released',actual:'—',label:'PUBLISHED'}),true,'verified USDA report without one numeric actual is published');
+ assert.equal(isReleased({releaseState:'released',actual:'+2.1M'}),true,'released numeric actual');
+ assert.equal(isReleased({releaseState:'scheduled',actual:'—',label:'PENDING'}),false,'future report remains pending');
+ assert.equal(isReleased({releaseState:'overdue',actual:'—'}),false,'overdue report is not falsely published');
+ assert.ok(html.includes("x.actual&&x.actual!=='—'?x.actual:(x.label||'RELEASED')"),'non-numeric verified reports render PUBLISHED instead of a dash');
+});
