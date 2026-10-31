@@ -2310,3 +2310,17 @@ test('China NBS official PMI crossing the 50 threshold is highlighted without pr
  assert.ok(categories(below).includes('MACRO'));
  assert.ok(!categories(below).includes('GEOPOLITICS'));
 });
+
+
+test('31 Oct China NBS PMI contraction appears in Weekly Focus with secondary provenance and no fake rate odds',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ const start=html.indexOf('function weekly()');
+ const end=html.indexOf('function ',start+10);
+ const weekly=html.slice(start,end>start?end:start+18000);
+ assert.ok(weekly.includes('NEW / 31 OCT 02:30 CET · CHINA OFFICIAL PMI DROPS BELOW 50'));
+ assert.ok(weekly.includes('NBS Manufacturing PMI 49.3'));
+ assert.ok(weekly.includes('NBS Non-Manufacturing PMI 49.7'));
+ assert.ok(weekly.includes('SECONDARY VERIFIED'));
+ assert.ok(weekly.includes('G10 historical PMI coverage and live central-bank rate probabilities remain unchanged'));
+ assert.ok(weekly.indexOf('NEW / 31 OCT')<weekly.indexOf('NEW / 30 OCT'));
+});
