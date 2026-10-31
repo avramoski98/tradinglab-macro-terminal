@@ -2304,6 +2304,10 @@ test('China NBS official PMI crossing the 50 threshold is highlighted without pr
  const services='FinancialJuice: Chinese NBS Non-Manufacturing PMI Actual 49.7 (Forecast 50, Previous 50.2)';
  assert.equal(regimeHighImpact(below),true);
  assert.equal(regimeHighImpact(services),true);
+ const composite='FinancialJuice: Chinese Composite PMI Actual 49.7 (Forecast -, Previous 50.7)';
+ assert.equal(regimeHighImpact(composite),true,'China official composite contraction should not be missed when NBS label is omitted');
+ assert.equal(regimeHighImpact('Chinese Caixin Composite PMI Actual 49.7 (Forecast -, Previous 50.7)'),false,'do not infer official source from Caixin release');
+ assert.equal(regimeHighImpact('Chinese Composite PMI Actual 49.7 (Forecast -)'),false,'missing previous cannot prove threshold crossing');
  assert.equal(regimeHighImpact('Chinese NBS Manufacturing PMI Actual 50.4 (Forecast 50.2, Previous 50.1)'),false);
  assert.equal(regimeHighImpact('China NBS Manufacturing PMI Actual 49.3 (Forecast 49.9)'),false);
  assert.equal(regimeHighImpact('US Manufacturing PMI Actual 49.3 (Forecast 49.9, Previous 50.1)'),false);
