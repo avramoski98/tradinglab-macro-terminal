@@ -2308,6 +2308,11 @@ test('China NBS official PMI crossing the 50 threshold is highlighted without pr
  assert.equal(regimeHighImpact(composite),true,'China official composite contraction should not be missed when NBS label is omitted');
  assert.equal(regimeHighImpact('Chinese Caixin Composite PMI Actual 49.7 (Forecast -, Previous 50.7)'),false,'do not infer official source from Caixin release');
  assert.equal(regimeHighImpact('Chinese Composite PMI Actual 49.7 (Forecast -)'),false,'missing previous cannot prove threshold crossing');
+ assert.equal(regimeHighImpact("FinancialJuice: China October official non-manufacturing PMI drops to 49.7 from September's 50.2"),true,'natural-language official NBS services contraction should be high impact');
+ assert.equal(regimeHighImpact('FinancialJuice: China October official manufacturing PMI at 49.3 vs 50.1 in September'),true,'natural-language official NBS factory contraction should be high impact');
+ assert.equal(regimeHighImpact('China October official composite PMI at 49.7'),false,'no previous value means crossing not established');
+ assert.equal(regimeHighImpact('Chinese Caixin Composite PMI at 49.7 vs 50.7'),false,'private Caixin survey must not be inferred official');
+ assert.equal(regimeHighImpact('China October official manufacturing PMI at 50.4 vs 50.1 in September'),false,'still expansion is not a threshold break');
  assert.equal(regimeHighImpact('Chinese NBS Manufacturing PMI Actual 50.4 (Forecast 50.2, Previous 50.1)'),false);
  assert.equal(regimeHighImpact('China NBS Manufacturing PMI Actual 49.3 (Forecast 49.9)'),false);
  assert.equal(regimeHighImpact('US Manufacturing PMI Actual 49.3 (Forecast 49.9, Previous 50.1)'),false);
