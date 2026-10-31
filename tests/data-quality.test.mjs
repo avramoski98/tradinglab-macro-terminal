@@ -2286,6 +2286,23 @@ test('30 Oct Chicago PMI headline is primary verified against MNI, with forecast
 });
 
 
+test('31 Oct Hormuz closure and tanker ignition are high-impact energy alerts, not routine shipping',()=>{
+ const high=[
+  "FinancialJuice: Iran’s security chief Rezaei: Strait of Hormuz to stay closed until Tehran’s conditions fulfilled",
+  "FinancialJuice: Iran's navy: oil tanker ignites in Strait of Hormuz after hitting naval mines - state media"
+ ];
+ for(const title of high){
+  assert.equal(regimeHighImpact(title),true,title);
+  assert.ok(categories(title).includes('ENERGY'),title);
+  assert.ok(categories(title).includes('GEOPOLITICS'),title);
+ }
+ for(const title of [
+  'Iran navy: oil tanker operated in limited zone - state media',
+  'Strait of Hormuz may reopen under talks',
+  'Shipping rates ease as tanker traffic returns to normal'
+ ])assert.equal(regimeHighImpact(title),false,title);
+});
+
 test('30 Oct Strait of Hormuz tanker violence is high-impact energy/geopolitical news, not ordinary shipping chatter',()=>{
  const violent=[
   'UKMTO: Received a time-late report of an incident in the Strait of Hormuz. Crude tanker hit by projectile transiting Hormuz strait',
