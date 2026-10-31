@@ -1271,6 +1271,8 @@ test('Weekly Focus policy matcher includes official fallback decision names with
   'JOLTS Job Openings · Sep',
   'Euro Area Flash HICP Inflation y/y · Oct',
   'ISM Services PMI · Oct',
+  'Riksbank Policy Rate Decision & Monetary Policy Update · Nov',
+  'Norges Bank Policy Rate Decision · Nov',
   'BoE Bank Rate Decision & MPC Minutes · Nov',
   'US Employment Situation / Nonfarm Payrolls · Oct'
  ];
@@ -2112,8 +2114,10 @@ test('Official Nov 2–6 high-impact schedule survives a calendar provider outag
   ['USD','ISM Manufacturing PMI','2026-11-02T16:00:00+01:00'],
   ['AUD','RBA Rate Decision','2026-11-03T04:30:00+01:00'],
   ['USD','JOLTS Job Openings','2026-11-03T16:00:00+01:00'],
+  ['SEK','Riksbank Policy Rate Decision','2026-11-04T09:30:00+01:00'],
   ['EUR','Euro Area Flash HICP','2026-11-04T11:00:00+01:00'],
   ['USD','ISM Services PMI','2026-11-04T16:00:00+01:00'],
+  ['NOK','Norges Bank Policy Rate Decision','2026-11-05T10:00:00+01:00'],
   ['GBP','BoE Bank Rate','2026-11-05T13:00:00+01:00'],
   ['USD','US Employment Situation','2026-11-06T14:30:00+01:00']
  ];
@@ -2121,7 +2125,7 @@ test('Official Nov 2–6 high-impact schedule survives a calendar provider outag
   const rows=out.events.filter(x=>x.currency===ccy&&x.date===date&&x.event.startsWith(prefix));
   assert.equal(rows.length,1,'missing or duplicate '+ccy+' '+prefix);
   assert.equal(rows[0].date,date);
-  assert.equal(rows[0].releaseState,'scheduled');
+  assert.equal(rows[0].releaseState,Date.parse(date)>Date.now()?'scheduled':'overdue');
   assert.equal(rows[0].verificationStatus,'official-schedule');
   assert.equal(rows[0].actual,'—');
   assert.equal(rows[0].forecast,'—');
