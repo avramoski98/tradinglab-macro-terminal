@@ -2352,7 +2352,7 @@ test('Commodity Calendar UI uses verified releaseState for multi-metric publishe
 
 test('31 Oct verified G10 policy facts override archived 3M rate fields',()=>{
  const html=fs.readFileSync('index.html','utf8');
- const match=html.match(/const VERIFIED_POLICY_20261031=(\\{[^\\n]+\\});/);
+ const match=html.match(/const VERIFIED_POLICY_20261031=(\{[^\n]+\});/);
  assert.ok(match,'policy facts snapshot is embedded in production HTML');
  const policies=JSON.parse(match[1]);
  assert.equal(Object.keys(policies).length,10);
