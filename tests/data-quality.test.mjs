@@ -2297,3 +2297,16 @@ test('30 Oct Strait of Hormuz tanker violence is high-impact energy/geopolitical
   'Shipping rates ease as tanker traffic returns to normal'
  ])assert.equal(regimeHighImpact(headline),false,headline);
 });
+
+
+test('China NBS official PMI crossing the 50 threshold is highlighted without promoting unverified figures to G10 macro',()=>{
+ const below='FinancialJuice: Chinese NBS Manufacturing PMI Actual 49.3 (Forecast 49.9, Previous 50.1)';
+ const services='FinancialJuice: Chinese NBS Non-Manufacturing PMI Actual 49.7 (Forecast 50, Previous 50.2)';
+ assert.equal(regimeHighImpact(below),true);
+ assert.equal(regimeHighImpact(services),true);
+ assert.equal(regimeHighImpact('Chinese NBS Manufacturing PMI Actual 50.4 (Forecast 50.2, Previous 50.1)'),false);
+ assert.equal(regimeHighImpact('China NBS Manufacturing PMI Actual 49.3 (Forecast 49.9)'),false);
+ assert.equal(regimeHighImpact('US Manufacturing PMI Actual 49.3 (Forecast 49.9, Previous 50.1)'),false);
+ assert.ok(categories(below).includes('MACRO'));
+ assert.ok(!categories(below).includes('GEOPOLITICS'));
+});
