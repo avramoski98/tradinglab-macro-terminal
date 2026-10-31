@@ -87,6 +87,38 @@ const VERIFIED_EIA=[
  {date:'2026-10-08T16:30:00+02:00',event:'Natural Gas Storage',actual:'85B',forecast:'79B',previous:'64B',category:'ENERGY · GAS',markets:'Natural Gas',sourceUrl:'https://www.forexfactory.com/calendar/26-us-natural-gas-storage'}
 ];
 function knownEiaRows(){return VERIFIED_EIA.map(x=>({...x,country:'COM',currency:'COM',event:'EIA · '+x.event,importance:'HIGH',source:x.source||'EIA figures via published secondary calendar',verificationStatus:x.verificationStatus||'verified-secondary',sourceUpdatedAt:x.sourceUpdatedAt||null,forecastVerificationStatus:'provider-unverified',label:surprise(x.event,x.actual,x.forecast),releaseState:'released',impact:'Inventory surprise',note:x.note||'Reported EIA Actual and secondary-source forecast; official EIA report should be cross-checked.'}));}
+// EIA official weekly release rules (Eastern time), with published 2026 holiday exceptions.
+// Local times are Europe/Skopje CET (+01:00) after the US DST change on 1 Nov.
+// Sources: https://www.eia.gov/petroleum/supply/weekly/schedule.php
+//          https://ir.eia.gov/ngs/schedule.html
+// Scheduled events are NOT verified releases; Actual and Forecast stay blank.
+const EIA_SCHEDULE_2026=[
+ ['2026-11-04','16:30','Crude Oil Inventories'],['2026-11-05','16:30','Natural Gas Storage'],
+ ['2026-11-12','18:00','Crude Oil Inventories'],['2026-11-13','16:30','Natural Gas Storage'],
+ ['2026-11-18','16:30','Crude Oil Inventories'],['2026-11-19','16:30','Natural Gas Storage'],
+ ['2026-11-25','16:30','Crude Oil Inventories'],['2026-11-25','18:00','Natural Gas Storage'],
+ ['2026-12-02','16:30','Crude Oil Inventories'],['2026-12-03','16:30','Natural Gas Storage'],
+ ['2026-12-09','16:30','Crude Oil Inventories'],['2026-12-10','16:30','Natural Gas Storage'],
+ ['2026-12-16','16:30','Crude Oil Inventories'],['2026-12-17','16:30','Natural Gas Storage'],
+ ['2026-12-23','16:30','Crude Oil Inventories'],['2026-12-24','16:30','Natural Gas Storage'],
+ ['2026-12-30','16:30','Crude Oil Inventories'],['2026-12-31','16:30','Natural Gas Storage']
+];
+function scheduledEiaRows(){
+ const now=Date.now();
+ return EIA_SCHEDULE_2026.map(([day,time,name])=>{
+  const gas=name==='Natural Gas Storage';
+  const date=day+'T'+time+':00+01:00';
+  const past=Date.parse(date)<=now;
+  return {date,timeZone:TARGET_TZ,country:'COM',currency:'COM',event:'EIA · '+name,
+   category:gas?'ENERGY · GAS':'ENERGY · OIL',markets:gas?'Natural Gas':'WTI · Brent · Products',
+   importance:'HIGH',source:'U.S. Energy Information Administration · official release schedule',
+   sourceUrl:gas?'https://ir.eia.gov/ngs/schedule.html':'https://www.eia.gov/petroleum/supply/weekly/schedule.php',
+   verificationStatus:'official-schedule',sourceUpdatedAt:null,previous:'—',forecast:'—',actual:'—',
+   forecastVerificationStatus:'not-verified',label:past?'OVERDUE':'PENDING',
+   releaseState:past?'overdue':'scheduled',impact:'Inventory release',
+   note:'EIA official release schedule only; Actual is not confirmed until publication. Holiday exceptions applied.'};
+ });
+}
 function reconcileEia(providerRows){
  // Week-boundary exports can overlap; keep only one row per release timestamp/title.
  const out=providerRows.filter((row,i,all)=>all.findIndex(other=>String(other.date)===String(row.date)&&String(other.event)===String(row.event))===i);
@@ -94,6 +126,17 @@ function reconcileEia(providerRows){
   const match=out.find(x=>String(x.date||'').slice(0,10)===known.date.slice(0,10)&&String(x.event||'').toLowerCase().includes(known.event.slice(6).toLowerCase()));
   if(!match)out.push(known);
   else if(match.releaseState!=='released'||known.verificationStatus==='verified-primary')Object.assign(match,known);
+ }
+ // ForexFactory weekly exports can omit future EIA reports; retain official dates.
+ for(const scheduled of scheduledEiaRows()){
+  const name=scheduled.event.slice(6).toLowerCase();
+  const match=out.find(row=>String(row.date||'').slice(0,10)===scheduled.date.slice(0,10)&&String(row.event||'').toLowerCase().includes(name));
+  if(!match)out.push(scheduled);
+  else if(match.releaseState!=='released'){
+   Object.assign(match,{date:scheduled.date,timeZone:TARGET_TZ,sourceUrl:scheduled.sourceUrl,
+    verificationStatus:'official-schedule',releaseState:scheduled.releaseState,
+    label:scheduled.label,note:scheduled.note});
+  }
  }
  return out;
 }
