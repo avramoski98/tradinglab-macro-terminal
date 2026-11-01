@@ -1299,6 +1299,20 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-11-03T04:30:00+01:00',ccy:'AUD',event:'RBA Rate Decision & Statement on Monetary Policy · Nov',match:/RBA.*Rate|Cash Rate|Reserve Bank of Australia.*Rate|RBA Monetary Policy Decision/i,importance:'EXTREME',source:'Reserve Bank of Australia · official coming-up schedule, 3 Nov 14:30 AEDT',url:'https://www.rba.gov.au/coming-up/'},
  // 3 Nov 10:00 EST = 16:00 CET.
  {date:'2026-11-03T16:00:00+01:00',ccy:'USD',event:'JOLTS Job Openings · Sep',match:/JOLTS|Job Openings and Labor Turnover/i,importance:'HIGH',source:'U.S. Bureau of Labor Statistics · official November 2026 release schedule',url:'https://www.bls.gov/schedule/2026/11_sched_list.htm'},
+ // Stats NZ officially schedules September-quarter labour market statistics for 4 Nov local NZ date.
+ // 4 Nov 10:45 NZDT corresponds to 3 Nov 22:45 Europe/Skopje CET; clock time
+ // corroborated by the live calendar, but primary release page verifies date only.
+ // In fallback preserve both market-moving series with blank Actual/Forecast.
+ {date:'2026-11-03T22:45:00+01:00',ccy:'NZD',event:'NZ Employment Change q/q · Q3 2026',
+  match:/^(?:Employment Change q\/q|NZ Employment Change|Labour Market Statistics.*Employment)/i,
+  importance:'HIGH',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Stats NZ · Labour market statistics: September 2026 quarter, official 4 Nov date; 10:45 NZDT time cross-checked with live calendar',
+  url:'https://www.stats.govt.nz/information-releases/household-labour-force-survey-estimated-working-age-population-september-2026-quarter/'},
+ {date:'2026-11-03T22:45:00+01:00',ccy:'NZD',event:'NZ Unemployment Rate · Q3 2026',
+  match:/^(?:Unemployment Rate|NZ Unemployment Rate|Labour Market Statistics.*Unemployment)/i,
+  importance:'HIGH',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Stats NZ · Labour market statistics: September 2026 quarter, official 4 Nov date; 10:45 NZDT time cross-checked with live calendar',
+  url:'https://www.stats.govt.nz/information-releases/household-labour-force-survey-estimated-working-age-population-september-2026-quarter/'},
  // Riksbank 3 Nov board meeting; decision published 4 Nov 09:30 Stockholm CET, official calendar.
  {date:'2026-11-04T09:30:00+01:00',ccy:'SEK',event:'Riksbank Policy Rate Decision & Monetary Policy Update · Nov',match:/Riksbank.*(?:Policy|Rate|Decision)|Sweden.*Policy Rate|Swedish.*Rate Decision/i,importance:'EXTREME',source:'Sveriges Riksbank · official 2026 calendar, 4 Nov 09:30 CET (decision taken 3 Nov)',url:'https://www.riksbank.se/sv/press-och-publicerat/kalender/kalender-2026/'},
  // Eurostat confirms 4 Nov flash October HICP; 11:00 Luxembourg CET.
@@ -1308,6 +1322,19 @@ const OFFICIAL_UPCOMING=[
  {date:'2026-11-05T10:00:00+01:00',ccy:'NOK',event:'Norges Bank Policy Rate Decision · Nov',match:/Norges Bank.*(?:Policy|Rate|Decision)|Norway.*Policy Rate|Norwegian.*Rate Decision/i,importance:'EXTREME',source:'Norges Bank · official policy rate decisions calendar, 5 Nov 10:00 CET',url:'https://www.norges-bank.no/en/news-events/calendar/policy-rate-decisions/26-11-05/'},
  // 5 Nov 12:00 GMT = 13:00 CET.
  {date:'2026-11-05T13:00:00+01:00',ccy:'GBP',event:'BoE Bank Rate Decision & MPC Minutes · Nov',match:/BoE.*Rate|Bank Rate|Official Bank Rate|MPC.*Rate/i,importance:'EXTREME',source:'Bank of England · official November 2026 Monetary Policy Summary at 12:00 GMT',url:'https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes/2026/november-2026'},
+ // Statistics Canada September LFS primary report confirms the next LFS release
+ // on 6 Nov for October 2026. The 08:30 EST clock time follows The Daily
+ // release convention; do not fabricate October Actual, Previous or consensus.
+ {date:'2026-11-06T14:30:00+01:00',ccy:'CAD',event:'Canada Employment Change · Oct 2026',
+  match:/^(?:Employment Change|Canada Employment Change|Labour Force Survey.*Employment)/i,
+  importance:'HIGH',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Statistics Canada · September 2026 Labour Force Survey, Next release: 6 Nov 2026; 08:30 EST calendar time',
+  url:'https://www150.statcan.gc.ca/n1/daily-quotidien/261009/dq261009a-eng.pdf'},
+ {date:'2026-11-06T14:30:00+01:00',ccy:'CAD',event:'Canada Unemployment Rate · Oct 2026',
+  match:/^(?:Unemployment Rate|Canada Unemployment Rate|Labour Force Survey.*Unemployment)/i,
+  importance:'HIGH',scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Statistics Canada · September 2026 Labour Force Survey, Next release: 6 Nov 2026; 08:30 EST calendar time',
+  url:'https://www150.statcan.gc.ca/n1/daily-quotidien/261009/dq261009a-eng.pdf'},
  // 6 Nov 08:30 EST = 14:30 CET.
  {date:'2026-11-06T14:30:00+01:00',ccy:'USD',event:'US Employment Situation / Nonfarm Payrolls · Oct',match:/Employment Situation|Nonfarm Payrolls|Non-Farm Employment Change|Non-Farm Payrolls/i,importance:'EXTREME',source:'U.S. Bureau of Labor Statistics · official employment release schedule, 6 Nov 08:30 EST',url:'https://www.bls.gov/schedule/news_release/empsit.htm'}
 ];

@@ -4,6 +4,37 @@ import {numeric,normalizeRelease} from '../lib/economic-provider.mjs';
 import economic from '../api/economic.js';
 import {applyVerifiedReleaseOverlay} from '../api/calendar.js';
 
+test('NZD and CAD official labour release dates remain in fallback and dedupe in LIVE',()=>{
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ const expected=[
+  ['NZD','2026-11-03T22:45:00+01:00',/NZ Employment Change q\/q/],
+  ['NZD','2026-11-03T22:45:00+01:00',/NZ Unemployment Rate/],
+  ['CAD','2026-11-06T14:30:00+01:00',/Canada Employment Change/],
+  ['CAD','2026-11-06T14:30:00+01:00',/Canada Unemployment Rate/]
+ ];
+ for(const [ccy,date,match] of expected){
+  const rows=fallback.events.filter(e=>e.currency===ccy&&e.date===date&&match.test(e.event));
+  assert.equal(rows.length,1,'fallback should have one '+ccy+' '+match);
+  assert.equal(rows[0].actual,'—');
+  assert.equal(rows[0].forecast,'—');
+  assert.ok(['scheduled','overdue'].includes(rows[0].releaseState));
+  assert.ok(rows[0].sourceUrl.startsWith('https://'));
+  assert.equal(rows[0].releaseTimeVerified,false);
+ }
+ const live=applyVerifiedReleaseOverlay({mode:'live',events:[
+  {date:'2026-11-03T22:45:00+01:00',currency:'NZD',event:'Employment Change q/q',releaseState:'scheduled'},
+  {date:'2026-11-03T22:45:00+01:00',currency:'NZD',event:'Unemployment Rate',releaseState:'scheduled'},
+  {date:'2026-11-06T14:30:00+01:00',currency:'CAD',event:'Employment Change',releaseState:'scheduled'},
+  {date:'2026-11-06T14:30:00+01:00',currency:'CAD',event:'Unemployment Rate',releaseState:'scheduled'}
+ ]},{includeFullSchedule:true});
+ for(const [ccy,date,match] of expected){
+  const rows=live.events.filter(e=>e.currency===ccy&&e.date===date&&
+   (match.test(e.event)||(/Employment Change/.test(match.source)&&/Employment Change/.test(e.event))||
+    (/Unemployment Rate/.test(match.source)&&/Unemployment Rate/.test(e.event))));
+  assert.equal(rows.length,1,'live should not duplicate '+ccy+' '+match);
+ }
+});
+
 test('30 Oct Germany preliminary national CPI clears overdue in LIVE and FALLBACK with secondary provenance',()=>{
  for(const payload of [
   {mode:'live',events:[{date:'2026-10-30T14:00:00+01:00',currency:'EUR',event:'German Prelim CPI m/m',actual:'—',releaseState:'overdue',importance:'HIGH'}]},
