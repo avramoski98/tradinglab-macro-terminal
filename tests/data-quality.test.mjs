@@ -2564,6 +2564,12 @@ test('US 2 November 2026 ISM headline and prices are primary, S&P final is secon
  const construction=day.find(e=>/Construction Spending/.test(e.event));
  assert.equal(construction.actual,'—','Census September result must not be invented');
  assert.equal(construction.releaseState,'overdue');
+ const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
+ const usdFallback=fallback.events.filter(e=>e.currency==='USD'&&String(e.date).startsWith('2026-11-02'));
+ assert.equal(usdFallback.filter(e=>/ISM Manufacturing PMI/i.test(e.event)).length,1,'fallback headline');
+ assert.equal(usdFallback.filter(e=>/ISM Manufacturing Prices/i.test(e.event)).length,1,'fallback prices component must not be overwritten');
+ assert.equal(usdFallback.filter(e=>/S&P Global Final Manufacturing PMI/i.test(e.event)).length,1,'fallback S&P final');
+ assert.equal(usdFallback.find(e=>/ISM Manufacturing Prices/i.test(e.event)).actual,'75.2');
  const html=fs.readFileSync('index.html','utf8');
  assert.ok(html.includes('NEW · 2 NOV · USD / US MANUFACTURING:'));
  assert.ok(html.includes('US September Construction Spending remains OVERDUE'));
