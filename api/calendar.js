@@ -17,6 +17,21 @@ const VERIFIED=[
  status:'verified-primary',sourcePublishedAt:'2026-11-02T00:30:00Z',releaseTimeVerified:true,
  verifiedAt:'2026-11-02T02:36:00Z',force:true},
 
+// MI OCT 2026 m/m SECONDARY: Myfxbook calendar updated after release
+// reports +0.5% m/m, prior +0.3%. Melbourne Institute free public
+// bulletin confirms October y/y 4.9% but does not publish the m/m figure.
+// Keep the monthly figure SECONDARY and do not label it primary or assume
+// the displayed provider consensus is officially verified.
+{day:'2026-11-02',time:'02:00',dateOverride:'2026-11-02T02:00:00+01:00',ccy:'AUD',
+ match:/^(?:TD-)?MI Inflation Gauge m\/m(?: ·.*)?$/i,
+ event:'MI Inflation Gauge m/m · Oct 2026',
+ actual:'+0.5%',previous:'+0.3%',forecast:'—',importance:'LOW',
+ label:'RELEASED · MI OCT +0.5% m/m · MYFXBOOK SECONDARY',
+ source:'Myfxbook economic calendar (checked 2 Nov 2026) reports October MI Inflation Gauge +0.5% m/m vs September +0.3%. Melbourne Institute confirms the October release and 4.9% y/y but does not independently publish the exact m/m reading in its public bulletin. Provider forecast +0.3% not treated as primary-verified consensus.',
+ url:'https://www.myfxbook.com/forex-economic-calendar/australia/td-mi-inflation-gauge-mom',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T02:42:00Z',force:true},
+
 // Melbourne Institute official October 2026 Inflation Gauge release.
 // The freely published primary bulletin verifies annual headline 4.9% y/y
 // but does NOT disclose a numeric monthly m/m gauge; do not invent one.
