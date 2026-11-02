@@ -1417,6 +1417,10 @@ const OFFICIAL_UPCOMING=[
 // omit these entirely. Keep the events visible in fallback; once the clock
 // passes, label missing Actual OVERDUE rather than silently dropping it.
 // Do not reuse 23 Oct flash estimates as 2 Nov final actuals.
+{date:'2026-11-02T09:30:00+01:00',ccy:'CHF',event:'Swiss procure.ch Manufacturing PMI · Oct 2026',
+ match:/^(?:Swiss |Switzerland |procure\.ch )?Manufacturing PMI(?: ·.*)?$/i,importance:'MED',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'procure.ch / Investing.com economic calendar · 2 Nov 2026 09:30 CET (secondary schedule)',
+ url:'https://www.investing.com/economic-calendar/procure.ch-pmi-278'},
 {date:'2026-11-02T09:15:00+01:00',ccy:'EUR',event:'Spanish Manufacturing PMI · Oct 2026',
  match:/^(?:Spanish|Spain)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
  scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 09:15 CET (secondary schedule)',
