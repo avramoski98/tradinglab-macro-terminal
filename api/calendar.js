@@ -2,6 +2,47 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// AUD BUILDING APPROVALS · SEP 2026 · 2 NOV PRIMARY.
+// ABS official September release, published 2 Nov 11:30 AEDT = 01:30 CET.
+// The 5.1% is seasonally adjusted total dwelling approvals m/m;
+// previous August revised to -5.2%. Do not reuse the old -6.1% vintage.
+// Market consensus has not been independently primary-verified.
+{day:'2026-11-02',time:'01:30',dateOverride:'2026-11-02T01:30:00+01:00',ccy:'AUD',
+ match:/^(?:Building Approvals(?: m\/m)?|Australia Building Approvals)(?: ·.*)?$/i,
+ event:'Building Approvals m/m · Sep 2026 (total dwellings, SA)',
+ actual:'+5.1%',previous:'-5.2%',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ABS PRIMARY · SEP APPROVALS +5.1% m/m',
+ source:'Australian Bureau of Statistics, Building Approvals September 2026, released 2 Nov 2026 11:30 AEDT: seasonally adjusted total dwellings approved +5.1% m/m to 17,948; August revised to -5.2%. Private houses -5.3%, dwellings excluding houses +16.6%. No verified survey consensus.',
+ url:'https://www.abs.gov.au/statistics/industry/building-and-construction/building-approvals-australia/sep-2026',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02T00:30:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T02:36:00Z',force:true},
+
+// Melbourne Institute official October 2026 Inflation Gauge release.
+// The freely published primary bulletin verifies annual headline 4.9% y/y
+// but does NOT disclose a numeric monthly m/m gauge; do not invent one.
+{day:'2026-11-02',time:'02:00',dateOverride:'2026-11-02T02:00:00+01:00',ccy:'AUD',
+ match:/^MI Inflation Gauge y\/y(?: ·.*)?$/i,
+ event:'MI Inflation Gauge y/y · Oct 2026 (official publication)',
+ actual:'4.9%',previous:'4.8%',forecast:'—',importance:'MED',
+ label:'RELEASED · MELBOURNE INSTITUTE PRIMARY · OCT 4.9% y/y · m/m UNVERIFIED',
+ source:'Melbourne Institute 2 Nov 2026 public Inflation Gauge release: October annual headline 4.9% y/y (September 4.8% y/y), fourth consecutive monthly rise. The original publisher does not disclose the exact October m/m numeric change in the public bulletin; do not treat this y/y as the m/m Actual.',
+ url:'https://melbourneinstitute.unimelb.edu.au/news/news/macroeconomics/inflation-gauge',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02T01:00:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T02:36:00Z',force:true},
+
+// S&P Global Japan October final Manufacturing PMI: Reuters contemporaneous
+// report 2 Nov 00:37 UTC corroborates 53.3 vs September 54.1.
+// S&P original final bulletin not independently retrieved: SECONDARY only.
+{day:'2026-11-02',time:'01:30',dateOverride:'2026-11-02T01:30:00+01:00',ccy:'JPY',
+ match:/^(?:Final )?(?:Manufacturing PMI|S&P Global Manufacturing PMI)(?: ·.*)?$/i,
+ event:'Final Manufacturing PMI · Oct 2026 (S&P Global Japan)',
+ actual:'53.3',previous:'54.1',forecast:'—',importance:'MED',
+ label:'RELEASED · JAPAN FINAL PMI 53.3 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 00:37 UTC citing S&P Global: Japan October final Manufacturing PMI 53.3 vs September 54.1, slower but above 50. Final survey figure is reported by Reuters; original S&P primary release and independent consensus not retrieved.',
+ url:'https://www.reuters.com/world/asia-pacific/japans-october-factory-growth-slows-costs-pick-up-pmi-shows-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T00:37:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T02:36:00Z',force:true},
+
 // 30 Oct 2026 09:45 EDT (14:45 CET) Chicago Business Barometer.
 // MNI's own 30 Oct publication confirms October 55.3 versus September 58.8.
 // Provider forecast 55.8 is NOT a primary-source MNI consensus.
