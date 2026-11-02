@@ -2601,7 +2601,7 @@ test('2 Nov Fed SLOOS official schedule is consistent in LIVE and FALLBACK witho
   assert.equal(e.forecast,'—');
   assert.equal(e.verificationStatus,'official-schedule');
   assert.equal(e.releaseTimeVerified,true);
-  assert.match(e.sourceUrl,/federalreserve\\.gov\\/newsevents\\/2026-november\\.htm/);
+  assert.ok(e.sourceUrl.includes('federalreserve.gov/newsevents/2026-november.htm'));
  }
  const published=applyVerifiedReleaseOverlay({mode:'live',events:[
   {date:official,currency:'USD',event:'Loan Officer Survey',releaseState:'released',actual:'Published',verificationStatus:'verified-primary'}
