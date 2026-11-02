@@ -1622,6 +1622,14 @@ const OFFICIAL_UPCOMING=[
   match:/Loan Officer (?:Opinion )?Survey|SLOOS/i,importance:'MED',
   source:'Federal Reserve Board · official November 2026 calendar, 2 Nov 14:00 EST',
   url:'https://www.federalreserve.gov/newsevents/2026-november.htm'},
+ // Stats NZ schedules September 2026 building consents for 3 Nov NZ date.
+ // 10:45 NZDT = 2 Nov 22:45 CET (provider/prior Stats NZ release time, not issuer-confirmed).
+ // Preserve the publication gap in FALLBACK without inventing Actual or consensus.
+ {date:'2026-11-02T22:45:00+01:00',ccy:'NZD',event:'Building Consents m/m · Sep 2026',fullScheduleOnly:true,
+  match:/^(?:Building Consents|Building Permits)(?: m\/m)?/i,importance:'LOW',
+  scheduleVerificationStatus:'verified-secondary-schedule',
+  source:'Stats NZ · September 2026 building consents official release date 3 Nov; 10:45 NZDT corroborated by live calendar and prior Stats NZ releases',
+  url:'https://www.stats.govt.nz/information-releases/building-consents-issued-august-2026/'},
  // 3 Nov 14:30 AEDT = 04:30 CET. The RBA statement is released with the decision.
  {date:'2026-11-03T04:30:00+01:00',ccy:'AUD',event:'RBA Rate Decision & Statement on Monetary Policy · Nov',match:/RBA.*Rate|Cash Rate|Reserve Bank of Australia.*Rate|RBA Monetary Policy Decision/i,importance:'EXTREME',source:'Reserve Bank of Australia · official coming-up schedule, 3 Nov 14:30 AEDT',url:'https://www.rba.gov.au/coming-up/'},
  // 3 Nov 10:00 EST = 16:00 CET.
@@ -1717,7 +1725,16 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
     label:state==='scheduled'?'Scheduled · official':'OVERDUE · publication unverified',
     forecastVerificationStatus:'provider-unverified',lastUpdate:null};
   }
-  if(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)&&rows[matching].releaseState!=='released'){
+  if(o.ccy==='NZD'&&/Building Consents/.test(o.event)&&rows[matching].releaseState!=='released'){
+    const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
+    rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+     event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+     verificationStatus:'verified-secondary-schedule',releaseTimeVerified:false,
+     actual:'—',forecast:'—',releaseState:state,
+     label:state==='scheduled'?'Scheduled · publication unverified':'OVERDUE · publication unverified',
+     forecastVerificationStatus:'provider-unverified',lastUpdate:null};
+   }
+   if(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)&&rows[matching].releaseState!=='released'){
     // Prefer the official ECB time and schedule metadata over unverified provider fields.
     const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',

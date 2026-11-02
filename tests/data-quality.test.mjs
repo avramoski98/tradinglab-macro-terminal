@@ -2626,3 +2626,26 @@ test('USDA Nov 2 Crop Progress publication clears overdue and appears in both re
  assert.ok(html.includes('NEW · 2 NOV · USDA CROP PROGRESS / CORN'));
  assert.equal(html.split('https://esmis.nal.usda.gov/sites/default/release-files/796135/prog4426.txt').length-1,2,'both Macro Watch and Weekly Focus cite primary report');
 });
+
+test('NZD Building Consents 3 Nov NZ local schedule is consistent in LIVE and FALLBACK',()=>{
+ const date='2026-11-02T22:45:00+01:00';
+ for(const payload of [
+  {mode:'live',events:[{date,currency:'NZD',event:'Building Consents m/m',releaseState:'overdue',actual:'—',importance:'LOW'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(x=>x.currency==='NZD'&&/Building Consents/.test(x.event));
+  assert.equal(rows.length,1,payload.mode);
+  assert.equal(rows[0].date,date);
+  assert.equal(rows[0].releaseState,Date.parse(date)<=Date.now()?'overdue':'scheduled');
+  assert.equal(rows[0].actual,'—');assert.equal(rows[0].forecast,'—');
+  assert.equal(rows[0].verificationStatus,'verified-secondary-schedule');
+  assert.equal(rows[0].releaseTimeVerified,false);
+  assert.ok(rows[0].sourceUrl.includes('stats.govt.nz/information-releases/building-consents-issued-august-2026'));
+ }
+ const released=applyVerifiedReleaseOverlay({mode:'live',events:[
+  {date,currency:'NZD',event:'Building Consents m/m',releaseState:'released',actual:'+1.2%',verificationStatus:'verified-primary'}
+ ]},{includeFullSchedule:true});
+ const row=released.events.find(x=>x.currency==='NZD'&&/Building Consents/.test(x.event));
+ assert.equal(row.releaseState,'released');assert.equal(row.actual,'+1.2%');
+});
