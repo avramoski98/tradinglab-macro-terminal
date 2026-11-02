@@ -3,6 +3,21 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 · US SEPTEMBER CONSTRUCTION SPENDING · REUTERS SECONDARY VERIFIED.
+// Census officially scheduled the release for 2 Nov 2026 10:00 EST. Reuters
+// reported Census September actual -1.9% m/m vs August +2.0% revised,
+// against its economist poll +0.3%. Original September Census numeric bulletin
+// was not independently retrieved; do not mark as verified-primary.
+{day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
+ match:/^Construction Spending(?: m\/m)?(?: ·.*)?$/i,
+ event:'Construction Spending m/m · Sep 2026 (Reuters reporting Census)',
+ actual:'-1.9%',previous:'+2.0% revised',forecast:'—',importance:'MED',
+ label:'RELEASED · SEP -1.9% · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 reporting U.S. Census September construction spending -1.9% m/m vs revised August +2.0% and Reuters economist poll +0.3%; private residential -5.5%. Census official release schedule confirms 2 Nov 10:00 EST. Numeric original September Census bulletin not independently retrieved; forecast not primary-verified.',
+ url:'https://www.reuters.com/business/us-construction-spending-tumbles-september-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T15:35:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T16:45:00Z',force:true},
+
 // 2 NOV 2026 · ISM PRICES PAID COMPONENT (PRIMARY VERIFIED).
 {day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
  match:/^ISM Manufacturing Prices(?: Paid)?(?: ·.*)?$/i,

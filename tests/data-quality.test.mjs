@@ -2562,8 +2562,12 @@ test('US 2 November 2026 ISM headline and prices are primary, S&P final is secon
  assert.equal(sp[0].verificationStatus,'verified-secondary');
  for(const e of [...ism,...prices,...sp])assert.equal(e.releaseState,'released');
  const construction=day.find(e=>/Construction Spending/.test(e.event));
- assert.equal(construction.actual,'—','Census September result must not be invented');
- assert.equal(construction.releaseState,'overdue');
+ assert.equal(construction.actual,'-1.9%','Reuters-reported Census September result');
+ assert.equal(construction.previous,'+2.0% revised');
+ assert.equal(construction.forecast,'—','Reuters consensus is secondary, not a primary-verified forecast');
+ assert.equal(construction.verificationStatus,'verified-secondary');
+ assert.equal(construction.releaseState,'released');
+ assert.match(construction.sourceUrl,/reuters.com\/business\/us-construction-spending-tumbles-september-2026-11-02/);
  const fallback=applyVerifiedReleaseOverlay({mode:'schedule-fallback',events:[]},{includeFullSchedule:true});
  const usdFallback=fallback.events.filter(e=>e.currency==='USD'&&String(e.date).startsWith('2026-11-02'));
  assert.equal(usdFallback.filter(e=>/ISM Manufacturing PMI/i.test(e.event)).length,1,'fallback headline');
@@ -2572,6 +2576,10 @@ test('US 2 November 2026 ISM headline and prices are primary, S&P final is secon
  assert.equal(usdFallback.find(e=>/ISM Manufacturing Prices/i.test(e.event)).actual,'75.2');
  const html=fs.readFileSync('index.html','utf8');
  assert.ok(html.includes('NEW · 2 NOV · USD / US MANUFACTURING:'));
- assert.ok(html.includes('US September Construction Spending remains OVERDUE'));
+ assert.ok(html.includes('US September Construction Spending RELEASED · -1.9% m/m'));
+ assert.ok(html.includes('US SEPTEMBER CONSTRUCTION SPENDING / USD · REUTERS SECONDARY'));
+ assert.equal(usdFallback.filter(e=>/Construction Spending/.test(e.event)).length,1,'fallback construction spending');
+ assert.equal(usdFallback.find(e=>/Construction Spending/.test(e.event)).releaseState,'released');
+ assert.equal(usdFallback.find(e=>/Construction Spending/.test(e.event)).verificationStatus,'verified-secondary');
  assert.ok(!html.includes('<b>UPCOMING HIGH IMPACT · 2–7 NOV (EUROPE/SKOPJE):</b> 2 Nov ISM Manufacturing;'));
 });
