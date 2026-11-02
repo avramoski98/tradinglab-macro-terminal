@@ -32,7 +32,7 @@ const VERIFIED=[
 // Reuters survey 54.5 is secondary consensus, not an official ISM statistic.
 // Do not mechanically convert a headline beat into a USD/G10 ranking change.
 {day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
- match:/ISM.*Manufacturing|Manufacturing PMI.*ISM/i,
+ match:/^(?:ISM Manufacturing PMI|Manufacturing PMI.*ISM)(?: ·.*)?$/i,
  event:'ISM Manufacturing PMI · Oct 2026 (ISM official)',
  actual:'55.5',previous:'54.5',forecast:'—',importance:'HIGH',
  label:'RELEASED · US ISM OCT 55.5 · PRIMARY VERIFIED · PRICES 75.2',
