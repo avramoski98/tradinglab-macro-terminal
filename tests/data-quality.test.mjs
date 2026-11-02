@@ -2584,9 +2584,8 @@ test('US 2 November 2026 ISM headline and prices are primary, S&P final is secon
  assert.ok(!html.includes('<b>UPCOMING HIGH IMPACT · 2–7 NOV (EUROPE/SKOPJE):</b> 2 Nov ISM Manufacturing;'));
 });
 
-test('2 Nov Fed SLOOS official schedule is consistent in LIVE and FALLBACK without fabricated Actual',()=>{
+test('2 Nov Fed SLOOS official publication clears overdue in LIVE and FALLBACK without numeric Actual',()=>{
  const official='2026-11-02T20:00:00+01:00';
- const expected=Date.now()>=Date.parse(official)?'overdue':'scheduled';
  for(const payload of [
   {mode:'live',events:[{date:'2026-11-02T20:03:00+01:00',currency:'USD',event:'Loan Officer Survey',releaseState:'overdue',actual:'—',importance:'MED'}]},
   {mode:'schedule-fallback',events:[]}
@@ -2595,13 +2594,16 @@ test('2 Nov Fed SLOOS official schedule is consistent in LIVE and FALLBACK witho
   const matches=out.events.filter(e=>e.currency==='USD'&&/Loan Officer.*Survey|SLOOS/i.test(e.event));
   assert.equal(matches.length,1,payload.mode+' should have exactly one SLOOS row');
   const e=matches[0];
-  assert.equal(e.date,official,'Fed official time overrides approximate provider time');
-  assert.equal(e.releaseState,expected,'do not silently hide an unverified past publication');
-  assert.equal(e.actual,'—','qualitative survey has no single numeric Actual');
+  assert.equal(e.date,official,'official Fed release time overrides provider time');
+  assert.equal(e.releaseState,'released','published Fed survey must not remain overdue');
+  assert.equal(e.actual,'—','multi-metric survey has no single numeric Actual');
   assert.equal(e.forecast,'—');
-  assert.equal(e.verificationStatus,'official-schedule');
+  assert.equal(e.verificationStatus,'verified-primary-publication');
+  assert.equal(e.numericActualVerified,false);
+  assert.equal(e.actualVerifiedAt,null);
   assert.equal(e.releaseTimeVerified,true);
-  assert.ok(e.sourceUrl.includes('federalreserve.gov/newsevents/2026-november.htm'));
+  assert.ok(e.sourceUrl.includes('federalreserve.gov/data/sloos/sloos-202610.htm'));
+  assert.ok(e.source.includes('weaker CRE demand'));
  }
  const published=applyVerifiedReleaseOverlay({mode:'live',events:[
   {date:official,currency:'USD',event:'Loan Officer Survey',releaseState:'released',actual:'Published',verificationStatus:'verified-primary'}
