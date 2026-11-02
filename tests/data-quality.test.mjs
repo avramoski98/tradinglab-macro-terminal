@@ -2159,10 +2159,18 @@ test('Official Nov 2–6 high-impact schedule survives a calendar provider outag
   const rows=out.events.filter(x=>x.currency===ccy&&x.date===date&&x.event.startsWith(prefix));
   assert.equal(rows.length,1,'missing or duplicate '+ccy+' '+prefix);
   assert.equal(rows[0].date,date);
-  assert.equal(rows[0].releaseState,Date.parse(date)>Date.now()?'scheduled':'overdue');
-  assert.equal(rows[0].verificationStatus,'official-schedule');
-  assert.equal(rows[0].actual,'—');
-  assert.equal(rows[0].forecast,'—');
+  if(ccy==='USD'&&prefix==='ISM Manufacturing PMI'){
+   assert.equal(rows[0].releaseState,'released','2 Nov official ISM now published');
+   assert.equal(rows[0].verificationStatus,'verified-primary');
+   assert.equal(rows[0].actual,'55.5');
+   assert.equal(rows[0].previous,'54.5');
+   assert.equal(rows[0].forecast,'—');
+  }else{
+   assert.equal(rows[0].releaseState,Date.parse(date)>Date.now()?'scheduled':'overdue');
+   assert.equal(rows[0].verificationStatus,'official-schedule');
+   assert.equal(rows[0].actual,'—');
+   assert.equal(rows[0].forecast,'—');
+  }
   assert.ok(/^https:\/\//.test(rows[0].sourceUrl));
  }
 });
