@@ -2611,3 +2611,18 @@ test('2 Nov Fed SLOOS official publication clears overdue in LIVE and FALLBACK w
  assert.equal(published.events.filter(e=>/Loan Officer.*Survey|SLOOS/i.test(e.event)).length,1);
  assert.equal(published.events.find(e=>/Loan Officer.*Survey|SLOOS/i.test(e.event)).releaseState,'released');
 });
+
+
+test('USDA Nov 2 Crop Progress publication clears overdue and appears in both research views',()=>{
+ const c={Date,fetch:async()=>({ok:false}),console};vm.createContext(c);
+ vm.runInContext(fs.readFileSync('api/commodity-calendar.js','utf8').replace('export default async function','async function'),c);
+ const row=c.usdaRows().find(x=>x.date.startsWith('2026-11-02')&&x.event==='Crop Progress');
+ assert.ok(row,'Nov 2 USDA Crop Progress scheduled row exists');
+ assert.equal(row.releaseState,'released');
+ assert.equal(row.verificationStatus,'verified-primary');
+ assert.equal(row.actual,'—','USDA multi-metric report has no single numeric Actual');
+ assert.equal(row.sourceUrl,'https://esmis.nal.usda.gov/sites/default/release-files/796135/prog4426.txt');
+ assert.ok(html.includes('NEW · 2 NOV · USDA CROP PROGRESS · PRIMARY RELEASED'));
+ assert.ok(html.includes('NEW · 2 NOV · USDA CROP PROGRESS / CORN'));
+ assert.equal(html.split('https://esmis.nal.usda.gov/sites/default/release-files/796135/prog4426.txt').length-1,2,'both Macro Watch and Weekly Focus cite primary report');
+});
