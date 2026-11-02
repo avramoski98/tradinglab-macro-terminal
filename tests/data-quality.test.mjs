@@ -860,13 +860,16 @@ test('USD JOLTS March-Aug 2026 official revised mixed-vintage backfill has six t
 });
 
 
-test('Swedbank Silf September 2026 revised manufacturing PMI table verifies six monthly SEK growth observations',()=>{
+test('Swedbank Silf revised April-September history plus primary October 2026 PMI',()=>{
  const d=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
  const rows=d.currencies.SEK.filter(x=>x.event==='Swedbank Manufacturing PMI');
- assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09']);
- assert.deepEqual(rows.map(x=>x.actual),[56.9,57.2,58.1,56.0,56.3,58.1]);
- assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-04T06:30:00Z','2026-06-01T06:30:00Z','2026-07-01T06:30:00Z','2026-08-03T06:30:00Z','2026-09-01T06:30:00Z','2026-10-01T06:30:00Z']);
- assert.ok(rows.every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.stage==='official-revised-table'&&x.revisionVintage==='2026-10-01'&&x.sourceUrl==='https://mb.cision.com/Main/67/4402963/4296154.pdf'&&x.sourceUpdatedAt==='2026-10-01T06:30:00Z'&&x.releaseTimeKnown===true));
+ assert.deepEqual(rows.map(x=>x.reference),['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10']);
+ assert.deepEqual(rows.map(x=>x.actual),[56.9,57.2,58.1,56.0,56.3,58.5,60.5]);
+ assert.deepEqual(rows.map(x=>x.releaseDate),['2026-05-04T06:30:00Z','2026-06-01T06:30:00Z','2026-07-01T06:30:00Z','2026-08-03T06:30:00Z','2026-09-01T06:30:00Z','2026-10-01T06:30:00Z','2026-11-02T07:30:00Z']);
+ assert.ok(rows.slice(0,5).every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.stage==='official-revised-table'&&x.revisionVintage==='2026-10-01'&&x.sourceUrl==='https://mb.cision.com/Main/67/4402963/4296154.pdf'&&x.sourceUpdatedAt==='2026-10-01T06:30:00Z'&&x.releaseTimeKnown===true));
+ assert.ok(rows.slice(5).every(x=>x.verificationStatus==='verified-primary'&&x.frequency==='monthly'&&x.revisionVintage==='2026-11-02'&&x.sourceUrl.includes('swedbank.com')&&x.sourceUpdatedAt==='2026-11-02T07:30:00Z'&&x.releaseTimeKnown===true));
+ assert.equal(rows[5].stage,'official-revised-table');
+ assert.equal(rows[6].stage,'official-publication');
  assert.equal(d.audit.verified,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary').length);
  assert.equal(d.audit.total,Object.values(d.currencies).flat().length);
  assert.equal(d.audit.provenanceComplete,Object.values(d.currencies).flat().filter(x=>x.verificationStatus==='verified-primary'&&x.sourceUrl&&x.sourceUpdatedAt&&x.releaseDate&&x.referenceDate).length);
