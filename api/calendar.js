@@ -1485,7 +1485,7 @@ const OFFICIAL_UPCOMING=[
 // passes, label missing Actual OVERDUE rather than silently dropping it.
 // Do not reuse 23 Oct flash estimates as 2 Nov final actuals.
 {date:'2026-11-02T09:30:00+01:00',ccy:'CHF',event:'Swiss procure.ch Manufacturing PMI · Oct 2026',
- match:/^(?:Swiss |Switzerland |procure\.ch )?Manufacturing PMI(?: ·.*)?$/i,importance:'MED',fullScheduleOnly:true,
+ match:/^(?:Swiss procure\.ch |Swiss |Switzerland |procure\.ch )?Manufacturing PMI(?: ·.*)?$/i,importance:'MED',fullScheduleOnly:true,
  scheduleVerificationStatus:'verified-secondary-schedule',source:'procure.ch / Investing.com economic calendar · 2 Nov 2026 09:30 CET (secondary schedule)',
  url:'https://www.investing.com/economic-calendar/procure.ch-pmi-278'},
 {date:'2026-11-02T09:15:00+01:00',ccy:'EUR',event:'Spanish Manufacturing PMI · Oct 2026',
