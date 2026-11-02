@@ -3,6 +3,39 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 · SPAIN / SWITZERLAND / UK MANUFACTURING PMI FINAL.
+// Independent secondary reports confirm October results. These are NOT
+// original S&P/procure.ch licensed historical series and do not fill G10
+// primary-only historical coverage. Forecast left blank (not primary-verified).
+{day:'2026-11-02',time:'09:15',dateOverride:'2026-11-02T09:15:00+01:00',ccy:'EUR',
+ match:/^Spanish Manufacturing PMI(?: ·.*)?$/i,
+ event:'Spanish Manufacturing PMI · Oct 2026 (S&P Global)',
+ actual:'52.2',previous:'51.0',forecast:'—',importance:'LOW',
+ label:'RELEASED · SPAIN OCT PMI 52.2 · SECONDARY VERIFIED',
+ source:'Trading Economics 2 Nov 2026 08:27 UTC reports S&P Global Spain October Manufacturing PMI 52.2 vs September 51.0, above secondary market expectation 50.8. Production and orders improved; energy and transport costs increased. Original S&P Global report and licensed historical series not independently retrieved; do not treat 50.8 as primary consensus.',
+ url:'https://tradingeconomics.com/spain/manufacturing-pmi/news/597201',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T08:27:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T10:45:00Z',force:true},
+{day:'2026-11-02',time:'09:30',dateOverride:'2026-11-02T09:30:00+01:00',ccy:'CHF',
+ match:/^(?:Swiss procure\.ch )?Manufacturing PMI(?: ·.*)?$/i,
+ event:'Swiss procure.ch Manufacturing PMI · Oct 2026',
+ actual:'56.7',previous:'55.3',forecast:'—',importance:'LOW',
+ label:'RELEASED · SWISS OCT PMI 56.7 · SECONDARY VERIFIED',
+ source:'Trading Economics 2 Nov 2026 09:19 UTC and Investing.com report procure.ch–UBS October Manufacturing PMI 56.7 vs September 55.3; secondary market forecast 55.3. Production 58.5, orders 57.4, input purchase prices 77.1. Original procure.ch/UBS primary bulletin not independently retrieved; do not promote to primary or invent official consensus.',
+ url:'https://tradingeconomics.com/switzerland/manufacturing-pmi/news/597249',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T09:19:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T10:45:00Z',force:true},
+{day:'2026-11-02',time:'10:30',dateOverride:'2026-11-02T10:30:00+01:00',ccy:'GBP',
+ match:/^(?:(?:UK|British) )?(?:Final )?Manufacturing PMI(?: ·.*)?$/i,
+ event:'UK Final Manufacturing PMI · Oct 2026 (S&P Global)',
+ actual:'52.8',previous:'51.9',forecast:'—',importance:'LOW',
+ label:'RELEASED · UK OCT FINAL PMI 52.8 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026: S&P Global UK October FINAL Manufacturing PMI 52.8 vs September 51.9, matching October flash 52.8. Output index 53.6 vs 51.5, fastest output growth in over two years; rising input costs remain BoE-relevant. Reuters secondary confirmation; original S&P bulletin not independently retrieved. Flash is not official market consensus.',
+ url:'https://www.reuters.com/world/uk/uk-october-manufacturing-pmi-shows-fastest-output-growth-two-years-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T09:36:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T10:45:00Z',force:true},
+
+
 // 2 NOV 2026 EUROPE FINAL MANUFACTURING PMIs · REUTERS SECONDARY.
 // Reuters confirms the 2 Nov FINAL readings, not the 23 Oct FLASH figures.
 // Original S&P Global release documents and redistribution rights were not
