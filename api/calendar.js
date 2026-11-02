@@ -3,6 +3,22 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 · FED OCTOBER SLOOS · OFFICIAL PRIMARY PUBLICATION VERIFIED.
+// The Federal Reserve's current October 2026 survey page was updated 2 Nov.
+// This is a qualitative, multi-metric Q3 lending survey, not a single-number
+// economic release. Mark RELEASED without fabricating an Actual or consensus.
+{day:'2026-11-02',time:'20:00',dateOverride:'2026-11-02T20:00:00+01:00',ccy:'USD',
+ match:/Loan Officer (?:Opinion )?Survey|SLOOS/i,
+ event:'Fed Senior Loan Officer Opinion Survey (SLOOS) · Oct 2026',
+ actual:'—',previous:'—',forecast:'—',importance:'MED',
+ label:'RELEASED · FED PRIMARY · Q3 LENDING SURVEY PUBLISHED',
+ source:'Federal Reserve Board official October 2026 SLOOS, published 2 Nov 2026: Q3 C&I standards unchanged for large/mid-sized firms but tighter for small firms; weaker C&I demand; tighter CRE standards and weaker CRE demand across categories; tighter standards on NDFI lending. Qualitative multi-metric survey with no single numeric Actual or market consensus.',
+ url:'https://www.federalreserve.gov/data/sloos/sloos-202610.htm',
+ status:'verified-primary-publication',numericActualVerified:false,
+ sourcePublishedAt:'2026-11-02',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T20:34:00Z',force:true},
+
+
 // 2 NOV 2026 · US SEPTEMBER CONSTRUCTION SPENDING · REUTERS SECONDARY VERIFIED.
 // Census officially scheduled the release for 2 Nov 2026 10:00 EST. Reuters
 // reported Census September actual -1.9% m/m vs August +2.0% revised,
