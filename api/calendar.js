@@ -2,6 +2,20 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// 2 NOV 2026 · CANADA OCTOBER MANUFACTURING PMI / S&P GLOBAL SECONDARY.
+// FinancialJuice timestamped release 14:31:40 UTC reports October 49.6 vs
+// September 51.5. Original S&P bulletin / licensed historical data not retrieved.
+// Do not infer a market consensus or promote to primary G10 Growth history.
+{day:'2026-11-02',time:'15:30',dateOverride:'2026-11-02T15:30:00+01:00',ccy:'CAD',
+ match:/^(?:(?:Canadian|Canada|S&P Global) )?Manufacturing PMI(?: ·.*)?$/i,
+ event:'Canada S&P Global Manufacturing PMI · Oct 2026',
+ actual:'49.6',previous:'51.5',forecast:'—',importance:'MED',
+ label:'RELEASED · CANADA OCT PMI 49.6 · SECONDARY VERIFIED',
+ source:'FinancialJuice timestamped economic release 2 Nov 2026 14:31:40 UTC: Canada Manufacturing PMI October actual 49.6, previous 51.5; below 50 contraction. Original S&P Global report and licensed history not independently verified. No verified market consensus.',
+ url:'https://www.financialjuice.com/News/9832738/Canadian-Manufacturing-PMI-Actual-496-Forecast---Previous-515.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T14:31:40Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T14:43:00Z',force:true},
+
 
 // 2 NOV 2026 · SWEDEN MANUFACTURING PMI / SWEDBANK + SILF PRIMARY.
 // October 60.5, September revised to 58.5 (original September print 58.1).
