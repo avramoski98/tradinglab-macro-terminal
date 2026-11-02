@@ -2503,3 +2503,26 @@ test('2 Nov official Swedish PMI fills missing G10 calendar release and updates 
  assert.match(html,/SEK \/ SWEDBANK PRIMARY/);
  assert.match(html,/\['2026-09',58\.5\],\['2026-10',60\.5\]/);
 });
+
+
+test('Canada Oct 2026 Manufacturing PMI release clears live overdue and fallback without promoting secondary source',()=>{
+ for(const payload of [
+  {mode:'live',events:[{date:'2026-11-02T15:30:00+01:00',currency:'CAD',event:'Manufacturing PMI',actual:'—',previous:'51.5',releaseState:'overdue',importance:'MED'}]},
+  {mode:'schedule-fallback',events:[]}
+ ]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  const rows=out.events.filter(e=>e.currency==='CAD'&&e.date.startsWith('2026-11-02')&&/Manufacturing PMI/.test(e.event));
+  assert.equal(rows.length,1,'one Canada Oct PMI after dedupe');
+  const e=rows[0];
+  assert.equal(e.releaseState,'released');
+  assert.equal(e.actual,'49.6');
+  assert.equal(e.previous,'51.5');
+  assert.equal(e.forecast,'—');
+  assert.equal(e.verificationStatus,'verified-secondary');
+  assert.equal(e.date,'2026-11-02T15:30:00+01:00');
+  assert.match(e.sourceUrl,/financialjuice\\.com\\/News\\/9832738/);
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(html,/CANADA MANUFACTURING PMI \\/ CAD · FINANCIALJUICE SECONDARY/);
+ assert.match(html,/CAD \\/ S&amp;P GLOBAL MANUFACTURING PMI · SECONDARY/);
+});
