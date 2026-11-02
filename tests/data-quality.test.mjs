@@ -2520,9 +2520,9 @@ test('Canada Oct 2026 Manufacturing PMI release clears live overdue and fallback
   assert.equal(e.forecast,'—');
   assert.equal(e.verificationStatus,'verified-secondary');
   assert.equal(e.date,'2026-11-02T15:30:00+01:00');
-  assert.match(e.sourceUrl,/financialjuice\\.com\\/News\\/9832738/);
+  assert.ok(e.sourceUrl.includes('financialjuice.com/News/9832738'));
  }
  const html=fs.readFileSync('index.html','utf8');
- assert.match(html,/CANADA MANUFACTURING PMI \\/ CAD · FINANCIALJUICE SECONDARY/);
- assert.match(html,/CAD \\/ S&amp;P GLOBAL MANUFACTURING PMI · SECONDARY/);
+ assert.ok(html.includes('CANADA MANUFACTURING PMI / CAD · FINANCIALJUICE SECONDARY'));
+ assert.ok(html.includes('CAD / S&amp;P GLOBAL MANUFACTURING PMI · SECONDARY'));
 });
