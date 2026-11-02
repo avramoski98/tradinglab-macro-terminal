@@ -3,6 +3,40 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 EUROPE FINAL MANUFACTURING PMIs · REUTERS SECONDARY.
+// Reuters confirms the 2 Nov FINAL readings, not the 23 Oct FLASH figures.
+// Original S&P Global release documents and redistribution rights were not
+// independently retrieved. Do not promote these observations to primary,
+// invent consensus, or mistake flash estimates for the final actuals.
+{day:'2026-11-02',time:'09:50',dateOverride:'2026-11-02T09:50:00+01:00',ccy:'EUR',
+ match:/^(?:French|France)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,
+ event:'French Final Manufacturing PMI · Oct 2026 (S&P Global)',
+ actual:'49.5',previous:'50.6',forecast:'—',importance:'LOW',
+ label:'RELEASED · FRANCE OCT FINAL 49.5 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 08:58 UTC: S&P Global France October final Manufacturing PMI 49.5 vs September 50.6, revised up from 23 Oct flash 49.3. Below 50 signals renewed contraction; new orders and output fell, input cost pressure intensified. Original S&P bulletin and independent survey consensus not retrieved.',
+ url:'https://www.reuters.com/world/europe/french-manufacturing-back-contraction-october-pmi-shows-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T08:58:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T09:24:00Z',force:true},
+{day:'2026-11-02',time:'09:55',dateOverride:'2026-11-02T09:55:00+01:00',ccy:'EUR',
+ match:/^(?:German|Germany)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,
+ event:'German Final Manufacturing PMI · Oct 2026 (S&P Global)',
+ actual:'54.2',previous:'53.9',forecast:'—',importance:'LOW',
+ label:'RELEASED · GERMANY OCT FINAL 54.2 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 08:59 UTC: S&P Global Germany October final Manufacturing PMI 54.2 vs September 53.9; output and orders grew, export demand strengthened, input-cost pressures increased. October flash was also 54.2, but final 2 Nov is independently wire-confirmed. No primary-verified survey consensus.',
+ url:'https://www.reuters.com/business/german-factory-activity-expands-steadily-october-pmi-shows-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T08:59:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T09:24:00Z',force:true},
+{day:'2026-11-02',time:'10:00',dateOverride:'2026-11-02T10:00:00+01:00',ccy:'EUR',
+ match:/^(?:Euro(?:zone| Area) )?(?:Final )?Manufacturing PMI(?: ·.*)?$/i,
+ event:'Euro Area Final Manufacturing PMI · Oct 2026 (S&P Global)',
+ actual:'52.7',previous:'52.9',forecast:'—',importance:'MED',
+ label:'RELEASED · EURO AREA OCT FINAL 52.7 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 09:10 UTC: S&P Global Euro Area October final Manufacturing PMI 52.7 vs September 52.9, above October flash 52.4; still expansion. Export orders firm, energy/input-cost inflation accelerated. October flash 52.4 is not the final Actual or a verified market consensus. S&P primary bulletin not independently retrieved.',
+ url:'https://www.reuters.com/world/europe/euro-zone-factory-growth-eases-october-remains-solid-pmi-shows-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T09:10:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T09:24:00Z',force:true},
+
+
 // 2 NOV 2026 ITALY OCTOBER MANUFACTURING PMI · REUTERS SECONDARY.
 // Reuters report 08:53 UTC confirms final 49.4 vs September 50.4,
 // below the Reuters analyst survey 50.2. S&P Global primary report
