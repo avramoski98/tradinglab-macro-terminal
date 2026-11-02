@@ -2458,3 +2458,13 @@ test('2 Nov six Europe manufacturing PMI secondary releases clear live and fallb
  assert.match(html,/SPAIN \/ SWITZERLAND \/ UK OCTOBER MANUFACTURING PMI/);
  assert.match(html,/these are secondary-confirmed|these are not primary-licensed historical series|NOT original S&amp;P\/procure.ch primary historical observations/i);
 });
+
+
+test('Macro Watch must not contradict resolved Nov 2 PMI calendar status',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ const watch=html.slice(html.indexOf('id="macroWatchAlert"'),html.indexOf('id="macroWatchAlert"')+18000);
+ assert.match(watch,/Spain 52\.2 and Swiss procure\.ch 56\.7 have since been secondary-verified/);
+ assert.match(watch,/The 2 Nov European final PMI releases are now <b>RELEASED<\/b>/);
+ assert.doesNotMatch(watch,/Spain and Swiss procure\.ch October PMI Actual remain <b>OVERDUE/);
+ assert.doesNotMatch(watch,/Other 2 Nov European final PMI releases are being tracked in the calendar with overdue/);
+});
