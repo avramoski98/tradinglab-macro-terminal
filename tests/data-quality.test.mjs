@@ -2468,3 +2468,35 @@ test('Macro Watch must not contradict resolved Nov 2 PMI calendar status',()=>{
  assert.doesNotMatch(watch,/Spain and Swiss procure\.ch October PMI Actual remain <b>OVERDUE/);
  assert.doesNotMatch(watch,/Other 2 Nov European final PMI releases are being tracked in the calendar with overdue/);
 });
+
+
+test('2 Nov official Swedish PMI fills missing G10 calendar release and updates revised history',()=>{
+ const date='2026-11-02T08:30:00+01:00';
+ for(const mode of ['live','schedule-fallback']){
+  const events=mode==='live'?[{date,currency:'SEK',event:'Manufacturing PMI',actual:'—',releaseState:'overdue',importance:'LOW'}]:[];
+  const out=applyVerifiedReleaseOverlay({mode,events},{includeFullSchedule:true});
+  const matches=out.events.filter(e=>e.currency==='SEK'&&e.date===date&&/Swedbank \/ Silf Manufacturing PMI/.test(e.event));
+  assert.equal(matches.length,1,mode+' must include one verified October Swedish PMI');
+  const row=matches[0];
+  assert.equal(row.releaseState,'released');
+  assert.equal(row.actual,'60.5');
+  assert.equal(row.previous,'58.5');
+  assert.equal(row.forecast,'—');
+  assert.equal(row.verificationStatus,'verified-primary');
+  assert.equal(row.releaseTimeVerified,true);
+  assert.match(row.sourceUrl,/swedbank\.com/);
+ }
+ const archive=JSON.parse(fs.readFileSync('assets/economic-archive.json','utf8'));
+ const rows=archive.currencies.SEK.filter(x=>x.event==='Swedbank Manufacturing PMI');
+ assert.equal(rows.length,7);
+ assert.equal(rows.find(x=>x.reference==='2026-09').actual,58.5);
+ const october=rows.find(x=>x.reference==='2026-10');
+ assert.equal(october.actual,60.5);
+ assert.equal(october.verificationStatus,'verified-primary');
+ assert.equal(october.sourceUpdatedAt,'2026-11-02T07:30:00Z');
+ assert.match(october.sourceUrl,/swedbank\.com/);
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(html,/SWEDEN MANUFACTURING PMI \/ SEK · SWEDBANK \/ SILF PRIMARY/);
+ assert.match(html,/SEK \/ SWEDBANK PRIMARY/);
+ assert.match(html,/\['2026-09',58\.5\],\['2026-10',60\.5\]/);
+});

@@ -3,6 +3,20 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 · SWEDEN MANUFACTURING PMI / SWEDBANK + SILF PRIMARY.
+// October 60.5, September revised to 58.5 (original September print 58.1).
+// Primary publisher's 08:30 CET bulletin. No primary-verified market consensus.
+{day:'2026-11-02',time:'08:30',dateOverride:'2026-11-02T08:30:00+01:00',ccy:'SEK',
+ match:/^(?:(?:Swedish|Sweden|Swedbank|Silf)[ -]*)?Manufacturing PMI(?: ·.*)?$/i,
+ event:'Swedbank / Silf Manufacturing PMI · Oct 2026',
+ actual:'60.5',previous:'58.5',forecast:'—',importance:'MED',
+ label:'RELEASED · SWEDBANK PRIMARY · OCT 60.5 · SEP REVISED 58.5',
+ source:'Swedbank / Silf official press release, 2 Nov 2026 08:30 CET: October Swedish manufacturing PMI 60.5 vs September revised 58.5 (original September 58.1); highest since January 2022. Input price index 82.6 vs 78.3. No independently verified market consensus.',
+ url:'https://www.swedbank.com/sv/newsroom/press-releases.details.pmi-%C3%B6kade-till-60%2C5-i-oktober-%E2%80%93-h%C3%B6gtryck-i-industrin.5B1F3126CEA348D2.html',status:'verified-primary',
+ sourcePublishedAt:'2026-11-02T07:30:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T13:50:00Z',force:true},
+
+
 // 2 NOV 2026 · SPAIN / SWITZERLAND / UK MANUFACTURING PMI FINAL.
 // Independent secondary reports confirm October results. These are NOT
 // original S&P/procure.ch licensed historical series and do not fill G10
