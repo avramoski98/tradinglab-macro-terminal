@@ -3,21 +3,7 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
-// 2 NOV 2026 · US ISM MANUFACTURING / OFFICIAL ISM OCTOBER REPORT.
-// Official October report: headline 55.5 vs September 54.5, prices paid
-// 75.2 vs 77.9, production 59.0 vs 56.7, new orders 55.5 vs 55.3.
-// These are two DIFFERENT series; do not confuse prices with headline PMI.
-// No official market consensus is provided by ISM. Source primary, published
-// at 10:00 EST / 16:00 Europe/Skopje on 2 Nov 2026.
-{day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
- match:/^ISM Manufacturing PMI(?: ·.*)?$/i,
- event:'ISM Manufacturing PMI · Oct 2026 (official ISM)',
- actual:'55.5',previous:'54.5',forecast:'—',importance:'HIGH',
- label:'RELEASED · ISM PRIMARY · OCT 55.5 · SEP 54.5',
- source:'Institute for Supply Management official October 2026 Manufacturing PMI Report published 2 Nov 2026: headline 55.5 vs September 54.5; production 59.0 vs 56.7, new orders 55.5 vs 55.3, employment 52.4 vs 52.7. Prices Paid is a separate 75.2 index. ISM does not publish an official market consensus.',
- url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/october',
- status:'verified-primary',sourcePublishedAt:'2026-11-02T15:00:00Z',releaseTimeVerified:true,
- verifiedAt:'2026-11-02T15:18:00Z',force:true},
+// 2 NOV 2026 · ISM PRICES PAID COMPONENT (PRIMARY VERIFIED).
 {day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
  match:/^ISM Manufacturing Prices(?: Paid)?(?: ·.*)?$/i,
  event:'ISM Manufacturing Prices Paid · Oct 2026 (official ISM)',
