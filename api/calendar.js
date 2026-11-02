@@ -2,6 +2,46 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+
+// 2 NOV 2026 · US ISM MANUFACTURING / OFFICIAL ISM OCTOBER REPORT.
+// Official October report: headline 55.5 vs September 54.5, prices paid
+// 75.2 vs 77.9, production 59.0 vs 56.7, new orders 55.5 vs 55.3.
+// These are two DIFFERENT series; do not confuse prices with headline PMI.
+// No official market consensus is provided by ISM. Source primary, published
+// at 10:00 EST / 16:00 Europe/Skopje on 2 Nov 2026.
+{day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
+ match:/^ISM Manufacturing PMI(?: ·.*)?$/i,
+ event:'ISM Manufacturing PMI · Oct 2026 (official ISM)',
+ actual:'55.5',previous:'54.5',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ISM PRIMARY · OCT 55.5 · SEP 54.5',
+ source:'Institute for Supply Management official October 2026 Manufacturing PMI Report published 2 Nov 2026: headline 55.5 vs September 54.5; production 59.0 vs 56.7, new orders 55.5 vs 55.3, employment 52.4 vs 52.7. Prices Paid is a separate 75.2 index. ISM does not publish an official market consensus.',
+ url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/october',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02T15:00:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T15:18:00Z',force:true},
+{day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
+ match:/^ISM Manufacturing Prices(?: Paid)?(?: ·.*)?$/i,
+ event:'ISM Manufacturing Prices Paid · Oct 2026 (official ISM)',
+ actual:'75.2',previous:'77.9',forecast:'—',importance:'HIGH',
+ label:'RELEASED · ISM PRIMARY · PRICES PAID 75.2 · SEP 77.9',
+ source:'Institute for Supply Management official October 2026 Manufacturing PMI Report: Prices Index 75.2 vs September 77.9 (-2.7 points); remains in rising-price territory despite slower inflation in input costs. Not the 55.5 headline manufacturing PMI; no primary-verified market consensus.',
+ url:'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/october',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02T15:00:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T15:18:00Z',force:true},
+
+// 2 NOV 2026 · S&P GLOBAL US OCTOBER FINAL MANUFACTURING PMI.
+// Mace News contemporaneous release headline reports FINAL 54.9, September
+// 55.9, versus October FLASH 56.0. Do not treat FLASH as FINAL or import
+// this secondary result into the six-month primary-only S&P history.
+{day:'2026-11-02',time:'15:45',dateOverride:'2026-11-02T15:45:00+01:00',ccy:'USD',
+ match:/^(?:S&P Global )?(?:US )?Final Manufacturing PMI(?: ·.*)?$/i,
+ event:'US S&P Global Final Manufacturing PMI · Oct 2026',
+ actual:'54.9',previous:'55.9',forecast:'—',importance:'MED',
+ label:'RELEASED · US OCT FINAL 54.9 · MACE NEWS SECONDARY',
+ source:'Mace News contemporaneous 2 Nov 2026 headline: October FINAL S&P Global US Manufacturing PMI 54.9 vs September 55.9, below October flash 56.0. Original S&P Global final bulletin not independently retrieved. Flash estimate is not the final reading and is not treated as primary-verified market consensus. No licensed historical backfill.',
+ url:'https://www.tradingview.com/news/macenews%3A8b24b63f1094b%3A0-october-final-s-p-global-us-manufacturing-pmi-54-9-vs-56-0-expected-and-55-9-in-september/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T15:18:00Z',force:true},
+
 // US ISM MANUFACTURING OCT 2026 · PRIMARY ISM PUBLISHED 2 NOV 10:00 EST.
 // Reuters survey 54.5 is secondary consensus, not an official ISM statistic.
 // Do not mechanically convert a headline beat into a USD/G10 ranking change.
