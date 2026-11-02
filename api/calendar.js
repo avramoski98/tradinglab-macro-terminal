@@ -3,6 +3,21 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 ITALY OCTOBER MANUFACTURING PMI · REUTERS SECONDARY.
+// Reuters report 08:53 UTC confirms final 49.4 vs September 50.4,
+// below the Reuters analyst survey 50.2. S&P Global primary report
+// not independently retrieved; do not promote to verified-primary.
+{day:'2026-11-02',time:'09:45',dateOverride:'2026-11-02T09:45:00+01:00',ccy:'EUR',
+ match:/^(?:Italian|Italy)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,
+ event:'Italian Manufacturing PMI · Oct 2026 (S&P Global, final)',
+ actual:'49.4',previous:'50.4',forecast:'—',importance:'LOW',
+ label:'RELEASED · ITALY OCT PMI 49.4 · REUTERS SECONDARY',
+ source:'Reuters 2 Nov 2026 08:53 UTC: Italian S&P Global October Manufacturing PMI 49.4 vs September 50.4; Reuters survey forecast 50.2. Manufacturing output 47.3 vs 49.1, new orders 47.8 vs 49.4. Original S&P Global primary bulletin not independently retrieved; forecast in commentary is Reuters poll, not primary.',
+ url:'https://www.reuters.com/business/italian-manufacturing-sector-unexpectedly-contracts-october-pmi-shows-2026-11-02/',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T08:53:00Z',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T09:13:00Z',force:true},
+
+
 // 2 NOV 2026 GERMAN RETAIL SALES · SEPTEMBER (DESTATS PRIMARY).
 // Destatis release No. 383 confirms calendar/seasonally adjusted real
 // -2.0% m/m, August revised to +1.2% from +1.3%.
@@ -1396,6 +1411,37 @@ const OFFICIAL_UPCOMING=[
   importance:'MED',scheduleVerificationStatus:'verified-secondary-schedule',
   source:'MNI / ForexFactory · Chicago Business Barometer, 30 Oct 2026 09:45 EDT (14:45 CET)',
   url:'https://www.forexfactory.com/calendar/189-us-chicago-pmi',fullScheduleOnly:true},
+
+// 2 NOV EUROPEAN MANUFACTURING PMI FINAL RELEASES: scheduled slots from
+// published economic calendars (secondary). The live provider may fail and
+// omit these entirely. Keep the events visible in fallback; once the clock
+// passes, label missing Actual OVERDUE rather than silently dropping it.
+// Do not reuse 23 Oct flash estimates as 2 Nov final actuals.
+{date:'2026-11-02T09:15:00+01:00',ccy:'EUR',event:'Spanish Manufacturing PMI · Oct 2026',
+ match:/^(?:Spanish|Spain)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 09:15 CET (secondary schedule)',
+ url:'https://sruth.app/calendar?date=2026-11-02&month=2026-11&tz=Europe%2FBerlin'},
+{date:'2026-11-02T09:45:00+01:00',ccy:'EUR',event:'Italian Manufacturing PMI · Oct 2026',
+ match:/^(?:Italian|Italy)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 09:45 CET (secondary schedule)',
+ url:'https://www.investing.com/economic-calendar/italian-manufacturing-pmi-832'},
+{date:'2026-11-02T09:50:00+01:00',ccy:'EUR',event:'French Final Manufacturing PMI · Oct 2026',
+ match:/^(?:French|France)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 09:50 CET (secondary schedule)',
+ url:'https://sruth.app/calendar?date=2026-11-02&month=2026-11&tz=Europe%2FBerlin'},
+{date:'2026-11-02T09:55:00+01:00',ccy:'EUR',event:'German Final Manufacturing PMI · Oct 2026',
+ match:/^(?:German|Germany)(?: Final)? Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 09:55 CET (secondary schedule)',
+ url:'https://sruth.app/calendar?date=2026-11-02&month=2026-11&tz=Europe%2FBerlin'},
+{date:'2026-11-02T10:00:00+01:00',ccy:'EUR',event:'Euro Area Final Manufacturing PMI · Oct 2026',
+ match:/^(?:Euro(?:zone| Area) )?(?:Final )?Manufacturing PMI(?: ·.*)?$/i,importance:'MED',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 10:00 CET (secondary schedule)',
+ url:'https://sruth.app/calendar?date=2026-11-02&month=2026-11&tz=Europe%2FBerlin'},
+{date:'2026-11-02T10:30:00+01:00',ccy:'GBP',event:'UK Final Manufacturing PMI · Oct 2026',
+ match:/^(?:(?:UK|British) )?(?:Final )?Manufacturing PMI(?: ·.*)?$/i,importance:'LOW',fullScheduleOnly:true,
+ scheduleVerificationStatus:'verified-secondary-schedule',source:'Economic calendar · 2 Nov 2026 10:30 CET (secondary schedule)',
+ url:'https://sruth.app/calendar?date=2026-11-02&month=2026-11&tz=Europe%2FBerlin'},
+
  // Next-week high-impact publisher-verified schedule (2–6 Nov 2026).
  // Dates and times use Europe/Skopje CET (UTC+1). The US moves to EST on 1 Nov.
  // These are SCHEDULE-ONLY rows: never fabricate actual, consensus or release status.
