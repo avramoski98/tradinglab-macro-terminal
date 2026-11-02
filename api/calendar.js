@@ -3,6 +3,37 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 2 NOV 2026 GERMAN RETAIL SALES · SEPTEMBER (DESTATS PRIMARY).
+// Destatis release No. 383 confirms calendar/seasonally adjusted real
+// -2.0% m/m, August revised to +1.2% from +1.3%.
+// Reuters poll +0.4% is secondary consensus, NOT a Destatis statistic.
+// Real y/y -2.3%; nominal m/m -1.5%. Keep metrics distinct.
+{day:'2026-11-02',time:'08:00',dateOverride:'2026-11-02T08:00:00+01:00',ccy:'EUR',
+ match:/^German Retail Sales m\/m(?: ·.*)?$/i,
+ event:'German Retail Sales m/m · Sep 2026 (real, SA)',
+ actual:'-2.0%',previous:'+1.2%',forecast:'—',importance:'LOW',
+ label:'RELEASED · DESTATIS PRIMARY · SEP -2.0% m/m · AUG REVISED +1.2%',
+ source:'Destatis press release 383, 2 Nov 2026: September real retail sales -2.0% m/m, August revised +1.2% (initial +1.3%); September real -2.3% y/y and nominal -1.5% m/m are separate measures. Reuters survey expected +0.4%, not a primary-source official consensus. Destatis methodology notes a new sample backdated to Jan 2026, with possible revisions.',
+ url:'https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/11/PD26_383_45212.html',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T07:38:00Z',force:true},
+
+// 2 NOV 2026 SWISS SEPTEMBER RETAIL SALES y/y (WIRE SECONDARY).
+// FinancialJuice timestamped 07:34:15 UTC: +1.6% y/y, prior +3.2%.
+// FSO official publication calendar confirms 2 Nov 08:30 CET but its
+// numeric bulletin was not independently retrievable at verification.
+// Do not promote wire actual/previous to primary or invent consensus.
+{day:'2026-11-02',time:'08:30',dateOverride:'2026-11-02T08:30:00+01:00',ccy:'CHF',
+ match:/^Retail Sales y\/y(?: ·.*)?$/i,
+ event:'Swiss Retail Sales y/y · Sep 2026 (wire-reported)',
+ actual:'+1.6%',previous:'+3.2%',forecast:'—',importance:'LOW',
+ label:'RELEASED · SWISS RETAIL +1.6% y/y · FINANCIALJUICE SECONDARY',
+ source:'FinancialJuice 2 Nov 2026 07:34:15 UTC wire: Swiss Retail Sales y/y +1.6%, previous +3.2%; no independently verified consensus. Swiss FSO official publication schedule confirms 2 Nov 08:30 CET for September retail trade, but the current primary numeric table was not independently retrieved. Treat wire actual and prior as secondary pending FSO reconciliation.',
+ url:'https://www.financialjuice.com/News/9832195/Swiss-Retail-Sales-YoY-Actual-16-Forecast---Previous-32.aspx?xy=rss',
+ status:'verified-secondary',sourcePublishedAt:'2026-11-02T07:34:15Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T07:39:00Z',force:true},
+
+
 // RBA OFFICIAL · OCT 2026 INDEX OF COMMODITY PRICES · RELEASED 2 NOV.
 // The ForexFactory "Commodity Prices y/y" headline is the RBA SDR-terms
 // year-on-year series, NOT the Australian-dollar series (+4.6% y/y).
