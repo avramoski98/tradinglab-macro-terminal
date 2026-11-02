@@ -2,6 +2,19 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+// US ISM MANUFACTURING OCT 2026 · PRIMARY ISM PUBLISHED 2 NOV 10:00 EST.
+// Reuters survey 54.5 is secondary consensus, not an official ISM statistic.
+// Do not mechanically convert a headline beat into a USD/G10 ranking change.
+{day:'2026-11-02',time:'16:00',dateOverride:'2026-11-02T16:00:00+01:00',ccy:'USD',
+ match:/ISM.*Manufacturing|Manufacturing PMI.*ISM/i,
+ event:'ISM Manufacturing PMI · Oct 2026 (ISM official)',
+ actual:'55.5',previous:'54.5',forecast:'—',importance:'HIGH',
+ label:'RELEASED · US ISM OCT 55.5 · PRIMARY VERIFIED · PRICES 75.2',
+ source:'Institute for Supply Management official 2 Nov 2026 release: October manufacturing PMI 55.5 vs September 54.5; new orders 55.5 vs 55.3, production 59.0 vs 56.7, employment 52.4 vs 52.7, prices paid 75.2 vs 77.9, supplier deliveries 59.1 vs 59.0. Reuters survey consensus 54.5 is secondary and intentionally not entered as official forecast. Prices remain elevated despite easing; do not mechanically change structural USD bias.',
+ url:'https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02T15:00:00Z',releaseTimeVerified:true,
+ verifiedAt:'2026-11-02T15:16:00Z',force:true},
+
 // 2 NOV 2026 · CANADA OCTOBER MANUFACTURING PMI / S&P GLOBAL SECONDARY.
 // FinancialJuice timestamped release 14:31:40 UTC reports October 49.6 vs
 // September 51.5. Original S&P bulletin / licensed historical data not retrieved.
