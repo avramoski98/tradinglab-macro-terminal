@@ -2416,3 +2416,43 @@ test('31 Oct verified G10 policy facts override archived 3M rate fields',()=>{
  assert.ok(html.includes("['Latest Policy Decision',r.lastDecision]"),'drawer must expose decision provenance');
  assert.ok(html.includes('BASE = archived 3M macro / policy thesis'),'qualitative bias must not be presented as current pricing');
 });
+
+
+test('2 Nov Europe final manufacturing PMI Reuters releases clear overdue without treating flash as final',()=>{
+ const expected=[
+  ['French Final Manufacturing PMI','49.5','50.6','2026-11-02T09:50:00+01:00'],
+  ['German Final Manufacturing PMI','54.2','53.9','2026-11-02T09:55:00+01:00'],
+  ['Euro Area Final Manufacturing PMI','52.7','52.9','2026-11-02T10:00:00+01:00']
+ ];
+ const liveEvents=expected.map(([name,, ,date])=>({date,currency:'EUR',event:name,actual:'—',releaseState:'overdue',importance:'LOW'}));
+ for(const payload of [{mode:'live',events:liveEvents},{mode:'schedule-fallback',events:[]}]){
+  const out=applyVerifiedReleaseOverlay(payload,{includeFullSchedule:true});
+  for(const [name,actual,previous,date] of expected){
+   const matches=out.events.filter(x=>x.currency==='EUR'&&x.date===date&&x.event.startsWith(name));
+   assert.equal(matches.length,1,payload.mode+' must have one '+name);
+   const row=matches[0];
+   assert.equal(row.releaseState,'released');
+   assert.equal(row.actual,actual);
+   assert.equal(row.previous,previous);
+   assert.equal(row.forecast,'—','do not confuse preliminary estimate with survey consensus');
+   assert.equal(row.verificationStatus,'verified-secondary');
+   assert.equal(row.releaseTimeVerified,false);
+   assert.match(row.sourceUrl,/reuters\.com/);
+   assert.match(row.source,/2 Nov 2026/);
+  }
+  for(const [name,ccy] of [['Spanish Manufacturing PMI','EUR'],['Swiss procure.ch Manufacturing PMI','CHF']]){
+   const rows=out.events.filter(x=>x.currency===ccy&&x.event.startsWith(name));
+   assert.equal(rows.length,1,'keep one '+name+' in '+payload.mode);
+   assert.equal(rows[0].actual,'—','never reuse flash or September reading as October final');
+   assert.equal(rows[0].releaseState,'overdue','unverified past release stays overdue');
+  }
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ const start=html.indexOf('function weekly(){');
+ const weekly=html.slice(start,start+14000);
+ assert.match(weekly,/Euro Area final October PMI <b>52\.7<\/b>/);
+ assert.match(weekly,/France <b>49\.5<\/b>/);
+ assert.match(weekly,/Spain and Swiss October PMI Actual are still unverified/);
+ assert.match(html,/MACRO WATCH · 02 НОЕ 2026/);
+ assert.match(html,/These are 2 Nov FINAL figures independently reported by Reuters/);
+});
