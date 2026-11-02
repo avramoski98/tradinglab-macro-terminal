@@ -1733,7 +1733,7 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
   rows.push({date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',country:o.ccy,currency:o.ccy,event:o.event,
    importance:o.importance,previous:'—',forecast:'—',actual:'—',label:upcoming?(o.approximate?'Scheduled · approximate time':'Scheduled · official'):'OVERDUE · unverified',
    impact:'Neutral',releaseState:upcoming?'scheduled':'overdue',source:o.source,sourceUrl:o.url,
-   verificationStatus:o.scheduleVerificationStatus||'official-schedule',releaseTimeVerified:o.scheduleVerificationStatus?false:(o.approximate?false:(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)?true:null)),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
+   verificationStatus:o.scheduleVerificationStatus||'official-schedule',releaseTimeVerified:o.scheduleVerificationStatus?false:(o.approximate?false:((o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event))||(o.ccy==='USD'&&/Senior Loan Officer Opinion Survey/.test(o.event))?true:null)),lastUpdate:null,forecastVerificationStatus:'provider-unverified'});
  }
  // ForexFactory's "all day" German preliminary CPI slot is not an 08:29
  // publication. Destatis October 2026 flash CPI is scheduled for 14:00 CET
