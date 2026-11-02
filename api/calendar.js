@@ -1599,6 +1599,13 @@ const OFFICIAL_UPCOMING=[
  // Dates and times use Europe/Skopje CET (UTC+1). The US moves to EST on 1 Nov.
  // These are SCHEDULE-ONLY rows: never fabricate actual, consensus or release status.
  {date:'2026-11-02T16:00:00+01:00',ccy:'USD',event:'ISM Manufacturing PMI · Oct',match:/ISM.*Manufacturing|Manufacturing PMI.*ISM/i,importance:'HIGH',source:'Institute for Supply Management · official 2026 release calendar, 2 Nov 10:00 EST',url:'https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/'},
+ // Fed official November 2026 statistical release calendar: 2 Nov 14:00 EST = 20:00 CET.
+ // SLOOS is a qualitative multi-metric survey; do not invent a numeric Actual.
+ // Keep it visible as awaiting verification/OVERDUE even when ForexFactory falls back.
+ {date:'2026-11-02T20:00:00+01:00',ccy:'USD',event:'Fed Senior Loan Officer Opinion Survey (SLOOS) · Oct 2026',
+  match:/Loan Officer (?:Opinion )?Survey|SLOOS/i,importance:'MED',
+  source:'Federal Reserve Board · official November 2026 calendar, 2 Nov 14:00 EST',
+  url:'https://www.federalreserve.gov/newsevents/2026-november.htm'},
  // 3 Nov 14:30 AEDT = 04:30 CET. The RBA statement is released with the decision.
  {date:'2026-11-03T04:30:00+01:00',ccy:'AUD',event:'RBA Rate Decision & Statement on Monetary Policy · Nov',match:/RBA.*Rate|Cash Rate|Reserve Bank of Australia.*Rate|RBA Monetary Policy Decision/i,importance:'EXTREME',source:'Reserve Bank of Australia · official coming-up schedule, 3 Nov 14:30 AEDT',url:'https://www.rba.gov.au/coming-up/'},
  // 3 Nov 10:00 EST = 16:00 CET.
@@ -1683,7 +1690,18 @@ export function applyVerifiedReleaseOverlay(payload,options={}){
      verificationStatus:'official-schedule',releaseTimeVerified:false,label:'Scheduled · approximate time',
      forecastVerificationStatus:'provider-unverified'};
    }
-   if(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)&&rows[matching].releaseState!=='released'){
+   if(o.ccy==='USD'&&/Senior Loan Officer Opinion Survey/.test(o.event)&&rows[matching].releaseState!=='released'){
+   // ForexFactory may use an approximate 20:03 CET time; the Fed confirms 20:00 CET.
+   // A past scheduled multi-metric survey without verified publication remains OVERDUE.
+   const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
+   rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
+    event:o.event,importance:o.importance,source:o.source,sourceUrl:o.url,
+    verificationStatus:'official-schedule',releaseTimeVerified:true,
+    actual:'—',forecast:'—',releaseState:state,
+    label:state==='scheduled'?'Scheduled · official':'OVERDUE · publication unverified',
+    forecastVerificationStatus:'provider-unverified',lastUpdate:null};
+  }
+  if(o.ccy==='EUR'&&/Bank Lending Survey/i.test(o.event)&&rows[matching].releaseState!=='released'){
     // Prefer the official ECB time and schedule metadata over unverified provider fields.
     const state=Date.parse(o.date)>Date.now()?'scheduled':'overdue';
     rows[matching]={...rows[matching],date:o.date,sourceDate:o.date,timeZone:'Europe/Skopje',
