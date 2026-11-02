@@ -2526,3 +2526,38 @@ test('Canada Oct 2026 Manufacturing PMI release clears live overdue and fallback
  assert.ok(html.includes('CANADA MANUFACTURING PMI / CAD · FINANCIALJUICE SECONDARY'));
  assert.ok(html.includes('CAD / S&amp;P GLOBAL MANUFACTURING PMI · SECONDARY'));
 });
+
+
+test('US 2 November 2026 ISM headline and prices are primary, S&P final is secondary, and no duplicate overdue events remain',()=>{
+ const payload={mode:'live',events:[
+  {date:'2026-11-02T16:00:00+01:00',currency:'USD',event:'ISM Manufacturing PMI',actual:'—',releaseState:'overdue',importance:'HIGH'},
+  {date:'2026-11-02T16:00:00+01:00',currency:'USD',event:'ISM Manufacturing Prices',actual:'—',releaseState:'overdue',importance:'HIGH'},
+  {date:'2026-11-02T15:45:00+01:00',currency:'USD',event:'Final Manufacturing PMI',actual:'—',releaseState:'overdue',importance:'MED'},
+  {date:'2026-11-02T16:00:00+01:00',currency:'USD',event:'Construction Spending m/m',actual:'—',releaseState:'overdue',importance:'LOW'}
+ ]};
+ const out=applyVerifiedReleaseOverlay(payload);
+ const day=out.events.filter(e=>e.currency==='USD'&&String(e.date).startsWith('2026-11-02'));
+ const ism=day.filter(e=>/ISM Manufacturing PMI/i.test(e.event));
+ const prices=day.filter(e=>/ISM Manufacturing Prices/i.test(e.event));
+ const sp=day.filter(e=>/S&P Global Final Manufacturing PMI|US S&P Global Final Manufacturing PMI/i.test(e.event));
+ assert.equal(ism.length,1,'ISM headline must not duplicate');
+ assert.equal(prices.length,1,'ISM prices must not duplicate');
+ assert.equal(sp.length,1,'S&P final must not duplicate');
+ assert.equal(ism[0].actual,'55.5');
+ assert.equal(ism[0].previous,'54.5');
+ assert.equal(ism[0].verificationStatus,'verified-primary');
+ assert.equal(prices[0].actual,'75.2');
+ assert.equal(prices[0].previous,'77.9');
+ assert.equal(prices[0].verificationStatus,'verified-primary');
+ assert.equal(sp[0].actual,'54.9');
+ assert.equal(sp[0].previous,'55.9');
+ assert.equal(sp[0].verificationStatus,'verified-secondary');
+ for(const e of [...ism,...prices,...sp])assert.equal(e.releaseState,'released');
+ const construction=day.find(e=>/Construction Spending/.test(e.event));
+ assert.equal(construction.actual,'—','Census September result must not be invented');
+ assert.equal(construction.releaseState,'overdue');
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.includes('NEW · 2 NOV · USD / US MANUFACTURING:'));
+ assert.ok(html.includes('US September Construction Spending remains OVERDUE'));
+ assert.ok(!html.includes('<b>UPCOMING HIGH IMPACT · 2–7 NOV (EUROPE/SKOPJE):</b> 2 Nov ISM Manufacturing;'));
+});
