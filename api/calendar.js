@@ -2,6 +2,24 @@
 // Source-confirmed releases, added without inventing market consensus.
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
+
+// RBA OFFICIAL · OCT 2026 INDEX OF COMMODITY PRICES · RELEASED 2 NOV.
+// The ForexFactory "Commodity Prices y/y" headline is the RBA SDR-terms
+// year-on-year series, NOT the Australian-dollar series (+4.6% y/y).
+// Official October bulletin: +12.5% y/y SDR vs September +15.5% y/y;
+// -1.3% m/m SDR and -0.3% m/m AUD. No primary-verified survey consensus.
+// Official bulletin verifies publication date but not precise intraday time.
+{day:'2026-11-02',time:'06:30',dateOverride:'2026-11-02T06:30:00+01:00',ccy:'AUD',
+ match:/^(?:(?:RBA )?Commodity Prices y\/y|RBA Commodity Index(?: y\/y)?|Index of Commodity Prices(?: y\/y)?)(?: ·.*)?$/i,
+ event:'RBA Index of Commodity Prices y/y · Oct 2026 (SDR terms)',
+ actual:'+12.5%',previous:'+15.5%',forecast:'—',importance:'LOW',
+ label:'RELEASED · RBA PRIMARY · OCT +12.5% y/y SDR',
+ source:'Reserve Bank of Australia, Index of Commodity Prices October 2026, released 2 Nov: +12.5% y/y in SDR terms (September +15.5%); +4.6% y/y in AUD terms; October -1.3% m/m SDR and -0.3% m/m AUD. Do not conflate currencies or infer a verified market consensus.',
+ url:'https://www.rba.gov.au/statistics/frequency/commodity-prices/2026/icp-1026.html',
+ status:'verified-primary',sourcePublishedAt:'2026-11-02',releaseTimeVerified:false,
+ verifiedAt:'2026-11-02T06:25:00Z',force:true},
+
+
 // AUD BUILDING APPROVALS · SEP 2026 · 2 NOV PRIMARY.
 // ABS official September release, published 2 Nov 11:30 AEDT = 01:30 CET.
 // The 5.1% is seasonally adjusted total dwelling approvals m/m;
