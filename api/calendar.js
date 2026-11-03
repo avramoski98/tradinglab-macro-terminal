@@ -11,7 +11,7 @@ const VERIFIED=[
 // Keep numeric verification secondary until the original Stats NZ page text/CSV
 // is directly retrieved; never invent market consensus.
 {day:'2026-11-02',time:'22:45',dateOverride:'2026-11-02T22:45:00+01:00',ccy:'NZD',
- match:/^(?:Building Consents|Building Permits)(?: m\\/m)?/i,
+ match:/^(?:Building Consents|Building Permits)(?: m\/m)?/i,
  event:'Building Consents m/m · Sep 2026',
  actual:'-7.9%',previous:'+5.3%',forecast:'—',importance:'LOW',
  label:'RELEASED · STATS NZ SEPTEMBER CONSENTS -7.9% M/M',
