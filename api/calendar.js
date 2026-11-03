@@ -3,6 +3,24 @@
 const VERIFIED_AT='2026-10-30T07:00:03.000Z';
 const VERIFIED=[
 
+// 3 NOV NZDT · STATS NZ SEPTEMBER 2026 BUILDING CONSENTS · PUBLICATION VERIFIED.
+// Official Stats NZ release is live. The full numeric statement was independently
+// corroborated in the republication of the Stats NZ release by National Tribune:
+// seasonally adjusted new-dwelling consents -7.9% m/m in Sep vs +5.3% Aug revised.
+// This is the building-consents m/m measure, not the 18% y/y annual dwellings count.
+// Keep numeric verification secondary until the original Stats NZ page text/CSV
+// is directly retrieved; never invent market consensus.
+{day:'2026-11-02',time:'22:45',dateOverride:'2026-11-02T22:45:00+01:00',ccy:'NZD',
+ match:/^(?:Building Consents|Building Permits)(?: m\\/m)?/i,
+ event:'Building Consents m/m · Sep 2026',
+ actual:'-7.9%',previous:'+5.3%',forecast:'—',importance:'LOW',
+ label:'RELEASED · STATS NZ SEPTEMBER CONSENTS -7.9% M/M',
+ source:'Stats NZ Building consents issued: September 2026, released 3 Nov 10:45 NZDT. Seasonally adjusted number of new dwellings consented fell 7.9% m/m after revised August +5.3%. Official release publication confirmed; numeric detail corroborated by National Tribune republication of Stats NZ text; market consensus not independently verified.',
+ url:'https://www.stats.govt.nz/information-releases/building-consents-issued-September-2026/',status:'verified-secondary',
+ sourcePublishedAt:'2026-11-02T22:45:00+01:00',releaseTimeVerified:true,
+ verifiedAt:'2026-11-03T00:30:00Z',force:true},
+
+
 // 2 NOV 2026 · FED OCTOBER SLOOS · OFFICIAL PRIMARY PUBLICATION VERIFIED.
 // The Federal Reserve's current October 2026 survey page was updated 2 Nov.
 // This is a qualitative, multi-metric Q3 lending survey, not a single-number
